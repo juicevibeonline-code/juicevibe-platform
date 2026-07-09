@@ -21,7 +21,7 @@ const columns = [
     label: "Status",
     render: (item: any) => (
       <span className={`inline-flex items-center gap-1 text-xs font-medium px-2 py-1 rounded-full ${
-        item.status === "active" ? "bg-primary/10 text-primary" : "bg-gray-100 text-gray-500"
+        item.status === "active" ? "bg-primary/10 text-primary" : "bg-gray-100 dark:bg-white/5 text-gray-500 dark:text-gray-400"
       }`}>
         {item.status}
       </span>
@@ -48,10 +48,10 @@ export default function CouponsPage() {
         <div className="absolute top-0 right-0 -mt-10 -mr-10 w-64 h-64 bg-pink/20 rounded-full blur-[80px]" />
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-black text-gray-800 tracking-tight">Coupons</h1>
-            <p className="text-gray-500 font-medium mt-2">Create and manage promotional coupons</p>
+            <h1 className="text-3xl font-black text-foreground tracking-tight">Coupons</h1>
+            <p className="text-muted font-medium mt-2">Create and manage promotional coupons</p>
           </div>
-          <button className="flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-primary to-primary-dark text-white rounded-xl shadow-[0_4px_15px_rgba(34,197,94,0.3)] hover:scale-105 transition-all duration-300 font-bold">
+          <button className="flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-primary to-primary-dark text-white rounded-xl shadow-[0_4px_15px_rgba(34,197,94,0.3)] hover:scale-105 transition-all duration-300 font-bold cursor-pointer">
             <Plus className="w-5 h-5" />
             Create Coupon
           </button>

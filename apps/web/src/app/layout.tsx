@@ -120,6 +120,7 @@ export default function RootLayout({
     <html
       lang="en"
       className={`${poppins.variable} ${inter.variable}`}
+      suppressHydrationWarning
     >
       <head>
         <script

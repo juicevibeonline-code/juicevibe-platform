@@ -21,7 +21,7 @@ const columns = [
     label: "Status",
     render: (item: any) => (
       <span className={`inline-flex items-center gap-1 text-xs font-medium px-2 py-1 rounded-full ${
-        item.status === "unread" ? "bg-primary/10 text-primary" : "bg-gray-100 text-gray-500"
+        item.status === "unread" ? "bg-primary/10 text-primary" : "bg-gray-100 dark:bg-white/5 text-gray-500 dark:text-gray-400"
       }`}>
         {item.status === "unread" ? <Mail className="w-3 h-3" /> : <MailOpen className="w-3 h-3" />}
         {item.status}
@@ -48,8 +48,8 @@ export default function MessagesPage() {
       <div className="relative p-8 rounded-[2rem] glass-panel overflow-hidden mb-8">
         <div className="absolute top-0 right-0 -mt-10 -mr-10 w-64 h-64 bg-primary/20 rounded-full blur-[80px]" />
         <div className="relative z-10">
-          <h1 className="text-3xl font-black text-gray-800 tracking-tight">Messages</h1>
-          <p className="text-gray-500 font-medium mt-2">View and manage contact form submissions</p>
+          <h1 className="text-3xl font-black text-foreground tracking-tight">Messages</h1>
+          <p className="text-muted font-medium mt-2">View and manage contact form submissions</p>
         </div>
       </div>
       <div className="px-2">

@@ -133,58 +133,58 @@ export function MenuItemCard({ item, index }: MenuItemCardProps) {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-40px" }}
       transition={{ duration: 0.5, delay: index * 0.02, type: "spring", stiffness: 100, damping: 18 }}
-      whileHover={{ y: -8, transition: { duration: 0.3 } }}
+      whileHover={{ y: -6, transition: { duration: 0.3 } }}
       className="h-full"
     >
-      <div className="group relative flex flex-col justify-between h-full rounded-[2.5rem] bg-white/45 backdrop-blur-xl border border-white/50 shadow-[0_10px_35px_rgba(0,0,0,0.03)] p-6 hover:shadow-[0_20px_50px_rgba(0,0,0,0.08)] hover:bg-white/60 hover:border-white/70 transition-all duration-500 overflow-hidden">
+      <div className="group relative flex flex-col justify-between h-full rounded-[2rem] bg-white/70 dark:bg-[#111813]/60 backdrop-blur-xl border border-white/80 dark:border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.02)] hover:shadow-[0_20px_45px_rgba(0,0,0,0.06)] hover:bg-white dark:hover:bg-[#111813]/85 hover:border-white dark:hover:border-white/15 transition-all duration-500 p-5 overflow-hidden">
         
-        {/* Top Badges Row */}
-        <div className="relative z-10 flex items-center justify-between gap-2 mb-4">
-          <span className={cn("px-3 py-1 rounded-full border text-[10px] font-extrabold uppercase tracking-wider", theme.badgeBg)}>
-            {theme.tag}
-          </span>
-          {item.popular && (
-            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-amber-500/10 border border-amber-500/25 text-amber-600 text-[10px] font-extrabold uppercase tracking-wider">
-              <Star className="h-3 w-3 fill-current" />
-              Popular
+        {/* Dynamic Image Container */}
+        <div className="relative w-full aspect-[4/3] rounded-2xl overflow-hidden bg-gradient-to-br from-gray-50/80 to-gray-100/40 dark:from-white/5 dark:to-white/10 border border-gray-100 dark:border-white/5 flex items-center justify-center mb-5">
+          {/* Top Badges Overlay */}
+          <div className="absolute top-3 left-3 right-3 z-20 flex items-center justify-between gap-2 pointer-events-none">
+            <span className={cn("px-2.5 py-0.5 rounded-full border text-[9px] font-extrabold uppercase tracking-wider shadow-sm", theme.badgeBg)}>
+              {theme.tag}
             </span>
-          )}
-        </div>
+            {item.popular && (
+              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-amber-500/10 backdrop-blur-md border border-amber-500/25 text-amber-600 text-[9px] font-extrabold uppercase tracking-wider shadow-sm">
+                <Star className="h-2.5 w-2.5 fill-current" />
+                Popular
+              </span>
+            )}
+          </div>
 
-        {/* Dynamic Glowing Image Container */}
-        <div className="relative w-full h-52 flex items-center justify-center mb-6 mt-2">
           {/* Radial category glow */}
-          <div className={cn("absolute inset-0 rounded-full blur-3xl opacity-70 z-0 bg-radial pointer-events-none scale-90", theme.glow)} />
+          <div className={cn("absolute inset-0 rounded-full blur-2xl opacity-60 z-0 bg-radial pointer-events-none scale-75 transition-transform duration-500 group-hover:scale-95", theme.glow)} />
           
           {item.image ? (
-            <div className="relative w-44 h-44 z-10 drop-shadow-[0_20px_25px_rgba(0,0,0,0.25)] animate-float-slow group-hover:scale-110 group-hover:-translate-y-2 transition-all duration-500 ease-out">
+            <div className="relative w-[75%] h-[75%] z-10 drop-shadow-[0_8px_16px_rgba(0,0,0,0.08)] group-hover:scale-110 group-hover:-translate-y-1.5 transition-all duration-500 ease-out">
               <Image
                 src={encodeURI(item.image)}
                 alt={item.name}
                 fill
                 sizes="(max-w-768px) 150px, 180px"
-                className="object-contain"
+                className="object-contain p-2"
               />
             </div>
           ) : (
-            <div className="relative text-7xl select-none z-10 animate-float group-hover:scale-110 transition-transform duration-500">
+            <div className="relative text-6xl select-none z-10 group-hover:scale-110 group-hover:-translate-y-1.5 transition-transform duration-500">
               {theme.emoji}
             </div>
           )}
         </div>
 
         {/* Product Details Section */}
-        <div className="flex-1 flex flex-col justify-start mb-6">
-          <h3 className="font-heading text-xl font-extrabold text-dark-green tracking-tight leading-tight group-hover:text-primary transition-colors duration-300">
+        <div className="flex-1 flex flex-col justify-start mb-4">
+          <h3 className="font-heading text-lg font-extrabold text-dark-green dark:text-white tracking-tight leading-tight group-hover:text-primary transition-colors duration-300">
             {item.name}
           </h3>
-          <p className="mt-2 text-sm text-gray-500/90 leading-relaxed font-medium">
+          <p className="mt-2 text-xs text-gray-500 dark:text-gray-400 leading-relaxed font-medium line-clamp-2">
             {item.description}
           </p>
           {item.flavours && (
-            <div className="mt-3 flex flex-wrap gap-1.5">
+            <div className="mt-3 flex flex-wrap gap-1">
               {item.flavours.map((flavour) => (
-                <span key={flavour} className="text-[10px] font-semibold bg-primary/5 text-primary border border-primary/10 rounded-md px-1.5 py-0.5">
+                <span key={flavour} className="text-[9px] font-semibold bg-primary/5 text-primary border border-primary/10 rounded-md px-1.5 py-0.5">
                   {flavour}
                 </span>
               ))}
@@ -193,10 +193,10 @@ export function MenuItemCard({ item, index }: MenuItemCardProps) {
         </div>
 
         {/* Footer Actions (Price & Order CTA) */}
-        <div className="relative z-10 flex items-center justify-between pt-4 border-t border-dark-green/5 mt-auto">
+        <div className="relative z-10 flex items-center justify-between pt-3 border-t border-gray-100 dark:border-white/5 mt-auto">
           <div className="flex flex-col">
-            <span className="text-[10px] font-extrabold text-gray-400 uppercase tracking-widest leading-none">Price</span>
-            <span className="font-heading text-2xl font-black text-dark-green mt-1">
+            <span className="text-[9px] font-extrabold text-gray-400 uppercase tracking-widest leading-none">Price</span>
+            <span className="font-heading text-xl font-black text-dark-green dark:text-primary mt-1">
               {formatPrice(item.price)}
             </span>
           </div>
@@ -205,8 +205,8 @@ export function MenuItemCard({ item, index }: MenuItemCardProps) {
             onClick={handleAddToCart}
             aria-label={`Order ${item.name}`}
             className={cn(
-              "flex h-11 w-11 items-center justify-center rounded-full text-white shadow-lg active:scale-90 hover:scale-105 transition-all duration-300 outline-none",
-              isAdded ? "bg-green-500 scale-105 shadow-green-500/30" : `${theme.btnBg} hover:rotate-90`
+              "flex h-10 w-10 items-center justify-center rounded-full text-white shadow-md active:scale-95 hover:scale-105 transition-all duration-300 outline-none",
+              isAdded ? "bg-green-500 shadow-green-500/30" : `${theme.btnBg} hover:rotate-90`
             )}
           >
             {isAdded ? (

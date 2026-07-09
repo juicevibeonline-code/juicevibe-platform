@@ -34,9 +34,9 @@ const columns = [
     label: "",
     render: () => (
       <div className="flex items-center gap-2">
-        <button className="p-1.5 rounded-lg hover:bg-blue-50 text-blue-600 transition-colors"><Eye className="w-4 h-4" /></button>
-        <button className="p-1.5 rounded-lg hover:bg-green-50 text-primary transition-colors"><Edit className="w-4 h-4" /></button>
-        <button className="p-1.5 rounded-lg hover:bg-pink/10 text-pink transition-colors"><Trash2 className="w-4 h-4" /></button>
+        <button className="p-1.5 rounded-lg hover:bg-blue-500/10 text-blue-600 transition-colors cursor-pointer"><Eye className="w-4 h-4" /></button>
+        <button className="p-1.5 rounded-lg hover:bg-primary/10 text-primary transition-colors cursor-pointer"><Edit className="w-4 h-4" /></button>
+        <button className="p-1.5 rounded-lg hover:bg-pink/10 text-pink transition-colors cursor-pointer"><Trash2 className="w-4 h-4" /></button>
       </div>
     ),
   },
@@ -52,10 +52,10 @@ export default function BlogPage() {
         <div className="absolute top-0 right-0 -mt-10 -mr-10 w-64 h-64 bg-yellow/20 rounded-full blur-[80px]" />
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-black text-gray-800 tracking-tight">Blog Management</h1>
-            <p className="text-gray-500 font-medium mt-2">Manage blog posts and articles</p>
+            <h1 className="text-3xl font-black text-foreground tracking-tight">Blog Management</h1>
+            <p className="text-muted font-medium mt-2">Manage blog posts and articles</p>
           </div>
-          <button className="flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-primary to-primary-dark text-white rounded-xl shadow-[0_4px_15px_rgba(34,197,94,0.3)] hover:scale-105 transition-all duration-300 font-bold">
+          <button className="flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-primary to-primary-dark text-white rounded-xl shadow-[0_4px_15px_rgba(34,197,94,0.3)] hover:scale-105 transition-all duration-300 font-bold cursor-pointer">
             <Plus className="w-5 h-5" />
             New Post
           </button>
@@ -67,8 +67,8 @@ export default function BlogPage() {
           <button
             key={f}
             onClick={() => setFilter(f)}
-            className={`px-5 py-2 rounded-xl text-sm font-bold capitalize transition-all duration-300 hover:-translate-y-0.5 ${
-              filter === f ? "bg-gradient-to-r from-primary to-primary-dark text-white shadow-[0_4px_15px_rgba(34,197,94,0.3)]" : "bg-white/60 text-gray-600 hover:bg-white hover:text-gray-900 border border-white/80 shadow-sm"
+            className={`px-5 py-2 rounded-xl text-sm font-bold capitalize transition-all duration-300 hover:-translate-y-0.5 cursor-pointer ${
+              filter === f ? "bg-gradient-to-r from-primary to-primary-dark text-white shadow-[0_4px_15px_rgba(34,197,94,0.3)]" : "bg-white/60 dark:bg-white/5 text-muted hover:bg-white dark:hover:bg-white/10 hover:text-foreground border border-white/80 dark:border-white/5 shadow-sm"
             }`}
           >
             {f}

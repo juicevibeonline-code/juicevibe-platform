@@ -423,6 +423,7 @@ export function Hero() {
                       src={activeTheme.image}
                       alt={activeTheme.name}
                       fill
+                      sizes="280px"
                       className="object-contain filter drop-shadow-[0_20px_50px_rgba(0,0,0,0.12)] hover:scale-[1.03] transition-transform duration-500"
                       priority
                     />

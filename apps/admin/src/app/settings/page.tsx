@@ -16,8 +16,8 @@ export default function SettingsPage() {
       <div className="relative p-8 rounded-[2rem] glass-panel overflow-hidden mb-8">
         <div className="absolute top-0 right-0 -mt-10 -mr-10 w-64 h-64 bg-orange/20 rounded-full blur-[80px]" />
         <div className="relative z-10">
-          <h1 className="text-3xl font-black text-gray-800 tracking-tight">Settings</h1>
-          <p className="text-gray-500 font-medium mt-2">Manage your business configuration and preferences</p>
+          <h1 className="text-3xl font-black text-foreground tracking-tight">Settings</h1>
+          <p className="text-muted font-medium mt-2">Manage your business configuration and preferences</p>
         </div>
       </div>
 
@@ -64,7 +64,7 @@ export default function SettingsPage() {
       {/* Save Button */}
       <button
         onClick={handleSave}
-        className="flex items-center justify-center gap-2 w-full sm:w-auto px-8 py-3.5 bg-gradient-to-r from-primary to-primary-dark text-white rounded-xl hover:scale-105 transition-all duration-300 font-bold shadow-[0_4px_15px_rgba(34,197,94,0.3)] mt-8"
+        className="flex items-center justify-center gap-2 w-full sm:w-auto px-8 py-3.5 bg-gradient-to-r from-primary to-primary-dark text-white rounded-xl hover:scale-105 transition-all duration-300 font-bold shadow-[0_4px_15px_rgba(34,197,94,0.3)] mt-8 cursor-pointer"
       >
         <Save className="w-5 h-5" />
         {saved ? "Changes Saved!" : "Save Configuration"}
@@ -76,7 +76,7 @@ export default function SettingsPage() {
 function SettingsSection({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div className="glass-panel rounded-3xl p-6 md:p-8 hover:shadow-lg transition-shadow duration-300">
-      <h2 className="text-xl font-bold mb-6 text-gray-800 tracking-tight">{title}</h2>
+      <h2 className="text-xl font-bold mb-6 text-foreground tracking-tight">{title}</h2>
       {children}
     </div>
   );
@@ -85,11 +85,11 @@ function SettingsSection({ title, children }: { title: string; children: React.R
 function FormField({ label, defaultValue, type = "text", className }: { label: string; defaultValue?: string; type?: string; className?: string }) {
   return (
     <div className={className}>
-      <label className="block text-sm font-bold text-gray-700 mb-2">{label}</label>
+      <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">{label}</label>
       <input
         type={type}
         defaultValue={defaultValue}
-        className="w-full px-4 py-2.5 rounded-xl border border-transparent bg-white/60 text-sm focus:outline-none focus:bg-white focus:border-primary/30 focus:shadow-[0_0_15px_rgba(34,197,94,0.1)] transition-all duration-300 font-medium text-gray-800"
+        className="w-full px-4 py-2.5 rounded-xl border border-transparent bg-white/60 dark:bg-white/5 text-sm focus:outline-none focus:bg-white dark:focus:bg-black/20 focus:border-primary/30 focus:shadow-[0_0_15px_rgba(34,197,94,0.1)] transition-all duration-300 font-medium text-foreground"
       />
     </div>
   );

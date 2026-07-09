@@ -24,7 +24,7 @@ const columns = [
     label: "Status",
     render: (item: any) => (
       <span className={`inline-flex items-center gap-1 text-xs font-medium px-2 py-1 rounded-full ${
-        item.status === "active" ? "bg-primary/10 text-primary" : "bg-gray-100 text-gray-500"
+        item.status === "active" ? "bg-primary/10 text-primary" : "bg-gray-100 dark:bg-white/5 text-gray-500 dark:text-gray-400"
       }`}>
         {item.status === "active" ? <Eye className="w-3 h-3" /> : <EyeOff className="w-3 h-3" />}
         {item.status}
@@ -42,8 +42,8 @@ const columns = [
     label: "Actions",
     render: () => (
       <div className="flex items-center gap-2">
-        <button className="p-1.5 rounded-lg hover:bg-blue-50 text-blue-600 transition-colors"><Edit className="w-4 h-4" /></button>
-        <button className="p-1.5 rounded-lg hover:bg-pink/10 text-pink transition-colors"><Trash2 className="w-4 h-4" /></button>
+        <button className="p-1.5 rounded-lg hover:bg-blue-500/10 text-blue-600 transition-colors cursor-pointer"><Edit className="w-4 h-4" /></button>
+        <button className="p-1.5 rounded-lg hover:bg-pink/10 text-pink transition-colors cursor-pointer"><Trash2 className="w-4 h-4" /></button>
       </div>
     ),
   },
@@ -62,7 +62,7 @@ export default function MenuPage() {
             <h1 className="text-3xl font-black text-foreground tracking-tight">Menu Management</h1>
             <p className="text-muted font-medium mt-2">Manage your menu items, prices, and categories</p>
           </div>
-          <button onClick={() => setIsAddModalOpen(true)} className="flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-primary to-primary-dark text-white rounded-xl shadow-[0_4px_15px_rgba(34,197,94,0.3)] hover:scale-105 transition-all duration-300 font-bold">
+          <button onClick={() => setIsAddModalOpen(true)} className="flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-primary to-primary-dark text-white rounded-xl shadow-[0_4px_15px_rgba(34,197,94,0.3)] hover:scale-105 transition-all duration-300 font-bold cursor-pointer">
             <Plus className="w-5 h-5" />
             Add New Item
           </button>
@@ -72,7 +72,7 @@ export default function MenuPage() {
       {/* Category Tabs */}
       <div className="flex gap-2 flex-wrap px-2">
         {["All", "Milkshakes", "Fresh Juices", "Smoothies", "Mocktails", "Lassi", "Tea", "Coffee"].map((cat) => (
-          <button key={cat} className={`px-5 py-2 rounded-xl text-sm font-bold transition-all duration-300 hover:-translate-y-0.5 ${
+          <button key={cat} className={`px-5 py-2 rounded-xl text-sm font-bold transition-all duration-300 hover:-translate-y-0.5 cursor-pointer ${
             cat === "All" ? "bg-gradient-to-r from-primary to-primary-dark text-white shadow-[0_4px_15px_rgba(34,197,94,0.3)]" : "bg-white/60 dark:bg-white/5 text-muted hover:bg-white dark:hover:bg-white/10 hover:text-foreground border border-transparent dark:border-white/10 shadow-sm"
           }`}>
             {cat}
@@ -87,7 +87,7 @@ export default function MenuPage() {
       <Modal isOpen={isAddModalOpen} onClose={() => setIsAddModalOpen(false)} title="Add New Item" size="md">
         <form className="space-y-6" onSubmit={(e) => { e.preventDefault(); setIsAddModalOpen(false); }}>
           {/* Image Upload Placeholder */}
-          <div className="w-full h-40 rounded-2xl border-2 border-dashed border-border/60 bg-gray-50/50 dark:bg-white/5 flex flex-col items-center justify-center cursor-pointer hover:bg-gray-100 dark:hover:bg-white/10 hover:border-primary/50 transition-colors group">
+          <div className="w-full h-40 rounded-2xl border-2 border-dashed border-border/60 bg-gray-50/50 dark:bg-neutral-900/50 flex flex-col items-center justify-center cursor-pointer hover:bg-gray-100 dark:hover:bg-neutral-900/70 hover:border-primary/50 transition-colors group">
             <div className="w-12 h-12 rounded-xl bg-white dark:bg-black/20 shadow-sm flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
               <Plus className="w-6 h-6 text-muted group-hover:text-primary transition-colors" />
             </div>

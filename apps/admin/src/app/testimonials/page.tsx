@@ -19,7 +19,7 @@ const columns = [
     render: (item: any) => (
       <div className="flex items-center gap-0.5">
         {Array.from({ length: 5 }).map((_, i) => (
-          <Star key={i} className={`w-3.5 h-3.5 ${i < item.rating ? "text-yellow fill-yellow" : "text-gray-200"}`} />
+          <Star key={i} className={`w-3.5 h-3.5 ${i < item.rating ? "text-yellow fill-yellow" : "text-gray-200 dark:text-neutral-700"}`} />
         ))}
       </div>
     ),
@@ -62,8 +62,8 @@ export default function TestimonialsPage() {
       <div className="relative p-8 rounded-[2rem] glass-panel overflow-hidden mb-8">
         <div className="absolute top-0 right-0 -mt-10 -mr-10 w-64 h-64 bg-orange/20 rounded-full blur-[80px]" />
         <div className="relative z-10">
-          <h1 className="text-3xl font-black text-gray-800 tracking-tight">Testimonials</h1>
-          <p className="text-gray-500 font-medium mt-2">Manage customer reviews and feedback</p>
+          <h1 className="text-3xl font-black text-foreground tracking-tight">Testimonials</h1>
+          <p className="text-muted font-medium mt-2">Manage customer reviews and feedback</p>
         </div>
       </div>
       <div className="px-2">
