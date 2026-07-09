@@ -3,6 +3,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { X, ChevronLeft, ChevronRight } from "lucide-react";
 import { useEffect } from "react";
+import Image from "next/image";
 import type { GalleryImage } from "@/data/gallery";
 
 interface LightboxProps {
@@ -73,19 +74,24 @@ export function Lightbox({ images, currentIndex, onClose, onPrev, onNext }: Ligh
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0, scale: 0.9 }}
           transition={{ duration: 0.3 }}
-          className="relative max-h-[85vh] max-w-[90vw]"
+          className="relative flex flex-col items-center justify-center max-h-[90vh] max-w-[95vw]"
           onClick={(e) => e.stopPropagation()}
         >
           <div
-            className="flex items-center justify-center overflow-hidden rounded-2xl"
+            className="relative flex items-center justify-center overflow-hidden rounded-2xl bg-transparent"
             style={{
-              width: "min(80vw, 800px)",
-              height: "min(70vh, 600px)",
+              width: "min(90vw, 1000px)",
+              height: "min(75vh, 700px)",
             }}
           >
-            <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-primary/10 to-orange/10 text-8xl">
-              🧃
-            </div>
+            <Image
+              src={encodeURI(current.src)}
+              alt={current.alt}
+              fill
+              className="object-contain"
+              sizes="100vw"
+              priority
+            />
           </div>
           <div className="mt-4 text-center">
             <p className="text-lg font-medium text-white">{current.alt}</p>

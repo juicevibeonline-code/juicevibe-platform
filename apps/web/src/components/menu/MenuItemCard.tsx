@@ -141,12 +141,12 @@ export function MenuItemCard({ item, index }: MenuItemCardProps) {
         </div>
 
         {/* Dynamic Glowing Image Container */}
-        <div className="relative w-full h-44 flex items-center justify-center mb-6">
+        <div className="relative w-full h-52 flex items-center justify-center mb-6 mt-2">
           {/* Radial category glow */}
-          <div className={cn("absolute inset-0 rounded-full blur-2xl opacity-60 z-0 bg-radial pointer-events-none scale-75", theme.glow)} />
+          <div className={cn("absolute inset-0 rounded-full blur-3xl opacity-70 z-0 bg-radial pointer-events-none scale-90", theme.glow)} />
           
           {item.image ? (
-            <div className="relative w-36 h-36 z-10 drop-shadow-[0_12px_24px_rgba(0,0,0,0.1)] group-hover:scale-105 group-hover:-translate-y-1 transition-all duration-500 ease-out">
+            <div className="relative w-44 h-44 z-10 drop-shadow-[0_20px_25px_rgba(0,0,0,0.25)] animate-float-slow group-hover:scale-110 group-hover:-translate-y-2 transition-all duration-500 ease-out">
               <Image
                 src={encodeURI(item.image)}
                 alt={item.name}

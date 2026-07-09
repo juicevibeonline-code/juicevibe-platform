@@ -4,6 +4,8 @@ import { motion } from "framer-motion";
 import { Expand } from "lucide-react";
 import type { GalleryImage } from "@/data/gallery";
 
+import Image from "next/image";
+
 interface GalleryCardProps {
   image: GalleryImage;
   onOpen: (image: GalleryImage) => void;
@@ -17,16 +19,20 @@ export function GalleryCard({ image, onOpen, index }: GalleryCardProps) {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-50px" }}
       transition={{ duration: 0.4, delay: index * 0.05 }}
-      className="group relative cursor-pointer overflow-hidden rounded-2xl"
+      className="group relative cursor-pointer overflow-hidden rounded-2xl shadow-sm hover:shadow-xl transition-all duration-500"
       onClick={() => onOpen(image)}
     >
       <div
         className="relative w-full overflow-hidden rounded-2xl bg-gray-100"
         style={{ aspectRatio: `${image.width}/${image.height}` }}
       >
-        <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-primary/5 to-orange/5 text-6xl">
-          🧃
-        </div>
+        <Image
+          src={encodeURI(image.src)}
+          alt={image.alt}
+          fill
+          sizes="(max-w-768px) 100vw, (max-w-1200px) 50vw, 33vw"
+          className="object-cover transition-transform duration-700 group-hover:scale-110"
+        />
       </div>
 
       <div className="absolute inset-0 flex items-center justify-center rounded-2xl bg-dark-green/60 opacity-0 backdrop-blur-sm transition-all duration-300 group-hover:opacity-100">
