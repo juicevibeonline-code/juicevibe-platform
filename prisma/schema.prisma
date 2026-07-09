@@ -1,0 +1,406 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  admin
+  manager
+  cashier
+  kitchen
+  editor
+  customer
+}
+
+enum ItemStatus {
+  active
+  inactive
+  archived
+}
+
+enum ItemAvailability {
+  in_stock
+  out_of_stock
+  coming_soon
+}
+
+enum OrderStatus {
+  pending
+  confirmed
+  preparing
+  ready
+  completed
+  cancelled
+}
+
+enum PaymentStatus {
+  pending
+  paid
+  refunded
+  failed
+}
+
+enum PaymentMethod {
+  cash
+  card
+  online
+}
+
+enum OrderType {
+  delivery
+  pickup
+  dine_in
+}
+
+model User {
+  id            String     @id @default(cuid())
+  email         String     @unique
+  name          String
+  password      String
+  phone         String?
+  avatar        String?
+  role          UserRole   @default(customer)
+  isActive      Boolean    @default(true)
+  emailVerified Boolean    @default(false)
+  refreshToken  String?
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+
+  customer      Customer?
+  employee      Employee?
+  orders        Order[]
+  reviews       Review[]
+  blogs         BlogPost[]
+  notifications Notification[]
+
+  @@index([email])
+  @@index([role])
+}
+
+model Category {
+  id          String     @id @default(cuid())
+  name        String
+  slug        String     @unique
+  description String?
+  icon        String
+  image       String?
+  order       Int        @default(0)
+  status      ItemStatus @default(active)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  items       MenuItem[]
+
+  @@index([slug])
+  @@index([order])
+}
+
+model MenuItem {
+  id           String            @id @default(cuid())
+  name         String
+  slug         String            @unique
+  description  String
+  price        Float
+  categoryId   String
+  images       String[]
+  thumbnail    String?
+  availability ItemAvailability  @default(in_stock)
+  isPopular    Boolean           @default(false)
+  isFeatured   Boolean           @default(false)
+  calories     Int?
+  ingredients  String[]
+  tags         String[]
+  order        Int               @default(0)
+  status       ItemStatus        @default(active)
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+
+  category     Category          @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  variants     ItemVariant[]
+  addOns       AddOn[]
+  orderItems   OrderItem[]
+  reviews      Review[]
+
+  @@index([slug])
+  @@index([categoryId])
+  @@index([isPopular])
+  @@index([isFeatured])
+  @@index([order])
+}
+
+model ItemVariant {
+  id              String   @id @default(cuid())
+  name            String
+  priceAdjustment Float    @default(0)
+  isDefault       Boolean  @default(false)
+  menuItemId      String
+  menuItem        MenuItem @relation(fields: [menuItemId], references: [id], onDelete: Cascade)
+
+  @@index([menuItemId])
+}
+
+model AddOn {
+  id          String   @id @default(cuid())
+  name        String
+  price       Float
+  category    String   @default("general")
+  isAvailable Boolean  @default(true)
+  menuItemId  String
+  menuItem    MenuItem @relation(fields: [menuItemId], references: [id], onDelete: Cascade)
+
+  @@index([menuItemId])
+}
+
+model Customer {
+  id            String   @id @default(cuid())
+  userId        String   @unique
+  loyaltyPoints Int      @default(0)
+  totalOrders   Int      @default(0)
+  totalSpent    Float    @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  addresses     Address[]
+  favorites     String[]
+}
+
+model Address {
+  id         String   @id @default(cuid())
+  street     String
+  city       String
+  state      String?
+  postalCode String
+  country    String   @default("Sri Lanka")
+  isDefault  Boolean  @default(false)
+  customerId String
+  customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  @@index([customerId])
+}
+
+model Order {
+  id                String        @id @default(cuid())
+  orderNumber       String        @unique
+  customerId        String?
+  customerName      String
+  customerPhone     String
+  customerEmail     String?
+  subtotal          Float
+  tax               Float         @default(0)
+  discount          Float         @default(0)
+  total             Float
+  status            OrderStatus   @default(pending)
+  paymentStatus     PaymentStatus @default(pending)
+  paymentMethod     PaymentMethod
+  type              OrderType     @default(pickup)
+  deliveryAddress   Json?
+  notes             String?
+  couponCode        String?
+  estimatedReadyTime DateTime?
+  completedAt       DateTime?
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+
+  customer          User?         @relation(fields: [customerId], references: [id])
+  items             OrderItem[]
+
+  @@index([orderNumber])
+  @@index([customerId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model OrderItem {
+  id         String   @id @default(cuid())
+  orderId    String
+  menuItemId String
+  name       String
+  quantity   Int
+  price      Float
+  variant    String?
+  addOns     Json?
+  notes      String?
+
+  order      Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  menuItem   MenuItem @relation(fields: [menuItemId], references: [id])
+
+  @@index([orderId])
+  @@index([menuItemId])
+}
+
+model Review {
+  id        String   @id @default(cuid())
+  rating    Int
+  text      String
+  isApproved Boolean @default(false)
+  userId    String
+  menuItemId String?
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id])
+  menuItem  MenuItem? @relation(fields: [menuItemId], references: [id])
+
+  @@index([menuItemId])
+  @@index([userId])
+}
+
+model Coupon {
+  id            String   @id @default(cuid())
+  code          String   @unique
+  type          String
+  value         Float
+  minOrderAmount Float   @default(0)
+  maxDiscount   Float?
+  usageLimit    Int      @default(100)
+  usedCount     Int      @default(0)
+  isActive      Boolean  @default(true)
+  expiresAt     DateTime?
+  createdAt     DateTime @default(now())
+
+  @@index([code])
+}
+
+model GalleryImage {
+  id        String   @id @default(cuid())
+  src       String
+  alt       String
+  width     Int
+  height    Int
+  category  String   @default("general")
+  isVideo   Boolean  @default(false)
+  videoSrc  String?
+  blurhash  String?
+  albumId   String?
+  album     GalleryAlbum? @relation(fields: [albumId], references: [id])
+  createdAt DateTime @default(now())
+
+  @@index([category])
+  @@index([albumId])
+}
+
+model GalleryAlbum {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  description String?
+  coverImage  String?
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+
+  images      GalleryImage[]
+
+  @@index([slug])
+}
+
+model Testimonial {
+  id        String   @id @default(cuid())
+  name      String
+  role      String?
+  avatar    String?
+  rating    Int
+  text      String
+  isFeatured Boolean @default(false)
+  isApproved Boolean @default(false)
+  createdAt DateTime @default(now())
+}
+
+model BlogPost {
+  id          String    @id @default(cuid())
+  title       String
+  slug        String    @unique
+  excerpt     String
+  content     String
+  coverImage  String?
+  authorId    String
+  tags        String[]
+  category    String    @default("general")
+  isPublished Boolean   @default(false)
+  publishedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  author      User      @relation(fields: [authorId], references: [id])
+
+  @@index([slug])
+  @@index([isPublished])
+  @@index([category])
+}
+
+model NewsletterSubscriber {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  @@index([email])
+}
+
+model ContactMessage {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  phone     String?
+  subject   String
+  message   String
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([isRead])
+  @@index([createdAt])
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  title     String
+  message   String
+  type      String   @default("info")
+  isRead    Boolean  @default(false)
+  userId    String
+  link      String?
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, isRead])
+  @@index([createdAt])
+}
+
+model Employee {
+  id         String   @id @default(cuid())
+  userId     String   @unique
+  employeeId String   @unique
+  position   String
+  salary     Float?
+  hireDate   DateTime @default(now())
+  isActive   Boolean  @default(true)
+
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([employeeId])
+}
+
+model InventoryItem {
+  id            String   @id @default(cuid())
+  name          String
+  quantity      Float
+  unit          String   @default("kg")
+  minStockLevel Float    @default(0)
+  supplier      String?
+  expiryDate    DateTime?
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([name])
+}
+
+model Setting {
+  id    String @id @default(cuid())
+  key   String @unique
+  value String
+}

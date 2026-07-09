@@ -1,0 +1,42 @@
+export type Status = "active" | "inactive" | "archived";
+export type Availability = "in-stock" | "out-of-stock" | "coming-soon";
+export type Currency = "LKR" | "USD";
+export type OrderStatus = "pending" | "confirmed" | "preparing" | "ready" | "completed" | "cancelled";
+export type PaymentStatus = "pending" | "paid" | "refunded" | "failed";
+export type PaymentMethod = "cash" | "card" | "online";
+
+export interface ApiResponse<T> {
+  success: boolean;
+  data?: T;
+  error?: string;
+  message?: string;
+  meta?: PaginationMeta;
+}
+
+export interface PaginationMeta {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+}
+
+export interface DateRange {
+  from: string;
+  to: string;
+}
+
+export interface Address {
+  id: string;
+  street: string;
+  city: string;
+  state?: string;
+  postalCode: string;
+  country: string;
+  isDefault: boolean;
+}
+
+export interface ContactInfo {
+  phone: string;
+  email: string;
+  whatsapp?: string;
+}

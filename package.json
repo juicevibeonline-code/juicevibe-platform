@@ -1,0 +1,26 @@
+{
+  "name": "juice-vibe-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "turbo dev",
+    "build": "turbo build",
+    "lint": "turbo lint",
+    "typecheck": "turbo typecheck",
+    "clean": "turbo clean",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,css,md}\"",
+    "db:generate": "pnpm --filter @juice-vibe/database db:generate",
+    "db:push": "pnpm --filter @juice-vibe/database db:push",
+    "db:seed": "pnpm --filter @juice-vibe/database db:seed",
+    "db:studio": "pnpm --filter @juice-vibe/database db:studio"
+  },
+  "devDependencies": {
+    "prettier": "^3.4.0",
+    "turbo": "^2.4.0",
+    "typescript": "^5.7.0"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "packageManager": "pnpm@10.7.0"
+}
