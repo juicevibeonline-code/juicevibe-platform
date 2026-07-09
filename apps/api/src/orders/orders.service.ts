@@ -5,7 +5,7 @@ import { generateId } from "@juice-vibe/utils";
 @Injectable()
 export class OrdersService {
   async createOrder(input: {
-    items: { menuItemId: string; quantity: number; variant?: string; addOnIds?: string[]; notes?: string }[];
+    items: { menuItemId?: string; name?: string; price?: number; quantity: number; variant?: string; addOnIds?: string[]; notes?: string }[];
     customerName: string; customerPhone: string; customerEmail?: string;
     type: string; paymentMethod: string; notes?: string; couponCode?: string;
     deliveryAddress?: any; userId?: string;
@@ -16,18 +16,41 @@ export class OrdersService {
 
     const orderItems = await Promise.all(
       input.items.map(async (item) => {
-        const menuItem = await prisma.menuItem.findUnique({ where: { id: item.menuItemId } });
-        if (!menuItem) throw new NotFoundException(`Menu item ${item.menuItemId} not found`);
-        if (menuItem.availability !== "in_stock") throw new BadRequestException(`${menuItem.name} is not available`);
+        let menuItemId = item.menuItemId;
+        let itemName = item.name ?? "Unknown Item";
+        let itemPrice = item.price ?? 0;
 
-        let itemPrice = menuItem.price * item.quantity;
-        subtotal += itemPrice;
+        // If menuItemId is provided, validate against DB
+        if (menuItemId) {
+          const menuItem = await prisma.menuItem.findUnique({ where: { id: menuItemId } });
+          if (menuItem) {
+            itemName = menuItem.name;
+            itemPrice = menuItem.price;
+            if (menuItem.availability !== "in_stock") throw new BadRequestException(`${menuItem.name} is not available`);
+          }
+        } else if (item.name) {
+          // Guest storefront order: try to find by name
+          const menuItem = await prisma.menuItem.findFirst({ where: { name: { equals: item.name, mode: "insensitive" } } });
+          if (menuItem) {
+            menuItemId = menuItem.id;
+            itemName = menuItem.name;
+            itemPrice = menuItem.price;
+          } else {
+            // Item not in DB (local-only menu item): use a placeholder
+            const placeholder = await prisma.menuItem.findFirst();
+            menuItemId = placeholder?.id ?? "";
+          }
+        }
+
+        if (!menuItemId) throw new BadRequestException(`Cannot find menu item: ${itemName}`);
+
+        subtotal += (itemPrice) * item.quantity;
 
         return {
-          menuItemId: item.menuItemId,
-          name: menuItem.name,
+          menuItemId,
+          name: itemName,
           quantity: item.quantity,
-          price: menuItem.price,
+          price: itemPrice,
           variant: item.variant,
           addOns: item.addOnIds ?? Prisma.DbNull,
           notes: item.notes,
