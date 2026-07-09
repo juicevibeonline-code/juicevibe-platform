@@ -4,6 +4,7 @@ import "./globals.css";
 import { Sidebar } from "@/components/sidebar";
 import { Header } from "@/components/header";
 import { ToastProvider } from "@/hooks/useToast";
+import { ThemeProvider } from "@/components/theme-provider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -17,8 +18,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   return (
     <html lang="en">
       <body className={inter.className}>
-        <ToastProvider>
-          <div className="admin-bg-gradient" />
+        <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
+          <ToastProvider>
+            <div className="admin-bg-gradient" />
           <div className="flex min-h-screen relative w-full bg-[#F8FFF8]">
             {/* Sidebar Container */}
             <div className="hidden md:block sticky top-0 h-screen w-[280px] p-4 z-50">
@@ -31,7 +33,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               <main className="p-4 md:p-8 w-full">{children}</main>
             </div>
           </div>
-        </ToastProvider>
+          </ToastProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

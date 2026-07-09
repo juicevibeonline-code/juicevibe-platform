@@ -11,8 +11,8 @@ export default function DashboardPage() {
       <div className="relative p-8 rounded-[2rem] glass-panel overflow-hidden mb-8">
         <div className="absolute top-0 right-0 -mt-10 -mr-10 w-64 h-64 bg-primary/20 rounded-full blur-[80px]" />
         <div className="relative z-10">
-          <h1 className="text-3xl font-black text-gray-800 tracking-tight">Overview Dashboard</h1>
-          <p className="text-gray-500 font-medium mt-2">Welcome back to Juice Vibe! Here's what's happening today.</p>
+          <h1 className="text-3xl font-black text-foreground tracking-tight">Overview Dashboard</h1>
+          <p className="text-muted font-medium mt-2">Welcome back to Juice Vibe! Here's what's happening today.</p>
         </div>
       </div>
 
@@ -60,7 +60,7 @@ function QuickActionCard({ title, description, href, color }: { title: string; d
       className={`rounded-3xl border bg-gradient-to-br p-6 transition-all duration-300 shadow-sm hover:shadow-xl hover:-translate-y-1 ${colors[color]} group cursor-pointer block backdrop-blur-sm`}
     >
       <h3 className="font-bold text-lg transition-colors">{title}</h3>
-      <p className="text-sm font-medium text-gray-500 mt-2">{description}</p>
+      <p className="text-sm font-medium text-muted mt-2">{description}</p>
     </a>
   );
 }

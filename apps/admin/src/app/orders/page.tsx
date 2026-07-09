@@ -1,8 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { Search, Eye, Clock, CheckCircle, XCircle } from "lucide-react";
+import { Search, Eye, Clock, CheckCircle, XCircle, LayoutList, LayoutGrid } from "lucide-react";
 import { Table } from "@/components/table";
+import { KanbanBoard } from "@/components/kanban-board";
+import { Drawer } from "@/components/ui/drawer";
 
 const initialOrders = [
   { id: "#JV-001", customer: "Priya Sharma", items: 3, total: "LKR 1,200", status: "completed", payment: "paid", type: "pickup", time: "2 min ago" },
@@ -20,40 +22,45 @@ const statusColors: Record<string, string> = {
   cancelled: "bg-pink/10 text-pink",
 };
 
-const columns = [
-  { key: "id", label: "Order ID" },
-  { key: "customer", label: "Customer" },
-  { key: "items", label: "Items" },
-  { key: "total", label: "Total" },
-  {
-    key: "status",
-    label: "Status",
-    render: (item: any) => (
-      <span className={`inline-flex items-center gap-1 text-xs font-medium px-2 py-1 rounded-full capitalize ${statusColors[item.status]}`}>
-        {item.status === "pending" && <Clock className="w-3 h-3" />}
-        {item.status === "completed" && <CheckCircle className="w-3 h-3" />}
-        {item.status === "cancelled" && <XCircle className="w-3 h-3" />}
-        {item.status}
-      </span>
-    ),
-  },
-  { key: "payment", label: "Payment" },
-  { key: "type", label: "Type" },
-  { key: "time", label: "Time" },
-  {
-    key: "actions",
-    label: "Actions",
-    render: () => (
-      <button className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors">
-        <Eye className="w-4 h-4 text-muted" />
-      </button>
-    ),
-  },
-];
-
 export default function OrdersPage() {
   const [orders] = useState(initialOrders);
   const [filter, setFilter] = useState("all");
+  const [view, setView] = useState<"list" | "board">("board");
+  const [selectedOrder, setSelectedOrder] = useState<any>(null);
+
+  const columns = [
+    { key: "id", label: "Order ID" },
+    { key: "customer", label: "Customer" },
+    { key: "items", label: "Items" },
+    { key: "total", label: "Total" },
+    {
+      key: "status",
+      label: "Status",
+      render: (item: any) => (
+        <span className={`inline-flex items-center gap-1 text-xs font-bold px-2 py-1 rounded-full capitalize ${statusColors[item.status]}`}>
+          {item.status === "pending" && <Clock className="w-3 h-3" />}
+          {item.status === "completed" && <CheckCircle className="w-3 h-3" />}
+          {item.status === "cancelled" && <XCircle className="w-3 h-3" />}
+          {item.status}
+        </span>
+      ),
+    },
+    { key: "payment", label: "Payment" },
+    { key: "type", label: "Type" },
+    { key: "time", label: "Time" },
+    {
+      key: "actions",
+      label: "Actions",
+      render: (item: any) => (
+        <button 
+          onClick={() => setSelectedOrder(item)}
+          className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-white/10 transition-colors"
+        >
+          <Eye className="w-4 h-4 text-muted hover:text-primary transition-colors" />
+        </button>
+      ),
+    },
+  ];
 
   const filters = ["all", "pending", "preparing", "ready", "completed", "cancelled"];
   const filtered = filter === "all" ? orders : orders.filter((o) => o.status === filter);
@@ -64,30 +71,116 @@ export default function OrdersPage() {
         <div className="absolute top-0 right-0 -mt-10 -mr-10 w-64 h-64 bg-orange/20 rounded-full blur-[80px]" />
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-black text-gray-800 tracking-tight">Orders Management</h1>
-            <p className="text-gray-500 font-medium mt-2">Manage and track customer orders in real-time</p>
+            <h1 className="text-3xl font-black text-foreground tracking-tight">Orders Management</h1>
+            <p className="text-muted font-medium mt-2">Manage and track customer orders in real-time</p>
+          </div>
+          <div className="flex bg-gray-100 dark:bg-white/5 p-1 rounded-2xl border border-border/50 shadow-inner">
+            <button
+              onClick={() => setView("board")}
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 ${
+                view === "board" ? "bg-white dark:bg-white/10 text-primary shadow-sm" : "text-muted hover:text-foreground hover:bg-white/50 dark:hover:bg-white/5"
+              }`}
+            >
+              <LayoutGrid className="w-4 h-4" />
+              Board
+            </button>
+            <button
+              onClick={() => setView("list")}
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 ${
+                view === "list" ? "bg-white dark:bg-white/10 text-primary shadow-sm" : "text-muted hover:text-foreground hover:bg-white/50 dark:hover:bg-white/5"
+              }`}
+            >
+              <LayoutList className="w-4 h-4" />
+              List
+            </button>
           </div>
         </div>
       </div>
 
       {/* Status Filters */}
-      <div className="flex gap-2 flex-wrap px-2">
-        {filters.map((f) => (
-          <button
-            key={f}
-            onClick={() => setFilter(f)}
-            className={`px-5 py-2 rounded-xl text-sm font-bold capitalize transition-all duration-300 hover:-translate-y-0.5 ${
-              filter === f ? "bg-gradient-to-r from-primary to-primary-dark text-white shadow-[0_4px_15px_rgba(34,197,94,0.3)]" : "bg-white/60 text-gray-600 hover:bg-white hover:text-gray-900 border border-white/80 shadow-sm"
-            }`}
-          >
-            {f}
-          </button>
-        ))}
-      </div>
+      {view === "list" && (
+        <div className="flex gap-2 flex-wrap px-2">
+          {filters.map((f) => (
+            <button
+              key={f}
+              onClick={() => setFilter(f)}
+              className={`px-5 py-2 rounded-xl text-sm font-bold capitalize transition-all duration-300 hover:-translate-y-0.5 ${
+                filter === f ? "bg-gradient-to-r from-primary to-primary-dark text-white shadow-[0_4px_15px_rgba(34,197,94,0.3)]" : "bg-white/60 dark:bg-white/5 text-muted hover:bg-white dark:hover:bg-white/10 hover:text-foreground border border-transparent dark:border-white/10 shadow-sm"
+              }`}
+            >
+              {f}
+            </button>
+          ))}
+        </div>
+      )}
 
       <div className="px-2">
-        <Table columns={columns} data={filtered} searchable />
+        {view === "board" ? (
+          <KanbanBoard onOrderClick={(order) => setSelectedOrder(order)} />
+        ) : (
+          <Table columns={columns} data={filtered} searchable />
+        )}
       </div>
+
+      <Drawer
+        isOpen={!!selectedOrder}
+        onClose={() => setSelectedOrder(null)}
+        title={selectedOrder ? `Order Details - ${selectedOrder.id}` : "Order Details"}
+        position="right"
+        size="md"
+      >
+        {selectedOrder && (
+          <div className="space-y-6">
+            <div className="glass-panel rounded-2xl p-4 bg-gray-50/50 dark:bg-white/5 border-border/50">
+              <h3 className="text-sm font-bold text-muted mb-4 uppercase tracking-wider">Customer Info</h3>
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm font-medium text-muted">Name</span>
+                <span className="text-sm font-bold text-foreground">{selectedOrder.customer}</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium text-muted">Time</span>
+                <span className="text-sm font-bold text-foreground flex items-center gap-1"><Clock className="w-4 h-4"/>{selectedOrder.time}</span>
+              </div>
+            </div>
+
+            <div className="glass-panel rounded-2xl p-4 bg-gray-50/50 dark:bg-white/5 border-border/50">
+              <h3 className="text-sm font-bold text-muted mb-4 uppercase tracking-wider">Order Info</h3>
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm font-medium text-muted">Status</span>
+                <span className={`inline-flex items-center gap-1 text-xs font-bold px-2 py-1 rounded-full capitalize ${statusColors[selectedOrder.status]}`}>
+                  {selectedOrder.status}
+                </span>
+              </div>
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm font-medium text-muted">Type</span>
+                <span className="text-sm font-bold text-foreground capitalize">{selectedOrder.type}</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium text-muted">Payment</span>
+                <span className={`inline-flex items-center gap-1 text-xs font-bold px-2 py-1 rounded-full capitalize ${selectedOrder.payment === 'paid' ? 'bg-primary/10 text-primary-dark' : 'bg-yellow/10 text-yellow-600'}`}>
+                  {selectedOrder.payment}
+                </span>
+              </div>
+            </div>
+
+            <div className="glass-panel rounded-2xl p-4 bg-primary/5 border-primary/20">
+              <div className="flex items-center justify-between">
+                <span className="text-base font-bold text-foreground">Total ({selectedOrder.items} items)</span>
+                <span className="text-2xl font-black text-primary-dark">{selectedOrder.total}</span>
+              </div>
+            </div>
+            
+            <div className="pt-4 flex gap-3">
+               <button className="flex-1 bg-white dark:bg-black border border-border rounded-xl py-3 text-sm font-bold text-foreground hover:bg-gray-50 dark:hover:bg-white/5 transition-colors">
+                 Print Receipt
+               </button>
+               <button className="flex-1 bg-gradient-to-r from-primary to-primary-dark rounded-xl py-3 text-sm font-bold text-white shadow-lg hover:-translate-y-0.5 transition-all">
+                 Update Status
+               </button>
+            </div>
+          </div>
+        )}
+      </Drawer>
     </div>
   );
 }

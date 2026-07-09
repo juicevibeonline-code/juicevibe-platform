@@ -35,7 +35,7 @@ export function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className="h-full w-full bg-white/70 backdrop-blur-xl border border-white shadow-[0_8px_30px_rgb(0,0,0,0.04)] rounded-[2rem] flex flex-col overflow-hidden animate-slide-in">
+    <aside className="h-full w-full glass-panel rounded-[2rem] flex flex-col overflow-hidden animate-slide-in">
       {/* Logo */}
       <div className="p-6 pb-4 mb-2">
         <Link href="/dashboard" className="flex items-center gap-3 group">
@@ -43,8 +43,8 @@ export function Sidebar() {
             <Leaf className="w-6 h-6 text-white" />
           </div>
           <div>
-            <h1 className="text-xl font-bold tracking-tight text-gray-800 group-hover:text-primary transition-colors">Juice Vibe</h1>
-            <p className="text-xs font-bold text-gray-400">Admin Workspace</p>
+            <h1 className="text-xl font-bold tracking-tight text-foreground group-hover:text-primary transition-colors">Juice Vibe</h1>
+            <p className="text-xs font-bold text-muted">Admin Workspace</p>
           </div>
         </Link>
       </div>
@@ -61,7 +61,7 @@ export function Sidebar() {
               className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all duration-300 group ${
                 isActive
                   ? "bg-gradient-to-r from-primary to-primary-dark text-white shadow-[0_4px_15px_rgba(34,197,94,0.25)] translate-x-1"
-                  : "text-gray-500 hover:bg-white hover:text-gray-900 hover:shadow-sm border border-transparent hover:border-white"
+                  : "text-muted hover:bg-white/50 dark:hover:bg-white/5 hover:text-foreground hover:shadow-sm border border-transparent"
               }`}
             >
               <Icon className={`w-5 h-5 flex-shrink-0 transition-transform duration-300 ${isActive ? 'scale-110' : 'group-hover:scale-110 group-hover:text-primary'}`} />
@@ -72,8 +72,8 @@ export function Sidebar() {
       </nav>
 
       {/* Logout */}
-      <div className="p-4 mt-auto border-t border-gray-100 bg-white/40">
-        <button className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-bold text-pink hover:bg-pink hover:text-white transition-all duration-300 w-full group shadow-sm bg-white hover:shadow-md">
+      <div className="p-4 mt-auto border-t border-border/50 bg-white/40 dark:bg-white/5">
+        <button className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-bold text-pink hover:bg-pink hover:text-white transition-all duration-300 w-full group shadow-sm bg-white dark:bg-black/20 hover:shadow-md">
           <LogOut className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
           Sign Out
         </button>

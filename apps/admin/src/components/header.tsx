@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { Bell, Search, ChevronDown, LogOut, User, Settings } from "lucide-react";
 import { cn } from "@juice-vibe/utils";
+import { CommandPalette } from "@/components/ui/command-palette";
 
 export function Header() {
   const [notificationsOpen, setNotificationsOpen] = useState(false);
@@ -32,14 +33,9 @@ export function Header() {
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
           </button>
           
-          {/* Search */}
+          {/* Search / Command Palette */}
           <div className="relative w-full group">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-primary transition-colors" />
-            <input
-              type="text"
-              placeholder="Search dashboard..."
-              className="w-full pl-10 pr-4 py-2 rounded-xl bg-gray-50/50 border border-transparent focus:bg-white focus:border-primary/30 focus:shadow-[0_0_15px_rgba(34,197,94,0.1)] text-sm transition-all duration-300 outline-none"
-            />
+            <CommandPalette />
           </div>
         </div>
 

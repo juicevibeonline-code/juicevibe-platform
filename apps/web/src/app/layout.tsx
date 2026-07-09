@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Poppins, Inter } from "next/font/google";
 import "./globals.css";
+import { FloatingCart } from "@/components/cart/FloatingCart";
+import { CartDrawer } from "@/components/cart/CartDrawer";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -127,6 +129,8 @@ export default function RootLayout({
       </head>
       <body className="min-h-screen font-body antialiased">
         {children}
+        <FloatingCart />
+        <CartDrawer />
       </body>
     </html>
   );

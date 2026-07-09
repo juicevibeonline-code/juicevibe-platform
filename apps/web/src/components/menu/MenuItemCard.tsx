@@ -2,8 +2,10 @@
 
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { Star, Plus, Leaf, Flame, Sparkles } from "lucide-react";
+import { Star, Plus, Leaf, Flame, Sparkles, CheckCircle } from "lucide-react";
+import { useState } from "react";
 import { formatPrice } from "@/lib/utils";
+import { useCartStore } from "@/store/cart";
 import type { MenuItem } from "@/data/menu";
 import { cn } from "@/lib/utils";
 
@@ -107,6 +109,9 @@ const categoryThemes: Record<
 };
 
 export function MenuItemCard({ item, index }: MenuItemCardProps) {
+  const addItem = useCartStore((state) => state.addItem);
+  const [isAdded, setIsAdded] = useState(false);
+
   const theme = categoryThemes[item.category] || {
     glow: "from-primary/15 to-transparent",
     btnBg: "bg-primary hover:bg-primary-dark shadow-primary/20",
@@ -114,6 +119,12 @@ export function MenuItemCard({ item, index }: MenuItemCardProps) {
     badgeText: "text-primary",
     emoji: "🌿",
     tag: "Fresh",
+  };
+
+  const handleAddToCart = () => {
+    addItem(item);
+    setIsAdded(true);
+    setTimeout(() => setIsAdded(false), 1500);
   };
 
   return (
@@ -191,13 +202,18 @@ export function MenuItemCard({ item, index }: MenuItemCardProps) {
           </div>
 
           <button
+            onClick={handleAddToCart}
             aria-label={`Order ${item.name}`}
             className={cn(
-              "flex h-11 w-11 items-center justify-center rounded-full text-white shadow-lg active:scale-90 hover:scale-105 hover:rotate-90 transition-all duration-300 outline-none",
-              theme.btnBg
+              "flex h-11 w-11 items-center justify-center rounded-full text-white shadow-lg active:scale-90 hover:scale-105 transition-all duration-300 outline-none",
+              isAdded ? "bg-green-500 scale-105 shadow-green-500/30" : `${theme.btnBg} hover:rotate-90`
             )}
           >
-            <Plus className="h-5 w-5 stroke-[2.5]" />
+            {isAdded ? (
+              <CheckCircle className="h-5 w-5 stroke-[2.5]" />
+            ) : (
+              <Plus className="h-5 w-5 stroke-[2.5]" />
+            )}
           </button>
         </div>
 

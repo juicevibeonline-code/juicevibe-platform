@@ -1,7 +1,7 @@
 "use client";
 
-import { Modal } from "./Modal";
-import { Button } from "./Button";
+import { Modal } from "./modal";
+import { Button } from "./button";
 
 interface ConfirmDialogProps {
   isOpen: boolean;

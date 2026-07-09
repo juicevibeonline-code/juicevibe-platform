@@ -1,20 +1,68 @@
 @import "tailwindcss";
 
+@layer base {
+  :root {
+    --background: #F8FFF8;
+    --foreground: #0F172A;
+    --card: #FFFFFF;
+    --card-foreground: #0F172A;
+    --primary: #22C55E;
+    --primary-dark: #16A34A;
+    --primary-light: #4ADE80;
+    --primary-foreground: #FFFFFF;
+    --dark-green: #14532D;
+    --orange: #FB923C;
+    --yellow: #FBBF24;
+    --pink: #F43F5E;
+    --sidebar: #FFFFFF;
+    --sidebar-hover: #F1F5F9;
+    --muted: #64748B;
+    --border: #E2E8F0;
+    --glass-bg: rgba(255, 255, 255, 0.65);
+    --glass-border: rgba(255, 255, 255, 0.8);
+    --glass-shadow: rgba(0, 0, 0, 0.04);
+  }
+
+  .dark {
+    --background: #0B0F0C;
+    --foreground: #F8FFF8;
+    --card: #111813;
+    --card-foreground: #F8FFF8;
+    --primary: #22C55E;
+    --primary-dark: #16A34A;
+    --primary-light: #4ADE80;
+    --primary-foreground: #0B0F0C;
+    --dark-green: #14532D;
+    --orange: #FB923C;
+    --yellow: #FBBF24;
+    --pink: #F43F5E;
+    --sidebar: #111813;
+    --sidebar-hover: #1A241C;
+    --muted: #94A3B8;
+    --border: #1F2922;
+    --glass-bg: rgba(17, 24, 19, 0.65);
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --glass-shadow: rgba(0, 0, 0, 0.2);
+  }
+}
+
 @theme inline {
-  --color-primary: #22C55E;
-  --color-primary-dark: #16A34A;
-  --color-primary-light: #4ADE80;
-  --color-dark-green: #14532D;
-  --color-orange: #FB923C;
-  --color-yellow: #FBBF24;
-  --color-pink: #F43F5E;
-  --color-light-bg: #F8FFF8;
-  --color-dark: #07110A;
-  --color-sidebar: #FFFFFF;
-  --color-sidebar-hover: #F1F5F9;
-  --color-card: #FFFFFF;
-  --color-muted: #64748B;
-  --color-border: #E2E8F0;
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-primary: var(--primary);
+  --color-primary-dark: var(--primary-dark);
+  --color-primary-light: var(--primary-light);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-dark-green: var(--dark-green);
+  --color-orange: var(--orange);
+  --color-yellow: var(--yellow);
+  --color-pink: var(--pink);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-hover: var(--sidebar-hover);
+  --color-muted: var(--muted);
+  --color-border: var(--border);
 }
 
 * {
@@ -25,8 +73,8 @@
 
 body {
   font-family: "Inter", sans-serif;
-  background: #F8FFF8;
-  color: #0F172A;
+  background-color: var(--background);
+  color: var(--foreground);
   position: relative;
   overflow-x: hidden;
 }
@@ -49,11 +97,11 @@ body {
 
 /* Premium Glass Utilities */
 .glass-panel {
-  background-color: rgba(255, 255, 255, 0.65);
+  background-color: var(--glass-bg);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
-  border: 1px solid rgba(255, 255, 255, 0.8);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.04);
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 8px 32px var(--glass-shadow);
 }
 
 /* Animations */
