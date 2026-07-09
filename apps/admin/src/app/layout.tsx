@@ -18,11 +18,17 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     <html lang="en">
       <body className={inter.className}>
         <ToastProvider>
-          <div className="flex min-h-screen">
-            <Sidebar />
-            <div className="flex-1 ml-64">
+          <div className="admin-bg-gradient" />
+          <div className="flex min-h-screen relative w-full bg-[#F8FFF8]">
+            {/* Sidebar Container */}
+            <div className="hidden md:block sticky top-0 h-screen w-[280px] p-4 z-50">
+              <Sidebar />
+            </div>
+            
+            {/* Main Content */}
+            <div className="flex-1 flex flex-col min-h-screen w-full overflow-hidden">
               <Header />
-              <main className="p-8">{children}</main>
+              <main className="p-4 md:p-8 w-full">{children}</main>
             </div>
           </div>
         </ToastProvider>

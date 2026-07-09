@@ -47,25 +47,28 @@ export default function BlogPage() {
   const [filter, setFilter] = useState("all");
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold">Blog</h1>
-          <p className="text-muted mt-1">Manage blog posts and articles</p>
+    <div className="space-y-6 max-w-7xl mx-auto px-2 animate-fade-in pb-12">
+      <div className="relative p-8 rounded-[2rem] glass-panel overflow-hidden mb-8">
+        <div className="absolute top-0 right-0 -mt-10 -mr-10 w-64 h-64 bg-yellow/20 rounded-full blur-[80px]" />
+        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-black text-gray-800 tracking-tight">Blog Management</h1>
+            <p className="text-gray-500 font-medium mt-2">Manage blog posts and articles</p>
+          </div>
+          <button className="flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-primary to-primary-dark text-white rounded-xl shadow-[0_4px_15px_rgba(34,197,94,0.3)] hover:scale-105 transition-all duration-300 font-bold">
+            <Plus className="w-5 h-5" />
+            New Post
+          </button>
         </div>
-        <button className="flex items-center gap-2 px-4 py-2.5 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors text-sm font-medium">
-          <Plus className="w-4 h-4" />
-          New Post
-        </button>
       </div>
 
-      <div className="flex gap-2 flex-wrap">
+      <div className="flex gap-2 flex-wrap px-2">
         {["all", "published", "draft"].map((f) => (
           <button
             key={f}
             onClick={() => setFilter(f)}
-            className={`px-4 py-1.5 rounded-full text-sm font-medium capitalize transition-colors ${
-              filter === f ? "bg-primary text-white" : "bg-white text-gray-600 hover:bg-gray-100 border border-border"
+            className={`px-5 py-2 rounded-xl text-sm font-bold capitalize transition-all duration-300 hover:-translate-y-0.5 ${
+              filter === f ? "bg-gradient-to-r from-primary to-primary-dark text-white shadow-[0_4px_15px_rgba(34,197,94,0.3)]" : "bg-white/60 text-gray-600 hover:bg-white hover:text-gray-900 border border-white/80 shadow-sm"
             }`}
           >
             {f}
@@ -73,7 +76,9 @@ export default function BlogPage() {
         ))}
       </div>
 
-      <Table columns={columns} data={filter === "all" ? posts : posts.filter((p) => p.status === filter)} searchable />
+      <div className="px-2">
+        <Table columns={columns} data={filter === "all" ? posts : posts.filter((p) => p.status === filter)} searchable />
+      </div>
     </div>
   );
 }

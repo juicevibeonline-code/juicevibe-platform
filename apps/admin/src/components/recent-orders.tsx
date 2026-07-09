@@ -18,23 +18,23 @@ const statusColors: Record<string, string> = {
 
 export function RecentOrders() {
   return (
-    <div className="bg-white rounded-xl border border-border p-6">
-      <h3 className="text-lg font-semibold mb-4">Recent Orders</h3>
-      <div className="space-y-3">
+    <div className="bg-transparent">
+      <h3 className="text-xl font-bold mb-6 tracking-tight text-gray-800">Recent Orders</h3>
+      <div className="space-y-4">
         {orders.map((order) => (
-          <div key={order.id} className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition-colors">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center">
-                <span className="text-sm font-bold text-gray-600">{order.customer[0]}</span>
+          <div key={order.id} className="flex items-center justify-between p-4 rounded-2xl bg-white/40 hover:bg-white/80 border border-white/60 hover:shadow-md transition-all duration-300 group cursor-pointer">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center group-hover:scale-105 transition-transform duration-300 shadow-inner">
+                <span className="text-sm font-black text-gray-600">{order.customer[0]}</span>
               </div>
               <div>
-                <p className="text-sm font-medium">{order.customer}</p>
-                <p className="text-xs text-muted">{order.id} · {order.items} items · {order.time}</p>
+                <p className="text-sm font-bold text-gray-800 group-hover:text-primary transition-colors">{order.customer}</p>
+                <p className="text-xs font-medium text-gray-500 mt-0.5">{order.id} · {order.items} items · {order.time}</p>
               </div>
             </div>
-            <div className="flex items-center gap-3">
-              <span className="text-sm font-semibold">{order.total}</span>
-              <span className={`text-xs font-medium px-2 py-1 rounded-full capitalize ${statusColors[order.status]}`}>
+            <div className="flex flex-col items-end gap-2">
+              <span className="text-sm font-black text-gray-800">{order.total}</span>
+              <span className={`text-[10px] font-extrabold px-2.5 py-1 rounded-md capitalize tracking-wider ${statusColors[order.status]}`}>
                 {order.status}
               </span>
             </div>

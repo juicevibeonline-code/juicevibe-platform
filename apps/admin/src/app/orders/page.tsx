@@ -59,20 +59,25 @@ export default function OrdersPage() {
   const filtered = filter === "all" ? orders : orders.filter((o) => o.status === filter);
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold">Orders</h1>
-        <p className="text-muted mt-1">Manage and track customer orders</p>
+    <div className="space-y-6 max-w-7xl mx-auto px-2 animate-fade-in pb-12">
+      <div className="relative p-8 rounded-[2rem] glass-panel overflow-hidden mb-8">
+        <div className="absolute top-0 right-0 -mt-10 -mr-10 w-64 h-64 bg-orange/20 rounded-full blur-[80px]" />
+        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-black text-gray-800 tracking-tight">Orders Management</h1>
+            <p className="text-gray-500 font-medium mt-2">Manage and track customer orders in real-time</p>
+          </div>
+        </div>
       </div>
 
       {/* Status Filters */}
-      <div className="flex gap-2 flex-wrap">
+      <div className="flex gap-2 flex-wrap px-2">
         {filters.map((f) => (
           <button
             key={f}
             onClick={() => setFilter(f)}
-            className={`px-4 py-1.5 rounded-full text-sm font-medium capitalize transition-colors ${
-              filter === f ? "bg-primary text-white" : "bg-white text-gray-600 hover:bg-gray-100 border border-border"
+            className={`px-5 py-2 rounded-xl text-sm font-bold capitalize transition-all duration-300 hover:-translate-y-0.5 ${
+              filter === f ? "bg-gradient-to-r from-primary to-primary-dark text-white shadow-[0_4px_15px_rgba(34,197,94,0.3)]" : "bg-white/60 text-gray-600 hover:bg-white hover:text-gray-900 border border-white/80 shadow-sm"
             }`}
           >
             {f}
@@ -80,7 +85,9 @@ export default function OrdersPage() {
         ))}
       </div>
 
-      <Table columns={columns} data={filtered} searchable />
+      <div className="px-2">
+        <Table columns={columns} data={filtered} searchable />
+      </div>
     </div>
   );
 }

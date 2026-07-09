@@ -44,12 +44,17 @@ export default function MessagesPage() {
   const [messages] = useState(initialMessages);
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold">Messages</h1>
-        <p className="text-muted mt-1">View and manage contact form submissions</p>
+    <div className="space-y-6 max-w-7xl mx-auto px-2 animate-fade-in pb-12">
+      <div className="relative p-8 rounded-[2rem] glass-panel overflow-hidden mb-8">
+        <div className="absolute top-0 right-0 -mt-10 -mr-10 w-64 h-64 bg-primary/20 rounded-full blur-[80px]" />
+        <div className="relative z-10">
+          <h1 className="text-3xl font-black text-gray-800 tracking-tight">Messages</h1>
+          <p className="text-gray-500 font-medium mt-2">View and manage contact form submissions</p>
+        </div>
       </div>
-      <Table columns={columns} data={messages} searchable />
+      <div className="px-2">
+        <Table columns={columns} data={messages} searchable />
+      </div>
     </div>
   );
 }

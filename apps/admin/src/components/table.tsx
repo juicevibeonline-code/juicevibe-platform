@@ -28,20 +28,20 @@ export function Table<T extends Record<string, any>>({
   const [searchQuery, setSearchQuery] = useState("");
 
   return (
-    <div className="bg-white rounded-xl border border-border">
+    <div className="glass-panel rounded-3xl overflow-hidden shadow-sm">
       {searchable && (
-        <div className="p-4 border-b border-border">
-          <div className="relative max-w-sm">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted" />
+        <div className="p-5 border-b border-border/50 bg-white/40">
+          <div className="relative max-w-sm group">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-primary transition-colors" />
             <input
               type="text"
-              placeholder="Search..."
+              placeholder="Search records..."
               value={searchQuery}
               onChange={(e) => {
                 setSearchQuery(e.target.value);
                 onSearch?.(e.target.value);
               }}
-              className="w-full pl-10 pr-4 py-2 rounded-lg border border-border bg-gray-50 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+              className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-transparent bg-white/60 text-sm focus:outline-none focus:bg-white focus:border-primary/30 focus:shadow-[0_0_15px_rgba(34,197,94,0.1)] transition-all duration-300"
             />
           </div>
         </div>
@@ -49,10 +49,10 @@ export function Table<T extends Record<string, any>>({
 
       <div className="overflow-x-auto">
         <table className="w-full">
-          <thead>
-            <tr className="border-b border-border">
+          <thead className="bg-gray-50/50 backdrop-blur-md">
+            <tr className="border-b border-border/50">
               {columns.map((col) => (
-                <th key={col.key} className="text-left px-4 py-3 text-sm font-semibold text-muted">
+                <th key={col.key} className="text-left px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">
                   {col.label}
                 </th>
               ))}
@@ -76,9 +76,9 @@ export function Table<T extends Record<string, any>>({
               </tr>
             ) : (
               data.map((item, i) => (
-                <tr key={i} className="border-b border-border last:border-0 hover:bg-gray-50 transition-colors">
+                <tr key={i} className="border-b border-border/50 last:border-0 hover:bg-white/80 transition-colors group">
                   {columns.map((col) => (
-                    <td key={col.key} className="px-4 py-3 text-sm">
+                    <td key={col.key} className="px-6 py-4 text-sm text-gray-700 font-medium group-hover:text-gray-900 transition-colors">
                       {col.render ? col.render(item) : item[col.key]}
                     </td>
                   ))}
@@ -90,22 +90,22 @@ export function Table<T extends Record<string, any>>({
       </div>
 
       {totalPages > 1 && (
-        <div className="flex items-center justify-between p-4 border-t border-border">
-          <span className="text-sm text-muted">Page {page} of {totalPages}</span>
+        <div className="flex items-center justify-between p-5 border-t border-border/50 bg-white/40">
+          <span className="text-sm font-medium text-gray-500">Page <strong className="text-gray-900">{page}</strong> of <strong className="text-gray-900">{totalPages}</strong></span>
           <div className="flex items-center gap-2">
             <button
               onClick={() => onPageChange?.(page - 1)}
               disabled={page <= 1}
-              className="p-2 rounded-lg hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="p-2 rounded-xl bg-white border border-border/50 hover:bg-gray-50 hover:border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed transition-all active:scale-95"
             >
-              <ChevronLeft className="w-4 h-4" />
+              <ChevronLeft className="w-4 h-4 text-gray-600" />
             </button>
             <button
               onClick={() => onPageChange?.(page + 1)}
               disabled={page >= totalPages}
-              className="p-2 rounded-lg hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="p-2 rounded-xl bg-white border border-border/50 hover:bg-gray-50 hover:border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed transition-all active:scale-95"
             >
-              <ChevronRight className="w-4 h-4" />
+              <ChevronRight className="w-4 h-4 text-gray-600" />
             </button>
           </div>
         </div>

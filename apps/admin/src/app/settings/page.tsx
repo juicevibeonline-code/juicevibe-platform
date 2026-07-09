@@ -12,10 +12,13 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="space-y-8 max-w-3xl">
-      <div>
-        <h1 className="text-2xl font-bold">Settings</h1>
-        <p className="text-muted mt-1">Manage your business configuration</p>
+    <div className="space-y-8 max-w-3xl mx-auto animate-fade-in pb-12">
+      <div className="relative p-8 rounded-[2rem] glass-panel overflow-hidden mb-8">
+        <div className="absolute top-0 right-0 -mt-10 -mr-10 w-64 h-64 bg-orange/20 rounded-full blur-[80px]" />
+        <div className="relative z-10">
+          <h1 className="text-3xl font-black text-gray-800 tracking-tight">Settings</h1>
+          <p className="text-gray-500 font-medium mt-2">Manage your business configuration and preferences</p>
+        </div>
       </div>
 
       {/* General Settings */}
@@ -61,10 +64,10 @@ export default function SettingsPage() {
       {/* Save Button */}
       <button
         onClick={handleSave}
-        className="flex items-center gap-2 px-6 py-3 bg-primary text-white rounded-xl hover:bg-primary-dark transition-colors font-medium"
+        className="flex items-center justify-center gap-2 w-full sm:w-auto px-8 py-3.5 bg-gradient-to-r from-primary to-primary-dark text-white rounded-xl hover:scale-105 transition-all duration-300 font-bold shadow-[0_4px_15px_rgba(34,197,94,0.3)] mt-8"
       >
-        <Save className="w-4 h-4" />
-        {saved ? "Saved!" : "Save Changes"}
+        <Save className="w-5 h-5" />
+        {saved ? "Changes Saved!" : "Save Configuration"}
       </button>
     </div>
   );
@@ -72,8 +75,8 @@ export default function SettingsPage() {
 
 function SettingsSection({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="bg-white rounded-xl border border-border p-6">
-      <h2 className="text-lg font-semibold mb-4">{title}</h2>
+    <div className="glass-panel rounded-3xl p-6 md:p-8 hover:shadow-lg transition-shadow duration-300">
+      <h2 className="text-xl font-bold mb-6 text-gray-800 tracking-tight">{title}</h2>
       {children}
     </div>
   );
@@ -82,11 +85,11 @@ function SettingsSection({ title, children }: { title: string; children: React.R
 function FormField({ label, defaultValue, type = "text", className }: { label: string; defaultValue?: string; type?: string; className?: string }) {
   return (
     <div className={className}>
-      <label className="block text-sm font-medium text-gray-700 mb-1.5">{label}</label>
+      <label className="block text-sm font-bold text-gray-700 mb-2">{label}</label>
       <input
         type={type}
         defaultValue={defaultValue}
-        className="w-full px-3 py-2 rounded-lg border border-border bg-gray-50 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
+        className="w-full px-4 py-2.5 rounded-xl border border-transparent bg-white/60 text-sm focus:outline-none focus:bg-white focus:border-primary/30 focus:shadow-[0_0_15px_rgba(34,197,94,0.1)] transition-all duration-300 font-medium text-gray-800"
       />
     </div>
   );

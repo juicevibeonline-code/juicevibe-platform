@@ -11,10 +11,10 @@ interface StatsCardProps {
 }
 
 const variants = {
-  primary: { bg: "bg-primary/10", icon: "text-primary", ring: "ring-primary/20" },
-  orange: { bg: "bg-orange/10", icon: "text-orange", ring: "ring-orange/20" },
-  pink: { bg: "bg-pink/10", icon: "text-pink", ring: "ring-pink/20" },
-  yellow: { bg: "bg-yellow/10", icon: "text-yellow", ring: "ring-yellow/20" },
+  primary: { bg: "bg-gradient-to-br from-primary to-primary-dark", icon: "text-white", shadow: "shadow-[0_8px_20px_rgba(34,197,94,0.3)]", glow: "from-primary/20" },
+  orange: { bg: "bg-gradient-to-br from-orange to-[#EA580C]", icon: "text-white", shadow: "shadow-[0_8px_20px_rgba(249,115,22,0.3)]", glow: "from-orange/20" },
+  pink: { bg: "bg-gradient-to-br from-pink to-[#BE123C]", icon: "text-white", shadow: "shadow-[0_8px_20px_rgba(225,29,72,0.3)]", glow: "from-pink/20" },
+  yellow: { bg: "bg-gradient-to-br from-yellow to-[#B45309]", icon: "text-white", shadow: "shadow-[0_8px_20px_rgba(217,119,6,0.3)]", glow: "from-yellow/20" },
 };
 
 export function StatsCard({ title, value, change, icon: Icon, variant = "primary" }: StatsCardProps) {
@@ -22,18 +22,25 @@ export function StatsCard({ title, value, change, icon: Icon, variant = "primary
   const v = variants[variant];
 
   return (
-    <div className="bg-white rounded-xl border border-border p-6 hover:shadow-lg transition-shadow">
-      <div className="flex items-center justify-between mb-4">
-        <div className={`w-12 h-12 rounded-xl ${v.bg} flex items-center justify-center ${v.icon}`}>
-          <Icon className="w-6 h-6" />
+    <div className="relative glass-panel rounded-3xl p-6 group hover:-translate-y-1 transition-all duration-500 overflow-hidden">
+      {/* Decorative ambient glow */}
+      <div className={`absolute -top-10 -right-10 w-32 h-32 rounded-full blur-3xl opacity-50 bg-gradient-to-br ${v.glow} to-transparent pointer-events-none group-hover:scale-150 transition-transform duration-700`} />
+      
+      <div className="relative z-10">
+        <div className="flex items-start justify-between mb-6">
+          <div className={`w-14 h-14 rounded-2xl ${v.bg} flex items-center justify-center ${v.icon} ${v.shadow} group-hover:scale-110 transition-transform duration-500`}>
+            <Icon className="w-7 h-7" />
+          </div>
+          <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold ${isPositive ? "bg-primary/10 text-primary-dark" : "bg-pink/10 text-pink"}`}>
+            {isPositive ? <TrendingUp className="w-3.5 h-3.5" /> : <TrendingDown className="w-3.5 h-3.5" />}
+            {Math.abs(change)}%
+          </div>
         </div>
-        <div className={`flex items-center gap-1 text-sm font-medium ${isPositive ? "text-primary" : "text-pink"}`}>
-          {isPositive ? <TrendingUp className="w-4 h-4" /> : <TrendingDown className="w-4 h-4" />}
-          {Math.abs(change)}%
+        <div>
+          <h3 className="text-3xl font-black text-gray-800 tracking-tight">{value}</h3>
+          <p className="text-sm font-medium text-gray-500 mt-1">{title}</p>
         </div>
       </div>
-      <h3 className="text-2xl font-bold">{value}</h3>
-      <p className="text-sm text-muted mt-1">{title}</p>
     </div>
   );
 }
