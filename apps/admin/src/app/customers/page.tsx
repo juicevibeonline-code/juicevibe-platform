@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Mail, Phone, ShoppingBag } from "lucide-react";
 import { Table } from "@/components/table";
+import { PageHeader } from "@/components/PageHeader";
 
 const initialCustomers = [
   { id: "1", name: "Priya Sharma", email: "priya@example.com", phone: "+94 71 234 5678", orders: 12, spent: "LKR 8,500", joined: "Jan 2024" },
@@ -51,13 +52,7 @@ export default function CustomersPage() {
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto px-2 animate-fade-in pb-12">
-      <div className="relative p-8 rounded-[2rem] glass-panel overflow-hidden mb-8">
-        <div className="absolute top-0 right-0 -mt-10 -mr-10 w-64 h-64 bg-pink/20 rounded-full blur-[80px]" />
-        <div className="relative z-10">
-          <h1 className="text-3xl font-black text-foreground tracking-tight">Customers</h1>
-          <p className="text-muted font-medium mt-2">View and manage your customer base</p>
-        </div>
-      </div>
+      <PageHeader title="Customers" subtitle={`${customers.length} customers in your database`} accentColor="pink" />
       <div className="px-2">
         <Table columns={columns} data={customers} searchable />
       </div>

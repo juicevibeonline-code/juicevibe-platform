@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { Plus, Edit, Trash2, Eye, Calendar, Clock } from "lucide-react";
+import { Plus, Edit, Trash2, Eye } from "lucide-react";
 import { Table } from "@/components/table";
+import { PageHeader } from "@/components/PageHeader";
 
 const initialPosts = [
   { id: "1", title: "5 Health Benefits of Fresh Juice", author: "Admin", category: "Health", status: "published", views: 234, comments: 12, date: "Jan 10, 2024" },
@@ -42,42 +43,48 @@ const columns = [
   },
 ];
 
+const filterOptions = ["all", "published", "draft"];
+
 export default function BlogPage() {
   const [posts] = useState(initialPosts);
   const [filter, setFilter] = useState("all");
 
+  const countFor = (f: string) => f === "all" ? posts.length : posts.filter((p) => p.status === f).length;
+  const filtered = filter === "all" ? posts : posts.filter((p) => p.status === filter);
+
+  const newPostBtn = (
+    <button className="flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-primary to-primary-dark text-white rounded-xl shadow-[0_4px_15px_rgba(34,197,94,0.3)] hover:scale-105 transition-all duration-300 font-bold cursor-pointer">
+      <Plus className="w-5 h-5" />
+      New Post
+    </button>
+  );
+
   return (
     <div className="space-y-6 max-w-7xl mx-auto px-2 animate-fade-in pb-12">
-      <div className="relative p-8 rounded-[2rem] glass-panel overflow-hidden mb-8">
-        <div className="absolute top-0 right-0 -mt-10 -mr-10 w-64 h-64 bg-yellow/20 rounded-full blur-[80px]" />
-        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div>
-            <h1 className="text-3xl font-black text-foreground tracking-tight">Blog Management</h1>
-            <p className="text-muted font-medium mt-2">Manage blog posts and articles</p>
-          </div>
-          <button className="flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-primary to-primary-dark text-white rounded-xl shadow-[0_4px_15px_rgba(34,197,94,0.3)] hover:scale-105 transition-all duration-300 font-bold cursor-pointer">
-            <Plus className="w-5 h-5" />
-            New Post
-          </button>
-        </div>
-      </div>
+      <PageHeader title="Blog Management" subtitle="Manage blog posts and articles" accentColor="yellow" action={newPostBtn} />
 
+      {/* Filter tabs with count badges */}
       <div className="flex gap-2 flex-wrap px-2">
-        {["all", "published", "draft"].map((f) => (
+        {filterOptions.map((f) => (
           <button
             key={f}
             onClick={() => setFilter(f)}
-            className={`px-5 py-2 rounded-xl text-sm font-bold capitalize transition-all duration-300 hover:-translate-y-0.5 cursor-pointer ${
-              filter === f ? "bg-gradient-to-r from-primary to-primary-dark text-white shadow-[0_4px_15px_rgba(34,197,94,0.3)]" : "bg-white/60 dark:bg-white/5 text-muted hover:bg-white dark:hover:bg-white/10 hover:text-foreground border border-white/80 dark:border-white/5 shadow-sm"
+            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold capitalize transition-all duration-300 hover:-translate-y-0.5 cursor-pointer ${
+              filter === f
+                ? "bg-gradient-to-r from-primary to-primary-dark text-white shadow-[0_4px_15px_rgba(34,197,94,0.3)]"
+                : "bg-white/60 dark:bg-white/5 text-muted hover:bg-white dark:hover:bg-white/10 hover:text-foreground border border-white/80 dark:border-white/5 shadow-sm"
             }`}
           >
             {f}
+            <span className={`text-xs px-1.5 py-0.5 rounded-full font-black ${filter === f ? "bg-white/20" : "bg-gray-100 dark:bg-white/10 text-muted"}`}>
+              {countFor(f)}
+            </span>
           </button>
         ))}
       </div>
 
       <div className="px-2">
-        <Table columns={columns} data={filter === "all" ? posts : posts.filter((p) => p.status === filter)} searchable />
+        <Table columns={columns} data={filtered} searchable />
       </div>
     </div>
   );

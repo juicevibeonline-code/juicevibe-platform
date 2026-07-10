@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Star, Check, X } from "lucide-react";
 import { Table } from "@/components/table";
+import { PageHeader } from "@/components/PageHeader";
 
 const initialTestimonials = [
   { id: "1", name: "Priya Sharma", rating: 5, text: "The fresh juices here are absolutely incredible!", status: "approved", date: "Jan 15, 2024" },
@@ -56,16 +57,15 @@ const columns = [
 
 export default function TestimonialsPage() {
   const [testimonials] = useState(initialTestimonials);
+  const pendingCount = testimonials.filter((t) => t.status === "pending").length;
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto px-2 animate-fade-in pb-12">
-      <div className="relative p-8 rounded-[2rem] glass-panel overflow-hidden mb-8">
-        <div className="absolute top-0 right-0 -mt-10 -mr-10 w-64 h-64 bg-orange/20 rounded-full blur-[80px]" />
-        <div className="relative z-10">
-          <h1 className="text-3xl font-black text-foreground tracking-tight">Testimonials</h1>
-          <p className="text-muted font-medium mt-2">Manage customer reviews and feedback</p>
-        </div>
-      </div>
+      <PageHeader
+        title="Testimonials"
+        subtitle={`Manage customer reviews — ${pendingCount} pending approval`}
+        accentColor="orange"
+      />
       <div className="px-2">
         <Table columns={columns} data={testimonials} searchable />
       </div>

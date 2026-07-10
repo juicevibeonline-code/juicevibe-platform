@@ -1,11 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { Plus, Search, Edit, Trash2, Eye, EyeOff, Star } from "lucide-react";
+import { Plus, Edit, Trash2, Eye, EyeOff, Star } from "lucide-react";
 import { Table } from "@/components/table";
 import { Modal } from "@/components/ui/modal";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { PageHeader } from "@/components/PageHeader";
 
 const initialItems = [
   { id: "1", name: "Chocolate Milkshake", category: "Milkshakes", price: "LKR 300", status: "active", popular: true, stock: "In Stock" },
@@ -53,21 +54,16 @@ export default function MenuPage() {
   const [items] = useState(initialItems);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
+  const addBtn = (
+    <button onClick={() => setIsAddModalOpen(true)} className="flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-primary to-primary-dark text-white rounded-xl shadow-[0_4px_15px_rgba(34,197,94,0.3)] hover:scale-105 transition-all duration-300 font-bold cursor-pointer">
+      <Plus className="w-5 h-5" />
+      Add New Item
+    </button>
+  );
+
   return (
     <div className="space-y-6 max-w-7xl mx-auto px-2 animate-fade-in pb-12">
-      <div className="relative p-8 rounded-[2rem] glass-panel overflow-hidden mb-8">
-        <div className="absolute top-0 right-0 -mt-10 -mr-10 w-64 h-64 bg-primary/20 rounded-full blur-[80px]" />
-        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div>
-            <h1 className="text-3xl font-black text-foreground tracking-tight">Menu Management</h1>
-            <p className="text-muted font-medium mt-2">Manage your menu items, prices, and categories</p>
-          </div>
-          <button onClick={() => setIsAddModalOpen(true)} className="flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-primary to-primary-dark text-white rounded-xl shadow-[0_4px_15px_rgba(34,197,94,0.3)] hover:scale-105 transition-all duration-300 font-bold cursor-pointer">
-            <Plus className="w-5 h-5" />
-            Add New Item
-          </button>
-        </div>
-      </div>
+      <PageHeader title="Menu Management" subtitle="Manage your menu items, prices, and categories" accentColor="primary" action={addBtn} />
 
       {/* Category Tabs */}
       <div className="flex gap-2 flex-wrap px-2">

@@ -1,5 +1,8 @@
 "use client";
 
+import Link from "next/link";
+import { ArrowRight } from "lucide-react";
+
 const orders = [
   { id: "#JV-001", customer: "Priya Sharma", items: 3, total: "LKR 1,200", status: "completed", time: "2 min ago" },
   { id: "#JV-002", customer: "Rahul Verma", items: 2, total: "LKR 850", status: "preparing", time: "15 min ago" },
@@ -18,13 +21,18 @@ const statusColors: Record<string, string> = {
 
 export function RecentOrders() {
   return (
-    <div className="bg-transparent">
-      <h3 className="text-xl font-bold mb-6 tracking-tight text-foreground">Recent Orders</h3>
-      <div className="space-y-4">
+    <div className="bg-transparent flex flex-col h-full">
+      <div className="flex items-center justify-between mb-5">
+        <h3 className="text-xl font-bold tracking-tight text-foreground">Recent Orders</h3>
+        <span className="text-xs font-semibold text-muted bg-gray-100 dark:bg-white/5 px-2.5 py-1 rounded-full">
+          {orders.length} orders
+        </span>
+      </div>
+      <div className="space-y-3 flex-1">
         {orders.map((order) => (
           <div key={order.id} className="flex items-center justify-between p-4 rounded-2xl bg-white/40 dark:bg-white/5 hover:bg-white/80 dark:hover:bg-white/10 border border-white/60 dark:border-white/5 hover:shadow-md transition-all duration-300 group cursor-pointer">
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-gray-100 to-gray-200 dark:from-white/5 dark:to-white/10 flex items-center justify-center group-hover:scale-105 transition-transform duration-300 shadow-inner">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-gray-100 to-gray-200 dark:from-white/5 dark:to-white/10 flex items-center justify-center group-hover:scale-105 transition-transform duration-300 shadow-inner shrink-0">
                 <span className="text-sm font-black text-muted-foreground">{order.customer[0]}</span>
               </div>
               <div>
@@ -32,15 +40,24 @@ export function RecentOrders() {
                 <p className="text-xs font-medium text-muted mt-0.5">{order.id} · {order.items} items · {order.time}</p>
               </div>
             </div>
-            <div className="flex flex-col items-end gap-2">
+            <div className="flex flex-col items-end gap-1.5">
               <span className="text-sm font-black text-foreground">{order.total}</span>
-              <span className={`text-[10px] font-extrabold px-2.5 py-1 rounded-md capitalize tracking-wider ${statusColors[order.status]}`}>
+              <span className={`text-[10px] font-extrabold px-2 py-0.5 rounded-md capitalize tracking-wider ${statusColors[order.status]}`}>
                 {order.status}
               </span>
             </div>
           </div>
         ))}
       </div>
+
+      {/* View All Link */}
+      <Link
+        href="/orders"
+        className="mt-5 flex items-center justify-center gap-2 py-2.5 rounded-xl border border-border/60 hover:border-primary/40 text-sm font-bold text-muted hover:text-primary transition-all duration-300 group"
+      >
+        View All Orders
+        <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+      </Link>
     </div>
   );
 }

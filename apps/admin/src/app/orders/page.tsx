@@ -5,6 +5,7 @@ import { Search, Eye, Clock, CheckCircle, XCircle, LayoutList, LayoutGrid } from
 import { Table } from "@/components/table";
 import { KanbanBoard } from "@/components/kanban-board";
 import { Drawer } from "@/components/ui/drawer";
+import { PageHeader } from "@/components/PageHeader";
 
 const initialOrders = [
   { id: "#JV-001", customer: "Priya Sharma", items: 3, total: "LKR 1,200", status: "completed", payment: "paid", type: "pickup", time: "2 min ago" },
@@ -20,6 +21,15 @@ const statusColors: Record<string, string> = {
   pending: "bg-yellow/10 text-yellow",
   ready: "bg-blue-100 text-blue-600",
   cancelled: "bg-pink/10 text-pink",
+};
+
+const filterDots: Record<string, string> = {
+  all: "bg-gray-400",
+  pending: "bg-yellow-400",
+  preparing: "bg-orange-400",
+  ready: "bg-blue-400",
+  completed: "bg-primary",
+  cancelled: "bg-pink",
 };
 
 export default function OrdersPage() {
@@ -52,7 +62,7 @@ export default function OrdersPage() {
       key: "actions",
       label: "Actions",
       render: (item: any) => (
-        <button 
+        <button
           onClick={() => setSelectedOrder(item)}
           className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-white/10 transition-colors"
         >
@@ -64,55 +74,58 @@ export default function OrdersPage() {
 
   const filters = ["all", "pending", "preparing", "ready", "completed", "cancelled"];
   const filtered = filter === "all" ? orders : orders.filter((o) => o.status === filter);
+  const countByStatus = (s: string) => s === "all" ? orders.length : orders.filter((o) => o.status === s).length;
+
+  const viewToggle = (
+    <div className="flex bg-gray-100 dark:bg-white/5 p-1 rounded-2xl border border-border/50 shadow-inner">
+      <button
+        onClick={() => setView("board")}
+        className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 ${
+          view === "board" ? "bg-white dark:bg-white/10 text-primary shadow-sm" : "text-muted hover:text-foreground"
+        }`}
+      >
+        <LayoutGrid className="w-4 h-4" /> Board
+      </button>
+      <button
+        onClick={() => setView("list")}
+        className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 ${
+          view === "list" ? "bg-white dark:bg-white/10 text-primary shadow-sm" : "text-muted hover:text-foreground"
+        }`}
+      >
+        <LayoutList className="w-4 h-4" /> List
+      </button>
+    </div>
+  );
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto px-2 animate-fade-in pb-12">
-      <div className="relative p-8 rounded-[2rem] glass-panel overflow-hidden mb-8">
-        <div className="absolute top-0 right-0 -mt-10 -mr-10 w-64 h-64 bg-orange/20 rounded-full blur-[80px]" />
-        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div>
-            <h1 className="text-3xl font-black text-foreground tracking-tight">Orders Management</h1>
-            <p className="text-muted font-medium mt-2">Manage and track customer orders in real-time</p>
-          </div>
-          <div className="flex bg-gray-100 dark:bg-white/5 p-1 rounded-2xl border border-border/50 shadow-inner">
-            <button
-              onClick={() => setView("board")}
-              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 ${
-                view === "board" ? "bg-white dark:bg-white/10 text-primary shadow-sm" : "text-muted hover:text-foreground hover:bg-white/50 dark:hover:bg-white/5"
-              }`}
-            >
-              <LayoutGrid className="w-4 h-4" />
-              Board
-            </button>
-            <button
-              onClick={() => setView("list")}
-              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 ${
-                view === "list" ? "bg-white dark:bg-white/10 text-primary shadow-sm" : "text-muted hover:text-foreground hover:bg-white/50 dark:hover:bg-white/5"
-              }`}
-            >
-              <LayoutList className="w-4 h-4" />
-              List
-            </button>
-          </div>
-        </div>
-      </div>
+      <PageHeader
+        title="Orders Management"
+        subtitle="Manage and track customer orders in real-time"
+        accentColor="orange"
+        action={viewToggle}
+      />
 
-      {/* Status Filters */}
-      {view === "list" && (
-        <div className="flex gap-2 flex-wrap px-2">
-          {filters.map((f) => (
-            <button
-              key={f}
-              onClick={() => setFilter(f)}
-              className={`px-5 py-2 rounded-xl text-sm font-bold capitalize transition-all duration-300 hover:-translate-y-0.5 ${
-                filter === f ? "bg-gradient-to-r from-primary to-primary-dark text-white shadow-[0_4px_15px_rgba(34,197,94,0.3)]" : "bg-white/60 dark:bg-white/5 text-muted hover:bg-white dark:hover:bg-white/10 hover:text-foreground border border-transparent dark:border-white/10 shadow-sm"
-              }`}
-            >
-              {f}
-            </button>
-          ))}
-        </div>
-      )}
+      {/* Status Filters — visible in both views */}
+      <div className="flex gap-2 flex-wrap px-2">
+        {filters.map((f) => (
+          <button
+            key={f}
+            onClick={() => setFilter(f)}
+            className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-bold capitalize transition-all duration-300 hover:-translate-y-0.5 ${
+              filter === f
+                ? "bg-gradient-to-r from-primary to-primary-dark text-white shadow-[0_4px_15px_rgba(34,197,94,0.3)]"
+                : "bg-white/60 dark:bg-white/5 text-muted hover:bg-white dark:hover:bg-white/10 hover:text-foreground border border-transparent dark:border-white/10 shadow-sm"
+            }`}
+          >
+            <span className={`w-1.5 h-1.5 rounded-full ${filter === f ? "bg-white" : filterDots[f]}`} />
+            {f}
+            <span className={`text-xs px-1.5 py-0.5 rounded-full font-black ${filter === f ? "bg-white/20" : "bg-gray-100 dark:bg-white/10"}`}>
+              {countByStatus(f)}
+            </span>
+          </button>
+        ))}
+      </div>
 
       <div className="px-2">
         {view === "board" ? (
@@ -125,26 +138,26 @@ export default function OrdersPage() {
       <Drawer
         isOpen={!!selectedOrder}
         onClose={() => setSelectedOrder(null)}
-        title={selectedOrder ? `Order Details - ${selectedOrder.id}` : "Order Details"}
+        title={selectedOrder ? `Order Details — ${selectedOrder.id}` : "Order Details"}
         position="right"
         size="md"
       >
         {selectedOrder && (
           <div className="space-y-6">
             <div className="glass-panel rounded-2xl p-4 bg-gray-50/50 dark:bg-white/5 border-border/50">
-              <h3 className="text-sm font-bold text-muted mb-4 uppercase tracking-wider">Customer Info</h3>
+              <h3 className="text-xs font-bold text-muted mb-4 uppercase tracking-wider">Customer Info</h3>
               <div className="flex items-center justify-between mb-2">
                 <span className="text-sm font-medium text-muted">Name</span>
                 <span className="text-sm font-bold text-foreground">{selectedOrder.customer}</span>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-sm font-medium text-muted">Time</span>
-                <span className="text-sm font-bold text-foreground flex items-center gap-1"><Clock className="w-4 h-4"/>{selectedOrder.time}</span>
+                <span className="text-sm font-bold text-foreground flex items-center gap-1"><Clock className="w-4 h-4" />{selectedOrder.time}</span>
               </div>
             </div>
 
             <div className="glass-panel rounded-2xl p-4 bg-gray-50/50 dark:bg-white/5 border-border/50">
-              <h3 className="text-sm font-bold text-muted mb-4 uppercase tracking-wider">Order Info</h3>
+              <h3 className="text-xs font-bold text-muted mb-4 uppercase tracking-wider">Order Info</h3>
               <div className="flex items-center justify-between mb-2">
                 <span className="text-sm font-medium text-muted">Status</span>
                 <span className={`inline-flex items-center gap-1 text-xs font-bold px-2 py-1 rounded-full capitalize ${statusColors[selectedOrder.status]}`}>
@@ -157,7 +170,7 @@ export default function OrdersPage() {
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-sm font-medium text-muted">Payment</span>
-                <span className={`inline-flex items-center gap-1 text-xs font-bold px-2 py-1 rounded-full capitalize ${selectedOrder.payment === 'paid' ? 'bg-primary/10 text-primary-dark' : 'bg-yellow/10 text-yellow-600'}`}>
+                <span className={`inline-flex items-center gap-1 text-xs font-bold px-2 py-1 rounded-full capitalize ${selectedOrder.payment === "paid" ? "bg-primary/10 text-primary-dark" : "bg-yellow/10 text-yellow-600"}`}>
                   {selectedOrder.payment}
                 </span>
               </div>
@@ -169,14 +182,14 @@ export default function OrdersPage() {
                 <span className="text-2xl font-black text-primary-dark">{selectedOrder.total}</span>
               </div>
             </div>
-            
+
             <div className="pt-4 flex gap-3">
-               <button className="flex-1 bg-white dark:bg-black border border-border rounded-xl py-3 text-sm font-bold text-foreground hover:bg-gray-50 dark:hover:bg-white/5 transition-colors">
-                 Print Receipt
-               </button>
-               <button className="flex-1 bg-gradient-to-r from-primary to-primary-dark rounded-xl py-3 text-sm font-bold text-white shadow-lg hover:-translate-y-0.5 transition-all">
-                 Update Status
-               </button>
+              <button className="flex-1 bg-white dark:bg-black border border-border rounded-xl py-3 text-sm font-bold text-foreground hover:bg-gray-50 dark:hover:bg-white/5 transition-colors">
+                Print Receipt
+              </button>
+              <button className="flex-1 bg-gradient-to-r from-primary to-primary-dark rounded-xl py-3 text-sm font-bold text-white shadow-lg hover:-translate-y-0.5 transition-all">
+                Update Status
+              </button>
             </div>
           </div>
         )}

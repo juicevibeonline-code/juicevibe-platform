@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { Plus, Trash2, Gift } from "lucide-react";
+import { Plus, Trash2 } from "lucide-react";
 import { Table } from "@/components/table";
+import { PageHeader } from "@/components/PageHeader";
 
 const initialCoupons = [
   { id: "1", code: "WELCOME10", type: "percentage", value: "10%", minOrder: "LKR 500", usage: "45/100", status: "active", expires: "Dec 31, 2024" },
@@ -42,21 +43,16 @@ const columns = [
 export default function CouponsPage() {
   const [coupons] = useState(initialCoupons);
 
+  const createBtn = (
+    <button className="flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-primary to-primary-dark text-white rounded-xl shadow-[0_4px_15px_rgba(34,197,94,0.3)] hover:scale-105 transition-all duration-300 font-bold cursor-pointer">
+      <Plus className="w-5 h-5" />
+      Create Coupon
+    </button>
+  );
+
   return (
     <div className="space-y-6 max-w-7xl mx-auto px-2 animate-fade-in pb-12">
-      <div className="relative p-8 rounded-[2rem] glass-panel overflow-hidden mb-8">
-        <div className="absolute top-0 right-0 -mt-10 -mr-10 w-64 h-64 bg-pink/20 rounded-full blur-[80px]" />
-        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div>
-            <h1 className="text-3xl font-black text-foreground tracking-tight">Coupons</h1>
-            <p className="text-muted font-medium mt-2">Create and manage promotional coupons</p>
-          </div>
-          <button className="flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-primary to-primary-dark text-white rounded-xl shadow-[0_4px_15px_rgba(34,197,94,0.3)] hover:scale-105 transition-all duration-300 font-bold cursor-pointer">
-            <Plus className="w-5 h-5" />
-            Create Coupon
-          </button>
-        </div>
-      </div>
+      <PageHeader title="Coupons" subtitle="Create and manage promotional coupons" accentColor="pink" action={createBtn} />
       <div className="px-2">
         <Table columns={columns} data={coupons} searchable />
       </div>

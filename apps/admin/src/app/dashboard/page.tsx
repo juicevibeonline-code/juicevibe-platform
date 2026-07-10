@@ -1,18 +1,56 @@
 "use client";
 
-import { DollarSign, ShoppingCart, Users, TrendingUp } from "lucide-react";
+import { DollarSign, ShoppingCart, Users, TrendingUp, ArrowRight } from "lucide-react";
 import { StatsCard } from "@/components/stats-card";
 import { RevenueChart } from "@/components/revenue-chart";
 import { RecentOrders } from "@/components/recent-orders";
+import { PageHeader } from "@/components/PageHeader";
+import { useEffect, useState } from "react";
+import Link from "next/link";
+
+function getGreeting() {
+  const hour = new Date().getHours();
+  if (hour < 12) return "Good morning";
+  if (hour < 18) return "Good afternoon";
+  return "Good evening";
+}
+
+function getFormattedDate() {
+  return new Date().toLocaleDateString("en-US", {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+}
 
 export default function DashboardPage() {
+  const [dateStr, setDateStr] = useState("");
+  const [greeting, setGreeting] = useState("");
+
+  useEffect(() => {
+    setDateStr(getFormattedDate());
+    setGreeting(getGreeting());
+  }, []);
+
   return (
     <div className="space-y-8 max-w-7xl mx-auto px-2 animate-fade-in pb-12">
+      {/* Page Header */}
       <div className="relative p-8 rounded-[2rem] glass-panel overflow-hidden mb-8">
         <div className="absolute top-0 right-0 -mt-10 -mr-10 w-64 h-64 bg-primary/20 rounded-full blur-[80px]" />
-        <div className="relative z-10">
-          <h1 className="text-3xl font-black text-foreground tracking-tight">Overview Dashboard</h1>
-          <p className="text-muted font-medium mt-2">Welcome back to Juice Vibe! Here's what's happening today.</p>
+        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <p className="text-sm font-semibold text-primary mb-1">{greeting} 👋</p>
+            <h1 className="text-3xl font-black text-foreground tracking-tight">Overview Dashboard</h1>
+            <p className="text-muted font-medium mt-1">{dateStr}</p>
+          </div>
+          <Link
+            href="/orders"
+            className="flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-primary to-primary-dark text-white rounded-xl shadow-[0_4px_15px_rgba(34,197,94,0.3)] hover:scale-105 transition-all duration-300 font-bold text-sm w-fit"
+          >
+            View All Orders
+            <ArrowRight className="w-4 h-4" />
+          </Link>
         </div>
       </div>
 
@@ -61,6 +99,9 @@ function QuickActionCard({ title, description, href, color }: { title: string; d
     >
       <h3 className="font-bold text-lg transition-colors">{title}</h3>
       <p className="text-sm font-medium text-muted mt-2">{description}</p>
+      <div className="flex items-center gap-1 mt-4 text-xs font-bold opacity-70 group-hover:opacity-100 transition-opacity">
+        Go to page <ArrowRight className="w-3 h-3" />
+      </div>
     </a>
   );
 }

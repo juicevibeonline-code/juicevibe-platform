@@ -1,27 +1,29 @@
 "use client";
 
 import { useState } from "react";
-import { Save } from "lucide-react";
+import { Save, CheckCircle } from "lucide-react";
+import { PageHeader } from "@/components/PageHeader";
+import { useToast } from "@/hooks/useToast";
 
 export default function SettingsPage() {
-  const [saved, setSaved] = useState(false);
+  const { toast } = useToast();
+  const [saving, setSaving] = useState(false);
 
-  const handleSave = () => {
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2000);
+  const handleSave = async () => {
+    setSaving(true);
+    await new Promise((r) => setTimeout(r, 800));
+    setSaving(false);
+    toast({ title: "Settings saved!", message: "Your configuration has been updated successfully.", type: "success" });
   };
 
   return (
     <div className="space-y-8 max-w-3xl mx-auto animate-fade-in pb-12">
-      <div className="relative p-8 rounded-[2rem] glass-panel overflow-hidden mb-8">
-        <div className="absolute top-0 right-0 -mt-10 -mr-10 w-64 h-64 bg-orange/20 rounded-full blur-[80px]" />
-        <div className="relative z-10">
-          <h1 className="text-3xl font-black text-foreground tracking-tight">Settings</h1>
-          <p className="text-muted font-medium mt-2">Manage your business configuration and preferences</p>
-        </div>
-      </div>
+      <PageHeader
+        title="Settings"
+        subtitle="Manage your business configuration and preferences"
+        accentColor="orange"
+      />
 
-      {/* General Settings */}
       <SettingsSection title="General Information">
         <div className="grid grid-cols-2 gap-4">
           <FormField label="Business Name" defaultValue="Juice Vibe" />
@@ -32,7 +34,6 @@ export default function SettingsPage() {
         </div>
       </SettingsSection>
 
-      {/* Business Hours */}
       <SettingsSection title="Business Hours">
         <div className="grid grid-cols-2 gap-4">
           <FormField label="Weekdays" defaultValue="8:00 AM - 10:00 PM" />
@@ -41,7 +42,6 @@ export default function SettingsPage() {
         </div>
       </SettingsSection>
 
-      {/* Pricing */}
       <SettingsSection title="Pricing & Delivery">
         <div className="grid grid-cols-2 gap-4">
           <FormField label="Tax Rate (%)" defaultValue="5" type="number" />
@@ -51,7 +51,6 @@ export default function SettingsPage() {
         </div>
       </SettingsSection>
 
-      {/* Social Media */}
       <SettingsSection title="Social Media">
         <div className="grid grid-cols-2 gap-4">
           <FormField label="Instagram URL" defaultValue="https://instagram.com/juicevibe" />
@@ -64,10 +63,20 @@ export default function SettingsPage() {
       {/* Save Button */}
       <button
         onClick={handleSave}
-        className="flex items-center justify-center gap-2 w-full sm:w-auto px-8 py-3.5 bg-gradient-to-r from-primary to-primary-dark text-white rounded-xl hover:scale-105 transition-all duration-300 font-bold shadow-[0_4px_15px_rgba(34,197,94,0.3)] mt-8 cursor-pointer"
+        disabled={saving}
+        className="flex items-center justify-center gap-2 w-full sm:w-auto px-8 py-3.5 bg-gradient-to-r from-primary to-primary-dark text-white rounded-xl hover:scale-105 transition-all duration-300 font-bold shadow-[0_4px_15px_rgba(34,197,94,0.3)] mt-8 cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed disabled:scale-100"
       >
-        <Save className="w-5 h-5" />
-        {saved ? "Changes Saved!" : "Save Configuration"}
+        {saving ? (
+          <>
+            <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+            Saving...
+          </>
+        ) : (
+          <>
+            <Save className="w-5 h-5" />
+            Save Configuration
+          </>
+        )}
       </button>
     </div>
   );

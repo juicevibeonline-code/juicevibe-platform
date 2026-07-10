@@ -2,19 +2,18 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import Image from "next/image";
 import {
   LayoutDashboard,
   ShoppingBag,
   ClipboardList,
   Users,
-  Image,
-  MessageSquare,
+  Image as ImageIcon,
   Tag,
   Mail,
   Settings,
   LogOut,
   Star,
-  Leaf,
   FileText,
 } from "lucide-react";
 
@@ -23,7 +22,7 @@ const navItems = [
   { href: "/menu", label: "Menu", icon: ShoppingBag },
   { href: "/orders", label: "Orders", icon: ClipboardList },
   { href: "/customers", label: "Customers", icon: Users },
-  { href: "/gallery", label: "Gallery", icon: Image },
+  { href: "/gallery", label: "Gallery", icon: ImageIcon },
   { href: "/blog", label: "Blog", icon: FileText },
   { href: "/testimonials", label: "Testimonials", icon: Star },
   { href: "/coupons", label: "Coupons", icon: Tag },
@@ -39,8 +38,13 @@ export function Sidebar() {
       {/* Logo */}
       <div className="p-6 pb-4 mb-2">
         <Link href="/dashboard" className="flex items-center gap-3 group">
-          <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-primary to-primary-dark flex items-center justify-center shadow-[0_4px_20px_rgba(34,197,94,0.3)] group-hover:scale-105 transition-transform duration-300">
-            <Leaf className="w-6 h-6 text-white" />
+          <div className="relative w-11 h-11 rounded-full overflow-hidden ring-2 ring-primary/30 shadow-[0_4px_20px_rgba(34,197,94,0.3)] group-hover:scale-105 transition-transform duration-300 shrink-0">
+            <Image
+              src="/images/Logo.jpeg"
+              alt="Juice Vibe Logo"
+              fill
+              className="object-cover"
+            />
           </div>
           <div>
             <h1 className="text-xl font-bold tracking-tight text-foreground group-hover:text-primary transition-colors">Juice Vibe</h1>
@@ -50,7 +54,7 @@ export function Sidebar() {
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 px-4 space-y-1.5 overflow-y-auto pb-4">
+      <nav className="flex-1 px-4 space-y-1.5 overflow-y-auto pb-4 custom-scrollbar">
         {navItems.map((item) => {
           const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
           const Icon = item.icon;
@@ -66,6 +70,9 @@ export function Sidebar() {
             >
               <Icon className={`w-5 h-5 flex-shrink-0 transition-transform duration-300 ${isActive ? 'scale-110' : 'group-hover:scale-110 group-hover:text-primary'}`} />
               {item.label}
+              {isActive && (
+                <span className="ml-auto w-1.5 h-1.5 rounded-full bg-white/70" />
+              )}
             </Link>
           );
         })}

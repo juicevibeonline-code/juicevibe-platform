@@ -157,17 +157,24 @@ export function Hero() {
     return () => window.removeEventListener("mousemove", handleMouseMove);
   }, [mouseX, mouseY]);
 
-  // Dynamic particle items (persists on render)
-  const particlesRef = useRef(
-    Array.from({ length: 20 }, (_, i) => ({
-      id: i,
-      size: Math.random() * 5 + 3,
-      x: Math.random() * 100,
-      y: Math.random() * 100,
-      duration: Math.random() * 8 + 8,
-      delay: Math.random() * 3,
-    }))
-  );
+  // Dynamic particle items — client-only to avoid SSR/client hydration mismatch
+  const [particles, setParticles] = useState<
+    { id: number; size: number; x: number; y: number; duration: number; delay: number; drift: number }[]
+  >([]);
+
+  useEffect(() => {
+    setParticles(
+      Array.from({ length: 20 }, (_, i) => ({
+        id: i,
+        size: Math.random() * 5 + 3,
+        x: Math.random() * 100,
+        y: Math.random() * 100,
+        duration: Math.random() * 8 + 8,
+        delay: Math.random() * 3,
+        drift: Math.random() * 30 - 15,
+      }))
+    );
+  }, []);
 
   return (
     <>
@@ -175,9 +182,9 @@ export function Hero() {
         className="relative min-h-screen w-full flex flex-col justify-between overflow-hidden pt-28 pb-10 transition-all duration-700 select-none"
         style={{ background: activeTheme.bgGradient }}
       >
-        {/* Background Particles Layer */}
+        {/* Background Particles Layer — rendered client-only to avoid hydration mismatch */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
-          {particlesRef.current.map((p) => (
+          {particles.map((p) => (
             <motion.div
               key={p.id}
               className={cn("absolute rounded-full opacity-30", activeTheme.particleColor)}
@@ -189,7 +196,7 @@ export function Hero() {
               }}
               animate={{
                 y: [0, -80, 0],
-                x: [0, Math.random() * 30 - 15, 0],
+                x: [0, p.drift, 0],
                 opacity: [0.15, 0.4, 0.15],
               }}
               transition={{

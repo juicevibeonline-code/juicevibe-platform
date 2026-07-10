@@ -1,19 +1,51 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { Bell, Search, ChevronDown, LogOut, User, Settings, Sun, Moon } from "lucide-react";
+import { Bell, ChevronDown, LogOut, User, Settings, Sun, Moon, Menu } from "lucide-react";
 import { cn } from "@juice-vibe/utils";
 import { CommandPalette } from "@/components/ui/command-palette";
 import { useTheme } from "next-themes";
+import { usePathname } from "next/navigation";
+import Link from "next/link";
 
-export function Header() {
+const pageTitles: Record<string, string> = {
+  "/dashboard": "Dashboard",
+  "/menu": "Menu",
+  "/orders": "Orders",
+  "/customers": "Customers",
+  "/gallery": "Gallery",
+  "/blog": "Blog",
+  "/testimonials": "Testimonials",
+  "/coupons": "Coupons",
+  "/messages": "Messages",
+  "/settings": "Settings",
+};
+
+const notifications = [
+  { title: "New order received", desc: "Order #JV-001 from Priya Sharma", time: "2 min ago", unread: true },
+  { title: "Low stock alert", desc: "Mango Smoothie is running low", time: "1 hour ago", unread: true },
+  { title: "Customer message", desc: "Sarah Johnson sent a message", time: "3 hours ago", unread: false },
+];
+
+interface HeaderProps {
+  onMobileMenuClick?: () => void;
+}
+
+export function Header({ onMobileMenuClick }: HeaderProps) {
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
-  
+
   const notificationsRef = useRef<HTMLDivElement>(null);
   const userMenuRef = useRef<HTMLDivElement>(null);
   const { theme, setTheme } = useTheme();
+  const pathname = usePathname();
+
+  const unreadCount = notifications.filter((n) => n.unread).length;
+
+  // Get the current page title from the path
+  const currentPage =
+    Object.entries(pageTitles).find(([key]) => pathname === key || pathname.startsWith(key + "/"))?.[1] ?? "Dashboard";
 
   useEffect(() => {
     setMounted(true);
@@ -34,10 +66,20 @@ export function Header() {
       <div className="flex items-center justify-between h-16 px-4 md:px-6">
         <div className="flex items-center gap-3 w-full max-w-md">
           {/* Mobile Menu Toggle */}
-          <button className="md:hidden p-2 bg-white/50 dark:bg-white/5 rounded-lg text-gray-600 dark:text-gray-400 hover:bg-white hover:text-primary transition-colors">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
+          <button
+            onClick={onMobileMenuClick}
+            className="md:hidden p-2 bg-white/50 dark:bg-white/5 rounded-lg text-gray-600 dark:text-gray-400 hover:bg-white hover:text-primary transition-colors shrink-0"
+            aria-label="Open menu"
+          >
+            <Menu className="w-5 h-5" />
           </button>
-          
+
+          {/* Page Breadcrumb — desktop only */}
+          <span className="hidden md:block text-sm font-semibold text-muted shrink-0">
+            {currentPage}
+          </span>
+          <span className="hidden md:block text-muted/40 shrink-0">/</span>
+
           {/* Search / Command Palette */}
           <div className="relative w-full group">
             <CommandPalette />
@@ -45,7 +87,7 @@ export function Header() {
         </div>
 
         {/* Actions */}
-        <div className="flex items-center gap-2 md:gap-4">
+        <div className="flex items-center gap-2 md:gap-3 ml-3">
           {/* Theme Toggle */}
           <button
             onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
@@ -70,9 +112,11 @@ export function Header() {
               aria-expanded={notificationsOpen}
             >
               <Bell className="w-5 h-5 text-muted hover:text-foreground transition-colors" />
-              <span className="absolute -top-1 -right-1 w-4 h-4 bg-pink text-white text-[10px] font-bold rounded-full flex items-center justify-center">
-                3
-              </span>
+              {unreadCount > 0 && (
+                <span className="absolute -top-1 -right-1 w-4 h-4 bg-pink text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+                  {unreadCount}
+                </span>
+              )}
             </button>
 
             {notificationsOpen && (
@@ -81,12 +125,8 @@ export function Header() {
                   <h3 className="font-semibold text-foreground">Notifications</h3>
                   <button className="text-sm text-primary hover:underline">Mark all read</button>
                 </div>
-                <div className="max-h-64 overflow-y-auto">
-                  {[
-                    { title: "New order received", desc: "Order #JV-001 from Priya Sharma", time: "2 min ago", unread: true },
-                    { title: "Low stock alert", desc: "Mango Smoothie is running low", time: "1 hour ago", unread: true },
-                    { title: "Customer message", desc: "Sarah Johnson sent a message", time: "3 hours ago", unread: false },
-                  ].map((n, i) => (
+                <div className="max-h-64 overflow-y-auto custom-scrollbar">
+                  {notifications.map((n, i) => (
                     <div
                       key={i}
                       className={cn(
@@ -111,36 +151,36 @@ export function Header() {
           <div className="relative" ref={userMenuRef}>
             <button
               onClick={() => setUserMenuOpen(!userMenuOpen)}
-              className="flex items-center gap-3 pl-4 pr-2 py-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-white/5 transition-colors cursor-pointer"
+              className="flex items-center gap-2.5 pl-3 pr-2 py-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-white/5 transition-colors cursor-pointer"
               aria-expanded={userMenuOpen}
               aria-haspopup="true"
             >
-              <div className="w-9 h-9 rounded-full bg-primary/20 flex items-center justify-center">
-                <span className="text-sm font-bold text-primary-dark">A</span>
+              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-primary-dark flex items-center justify-center shadow-sm">
+                <span className="text-xs font-black text-white tracking-wider">JV</span>
               </div>
               <div className="hidden md:block text-left">
-                <p className="text-sm font-medium text-foreground leading-none">Admin</p>
-                <p className="text-xs text-muted mt-1 leading-none">admin@juicevibe.com</p>
+                <p className="text-sm font-semibold text-foreground leading-none">Admin</p>
+                <p className="text-xs text-muted mt-0.5 leading-none">admin@juicevibe.com</p>
               </div>
-              <ChevronDown className="w-4 h-4 text-muted" />
+              <ChevronDown className={cn("w-4 h-4 text-muted transition-transform duration-200", userMenuOpen && "rotate-180")} />
             </button>
 
             {userMenuOpen && (
               <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-[#111813] rounded-xl border border-border dark:border-white/10 shadow-lg py-2 animate-slide-down z-50">
                 <div className="px-4 py-3 border-b border-border dark:border-white/10">
-                  <p className="font-medium text-foreground">Admin</p>
-                  <p className="text-xs text-muted">admin@juicevibe.com</p>
+                  <p className="font-semibold text-foreground text-sm">Admin</p>
+                  <p className="text-xs text-muted mt-0.5">admin@juicevibe.com</p>
                 </div>
-                <Link href="/settings" className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5">
+                <Link href="/settings" className="flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors">
                   <Settings className="w-4 h-4" />
                   Settings
                 </Link>
-                <Link href="/settings" className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5">
+                <Link href="/settings" className="flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors">
                   <User className="w-4 h-4" />
                   Profile
                 </Link>
-                <hr className="my-2 border-border dark:border-white/10" />
-                <button className="flex items-center gap-2 px-4 py-2 text-sm text-pink hover:bg-pink/5 w-full cursor-pointer">
+                <hr className="my-1 border-border dark:border-white/10" />
+                <button className="flex items-center gap-2 px-4 py-2.5 text-sm text-pink hover:bg-pink/5 w-full cursor-pointer transition-colors">
                   <LogOut className="w-4 h-4" />
                   Sign Out
                 </button>
@@ -151,8 +191,4 @@ export function Header() {
       </div>
     </header>
   );
-}
-
-function Link({ href, children, className, ...props }: { href: string; children: React.ReactNode; className?: string } & React.AnchorHTMLAttributes<HTMLAnchorElement>) {
-  return <a href={href} className={className} {...props}>{children}</a>;
 }

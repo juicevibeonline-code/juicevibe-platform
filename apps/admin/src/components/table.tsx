@@ -41,7 +41,7 @@ export function Table<T extends Record<string, any>>({
   };
 
   return (
-    <div className="glass-panel rounded-3xl overflow-hidden shadow-sm flex flex-col relative max-h-[800px]">
+    <div className="glass-panel rounded-3xl overflow-hidden shadow-sm flex flex-col relative">
       {searchable && (
         <div className="p-5 border-b border-border/50 bg-white/40 dark:bg-black/20 shrink-0">
           <div className="relative max-w-sm group">
