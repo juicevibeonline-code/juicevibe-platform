@@ -11,10 +11,10 @@ interface StatsCardProps {
 }
 
 const variants = {
-  primary: { bg: "bg-gradient-to-br from-primary to-primary-dark", icon: "text-white", shadow: "shadow-[0_8px_20px_rgba(34,197,94,0.3)]", glow: "from-primary/20" },
-  orange: { bg: "bg-gradient-to-br from-orange to-[#EA580C]", icon: "text-white", shadow: "shadow-[0_8px_20px_rgba(249,115,22,0.3)]", glow: "from-orange/20" },
-  pink: { bg: "bg-gradient-to-br from-pink to-[#BE123C]", icon: "text-white", shadow: "shadow-[0_8px_20px_rgba(225,29,72,0.3)]", glow: "from-pink/20" },
-  yellow: { bg: "bg-gradient-to-br from-yellow to-[#B45309]", icon: "text-white", shadow: "shadow-[0_8px_20px_rgba(217,119,6,0.3)]", glow: "from-yellow/20" },
+  primary: { bg: "bg-gradient-to-br from-primary to-primary-dark", icon: "text-white", shadow: "shadow-[0_8px_20px_rgba(16,185,129,0.25)]", glow: "from-primary/20" },
+  orange: { bg: "bg-gradient-to-br from-orange to-[#EA580C]", icon: "text-white", shadow: "shadow-[0_8px_20px_rgba(249,115,22,0.25)]", glow: "from-orange/20" },
+  pink: { bg: "bg-gradient-to-br from-pink to-[#BE123C]", icon: "text-white", shadow: "shadow-[0_8px_20px_rgba(239,68,68,0.25)]", glow: "from-pink/20" },
+  yellow: { bg: "bg-gradient-to-br from-yellow to-[#B45309]", icon: "text-white", shadow: "shadow-[0_8px_20px_rgba(245,158,11,0.25)]", glow: "from-yellow/20" },
 };
 
 export function StatsCard({ title, value, change, icon: Icon, variant = "primary" }: StatsCardProps) {

@@ -8,11 +8,11 @@ import { Drawer } from "@/components/ui/drawer";
 import { PageHeader } from "@/components/PageHeader";
 
 const initialOrders = [
-  { id: "#JV-001", customer: "Priya Sharma", items: 3, total: "LKR 1,200", status: "completed", payment: "paid", type: "pickup", time: "2 min ago" },
-  { id: "#JV-002", customer: "Rahul Verma", items: 2, total: "LKR 850", status: "preparing", payment: "paid", type: "delivery", time: "15 min ago" },
-  { id: "#JV-003", customer: "Ananya Patel", items: 1, total: "LKR 350", status: "pending", payment: "pending", type: "dine-in", time: "28 min ago" },
-  { id: "#JV-004", customer: "Arjun Nair", items: 4, total: "LKR 2,100", status: "ready", payment: "paid", type: "pickup", time: "45 min ago" },
-  { id: "#JV-005", customer: "Neha Gupta", items: 2, total: "LKR 950", status: "cancelled", payment: "refunded", type: "delivery", time: "1 hr ago" },
+  { id: "#JV-001", customer: "Priya Sharma", items: [{ name: "Chocolate Milkshake", qty: 2 }, { name: "Mango Smoothie", qty: 1 }], total: "LKR 1,200", status: "completed", payment: "paid", type: "pickup" as const, time: "2 min ago" },
+  { id: "#JV-002", customer: "Rahul Verma", items: [{ name: "Virgin Mojito", qty: 2 }], total: "LKR 850", status: "preparing", payment: "paid", type: "delivery" as const, time: "15 min ago" },
+  { id: "#JV-003", customer: "Ananya Patel", items: [{ name: "Classic Lassi", qty: 1 }], total: "LKR 350", status: "pending", payment: "pending", type: "dine-in" as const, time: "28 min ago" },
+  { id: "#JV-004", customer: "Arjun Nair", items: [{ name: "Avocado Smoothie", qty: 3 }, { name: "Fresh Orange Juice", qty: 1 }], total: "LKR 2,100", status: "ready", payment: "paid", type: "pickup" as const, time: "45 min ago" },
+  { id: "#JV-005", customer: "Neha Gupta", items: [{ name: "Chocolate Milkshake", qty: 2 }], total: "LKR 950", status: "cancelled", payment: "refunded", type: "delivery" as const, time: "1 hr ago" },
 ];
 
 const statusColors: Record<string, string> = {
@@ -33,15 +33,43 @@ const filterDots: Record<string, string> = {
 };
 
 export default function OrdersPage() {
-  const [orders] = useState(initialOrders);
+  const [orders, setOrders] = useState(initialOrders);
   const [filter, setFilter] = useState("all");
   const [view, setView] = useState<"list" | "board">("board");
   const [selectedOrder, setSelectedOrder] = useState<any>(null);
 
+  const handleStatusChange = (orderId: string, newStatus: string) => {
+    setOrders((prev) =>
+      prev.map((o) => (o.id === orderId ? { ...o, status: newStatus } : o))
+    );
+    // If the currently selected order is being dragged, update its status in the drawer too
+    if (selectedOrder && selectedOrder.id === orderId) {
+      setSelectedOrder((prev: any) => ({ ...prev, status: newStatus }));
+    }
+  };
+
+  const handleUpdateStatus = () => {
+    if (!selectedOrder) return;
+    const statusCycle: Record<string, string> = {
+      pending: "preparing",
+      preparing: "ready",
+      ready: "completed",
+      completed: "pending",
+    };
+    const nextStatus = statusCycle[selectedOrder.status] || "pending";
+    handleStatusChange(selectedOrder.id, nextStatus);
+  };
+
   const columns = [
     { key: "id", label: "Order ID" },
     { key: "customer", label: "Customer" },
-    { key: "items", label: "Items" },
+    { 
+      key: "items", 
+      label: "Items",
+      render: (item: any) => (
+        <span>{item.items.reduce((acc: number, it: any) => acc + it.qty, 0)} items</span>
+      )
+    },
     { key: "total", label: "Total" },
     {
       key: "status",
@@ -64,7 +92,7 @@ export default function OrdersPage() {
       render: (item: any) => (
         <button
           onClick={() => setSelectedOrder(item)}
-          className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-white/10 transition-colors"
+          className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-white/10 transition-colors cursor-pointer"
         >
           <Eye className="w-4 h-4 text-muted hover:text-primary transition-colors" />
         </button>
@@ -80,7 +108,7 @@ export default function OrdersPage() {
     <div className="flex bg-gray-100 dark:bg-white/5 p-1 rounded-2xl border border-border/50 shadow-inner">
       <button
         onClick={() => setView("board")}
-        className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 ${
+        className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 cursor-pointer ${
           view === "board" ? "bg-white dark:bg-white/10 text-primary shadow-sm" : "text-muted hover:text-foreground"
         }`}
       >
@@ -88,7 +116,7 @@ export default function OrdersPage() {
       </button>
       <button
         onClick={() => setView("list")}
-        className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 ${
+        className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 cursor-pointer ${
           view === "list" ? "bg-white dark:bg-white/10 text-primary shadow-sm" : "text-muted hover:text-foreground"
         }`}
       >
@@ -112,7 +140,7 @@ export default function OrdersPage() {
           <button
             key={f}
             onClick={() => setFilter(f)}
-            className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-bold capitalize transition-all duration-300 hover:-translate-y-0.5 ${
+            className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-bold capitalize transition-all duration-300 hover:-translate-y-0.5 cursor-pointer ${
               filter === f
                 ? "bg-gradient-to-r from-primary to-primary-dark text-white shadow-[0_4px_15px_rgba(34,197,94,0.3)]"
                 : "bg-white/60 dark:bg-white/5 text-muted hover:bg-white dark:hover:bg-white/10 hover:text-foreground border border-transparent dark:border-white/10 shadow-sm"
@@ -129,7 +157,11 @@ export default function OrdersPage() {
 
       <div className="px-2">
         {view === "board" ? (
-          <KanbanBoard onOrderClick={(order) => setSelectedOrder(order)} />
+          <KanbanBoard 
+            orders={filtered} 
+            onStatusChange={handleStatusChange} 
+            onOrderClick={(order) => setSelectedOrder(order)} 
+          />
         ) : (
           <Table columns={columns} data={filtered} searchable />
         )}
@@ -157,6 +189,18 @@ export default function OrdersPage() {
             </div>
 
             <div className="glass-panel rounded-2xl p-4 bg-gray-50/50 dark:bg-white/5 border-border/50">
+              <h3 className="text-xs font-bold text-muted mb-4 uppercase tracking-wider">Order Items</h3>
+              <div className="space-y-2">
+                {selectedOrder.items.map((item: any, idx: number) => (
+                  <div key={idx} className="flex justify-between items-center text-sm border-b border-border/20 pb-2 last:border-0 last:pb-0">
+                    <span className="font-semibold text-foreground">{item.name}</span>
+                    <span className="font-extrabold text-primary">x{item.qty}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="glass-panel rounded-2xl p-4 bg-gray-50/50 dark:bg-white/5 border-border/50">
               <h3 className="text-xs font-bold text-muted mb-4 uppercase tracking-wider">Order Info</h3>
               <div className="flex items-center justify-between mb-2">
                 <span className="text-sm font-medium text-muted">Status</span>
@@ -178,22 +222,26 @@ export default function OrdersPage() {
 
             <div className="glass-panel rounded-2xl p-4 bg-primary/5 border-primary/20">
               <div className="flex items-center justify-between">
-                <span className="text-base font-bold text-foreground">Total ({selectedOrder.items} items)</span>
+                <span className="text-base font-bold text-foreground">Total ({selectedOrder.items.reduce((acc: number, it: any) => acc + it.qty, 0)} items)</span>
                 <span className="text-2xl font-black text-primary-dark">{selectedOrder.total}</span>
               </div>
             </div>
 
             <div className="pt-4 flex gap-3">
-              <button className="flex-1 bg-white dark:bg-black border border-border rounded-xl py-3 text-sm font-bold text-foreground hover:bg-gray-50 dark:hover:bg-white/5 transition-colors">
+              <button className="flex-1 bg-white dark:bg-black border border-border rounded-xl py-3 text-sm font-bold text-foreground hover:bg-gray-50 dark:hover:bg-white/5 transition-colors cursor-pointer">
                 Print Receipt
               </button>
-              <button className="flex-1 bg-gradient-to-r from-primary to-primary-dark rounded-xl py-3 text-sm font-bold text-white shadow-lg hover:-translate-y-0.5 transition-all">
+              <button 
+                onClick={handleUpdateStatus}
+                className="flex-1 bg-gradient-to-r from-primary to-primary-dark rounded-xl py-3 text-sm font-bold text-white shadow-lg hover:-translate-y-0.5 transition-all cursor-pointer"
+              >
                 Update Status
               </button>
             </div>
           </div>
         )}
       </Drawer>
+
     </div>
   );
 }

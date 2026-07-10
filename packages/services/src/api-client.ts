@@ -3,7 +3,7 @@ import { apiConfig } from "@juice-vibe/config";
 
 export type ApiClient = AxiosInstance;
 
-let store: { getState: () => { tokens?: { accessToken: string } } } | undefined;
+let store: { getState: () => { tokens?: { accessToken: string; refreshToken?: string } } } | undefined;
 
 export function injectAuthStore(s: typeof store) {
   store = s;

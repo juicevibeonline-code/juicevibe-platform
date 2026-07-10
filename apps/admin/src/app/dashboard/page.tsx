@@ -1,10 +1,9 @@
 "use client";
 
-import { DollarSign, ShoppingCart, Users, TrendingUp, ArrowRight } from "lucide-react";
+import { DollarSign, ShoppingCart, Users, TrendingUp, ArrowRight, Sparkles } from "lucide-react";
 import { StatsCard } from "@/components/stats-card";
-import { RevenueChart } from "@/components/revenue-chart";
+import { RevenueChart, CategorySalesChart } from "@/components/revenue-chart";
 import { RecentOrders } from "@/components/recent-orders";
-import { PageHeader } from "@/components/PageHeader";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 
@@ -35,20 +34,29 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-8 max-w-7xl mx-auto px-2 animate-fade-in pb-12">
-      {/* Page Header */}
+      {/* Hero Greeting Section */}
       <div className="relative p-8 rounded-[2rem] glass-panel overflow-hidden mb-8">
-        <div className="absolute top-0 right-0 -mt-10 -mr-10 w-64 h-64 bg-primary/20 rounded-full blur-[80px]" />
-        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div>
-            <p className="text-sm font-semibold text-primary mb-1">{greeting} 👋</p>
-            <h1 className="text-3xl font-black text-foreground tracking-tight">Overview Dashboard</h1>
-            <p className="text-muted font-medium mt-1">{dateStr}</p>
+        {/* Glow Effects */}
+        <div className="absolute top-0 right-0 -mt-10 -mr-10 w-80 h-80 bg-primary/20 rounded-full blur-[90px]" />
+        <div className="absolute bottom-0 left-1/3 -mb-10 w-60 h-60 bg-orange/10 rounded-full blur-[80px]" />
+        
+        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div className="flex items-start gap-4">
+            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary to-primary-dark flex items-center justify-center text-white shadow-[0_8px_20px_rgba(34,197,94,0.35)] shrink-0">
+              <Sparkles className="w-7 h-7" />
+            </div>
+            <div>
+              <p className="text-xs font-black text-primary uppercase tracking-widest">{greeting} 👋</p>
+              <h1 className="text-3xl font-black text-foreground tracking-tight mt-1">Workspace Overview</h1>
+              <p className="text-muted-foreground font-semibold text-sm mt-1">{dateStr}</p>
+            </div>
           </div>
+          
           <Link
             href="/orders"
-            className="flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-primary to-primary-dark text-white rounded-xl shadow-[0_4px_15px_rgba(34,197,94,0.3)] hover:scale-105 transition-all duration-300 font-bold text-sm w-fit"
+            className="flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-primary to-primary-dark text-white rounded-xl shadow-[0_4px_15px_rgba(34,197,94,0.3)] hover:scale-105 active:scale-95 transition-all duration-300 font-extrabold text-sm w-fit"
           >
-            View All Orders
+            Live Orders Board
             <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
@@ -62,23 +70,31 @@ export default function DashboardPage() {
         <StatsCard title="Avg. Order Value" value="LKR 850" change={5.7} icon={TrendingUp} variant="yellow" />
       </div>
 
-      {/* Charts and Recent Orders */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="glass-panel rounded-3xl p-6">
-          <RevenueChart />
+      {/* Main Charts & Side Listing */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Left column: Analytics */}
+        <div className="lg:col-span-2 space-y-6">
+          <div className="glass-panel rounded-3xl p-6 border border-white/40 dark:border-white/5 shadow-sm">
+            <RevenueChart />
+          </div>
+          <div className="glass-panel rounded-3xl p-6 border border-white/40 dark:border-white/5 shadow-sm">
+            <CategorySalesChart />
+          </div>
         </div>
-        <div className="glass-panel rounded-3xl p-6">
+
+        {/* Right column: Orders list */}
+        <div className="glass-panel rounded-3xl p-6 border border-white/40 dark:border-white/5 shadow-sm">
           <RecentOrders />
         </div>
       </div>
 
       {/* Quick Actions */}
       <div>
-        <h2 className="text-xl font-bold mb-4 px-2">Quick Actions</h2>
+        <h2 className="text-xl font-black mb-5 px-2 text-foreground">Quick Shortcuts</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <QuickActionCard title="Add Menu Item" description="Create a new product or beverage" href="/menu" color="primary" />
-          <QuickActionCard title="View Orders" description="Manage incoming and active orders" href="/orders" color="orange" />
-          <QuickActionCard title="Upload Gallery" description="Add new images to the gallery" href="/gallery" color="pink" />
+          <QuickActionCard title="Add Menu Item" description="Create a new beverage or food item" href="/menu" color="primary" />
+          <QuickActionCard title="Track Orders" description="Manage active, cooking and ready orders" href="/orders" color="orange" />
+          <QuickActionCard title="Upload Assets" description="Manage image gallery and cafe promos" href="/gallery" color="pink" />
         </div>
       </div>
     </div>
@@ -93,15 +109,15 @@ function QuickActionCard({ title, description, href, color }: { title: string; d
   };
 
   return (
-    <a
+    <Link
       href={href}
-      className={`rounded-3xl border bg-gradient-to-br p-6 transition-all duration-300 shadow-sm hover:shadow-xl hover:-translate-y-1 ${colors[color]} group cursor-pointer block backdrop-blur-sm`}
+      className={`rounded-3xl border bg-gradient-to-br p-6 transition-all duration-300 shadow-sm hover:shadow-xl hover:-translate-y-1.5 ${colors[color]} group cursor-pointer block backdrop-blur-sm`}
     >
-      <h3 className="font-bold text-lg transition-colors">{title}</h3>
-      <p className="text-sm font-medium text-muted mt-2">{description}</p>
-      <div className="flex items-center gap-1 mt-4 text-xs font-bold opacity-70 group-hover:opacity-100 transition-opacity">
-        Go to page <ArrowRight className="w-3 h-3" />
+      <h3 className="font-extrabold text-lg transition-colors">{title}</h3>
+      <p className="text-sm font-semibold text-muted-foreground mt-2">{description}</p>
+      <div className="flex items-center gap-1 mt-4 text-xs font-bold opacity-75 group-hover:opacity-100 transition-opacity">
+        Open manager <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
       </div>
-    </a>
+    </Link>
   );
 }

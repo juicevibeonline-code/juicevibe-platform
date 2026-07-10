@@ -1,7 +1,7 @@
 "use client";
 
-import { Modal } from "./modal";
-import { Button } from "./button";
+import { Modal } from "./Modal";
+import { Button } from "./Button";
 
 interface ConfirmDialogProps {
   isOpen: boolean;
@@ -11,7 +11,7 @@ interface ConfirmDialogProps {
   message: string;
   confirmText?: string;
   cancelText?: string;
-  variant?: "destructive" | "primary";
+  variant?: "danger" | "primary";
   loading?: boolean;
 }
 
@@ -23,7 +23,7 @@ export function ConfirmDialog({
   message,
   confirmText = "Confirm",
   cancelText = "Cancel",
-  variant = "destructive",
+  variant = "danger",
   loading,
 }: ConfirmDialogProps) {
   return (
@@ -33,7 +33,7 @@ export function ConfirmDialog({
         <Button variant="outline" onClick={onClose} disabled={loading}>
           {cancelText}
         </Button>
-        <Button variant={variant} onClick={onConfirm} loading={loading}>
+        <Button variant={variant} onClick={onConfirm} isLoading={loading}>
           {confirmText}
         </Button>
       </div>

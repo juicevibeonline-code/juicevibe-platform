@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
+import { motion } from "framer-motion";
 import {
   LayoutDashboard,
   ShoppingBag,
@@ -34,7 +35,7 @@ export function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className="h-full w-full glass-panel rounded-[2rem] flex flex-col overflow-hidden animate-slide-in">
+    <aside className="h-full w-full glass-panel rounded-[2rem] flex flex-col overflow-hidden animate-slide-in border border-white/60 dark:border-white/10 shadow-xl">
       {/* Logo */}
       <div className="p-6 pb-4 mb-2">
         <Link href="/dashboard" className="flex items-center gap-3 group">
@@ -47,14 +48,14 @@ export function Sidebar() {
             />
           </div>
           <div>
-            <h1 className="text-xl font-bold tracking-tight text-foreground group-hover:text-primary transition-colors">Juice Vibe</h1>
-            <p className="text-xs font-bold text-muted">Admin Workspace</p>
+            <h1 className="text-xl font-black tracking-tight text-foreground group-hover:text-primary transition-colors">Juice Vibe</h1>
+            <p className="text-[10px] font-extrabold text-muted uppercase tracking-widest">Admin Workspace</p>
           </div>
         </Link>
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 px-4 space-y-1.5 overflow-y-auto pb-4 custom-scrollbar">
+      <nav className="flex-1 px-4 space-y-1.5 overflow-y-auto pb-4 custom-scrollbar relative">
         {navItems.map((item) => {
           const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
           const Icon = item.icon;
@@ -62,16 +63,23 @@ export function Sidebar() {
             <Link
               key={item.href}
               href={item.href}
-              className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all duration-300 group ${
+              className={`relative flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all duration-300 group border border-transparent ${
                 isActive
-                  ? "bg-gradient-to-r from-primary to-primary-dark text-white shadow-[0_4px_15px_rgba(34,197,94,0.25)] translate-x-1"
-                  : "text-muted hover:bg-white/50 dark:hover:bg-white/5 hover:text-foreground hover:shadow-sm border border-transparent"
+                  ? "text-white"
+                  : "text-muted hover:bg-white/50 dark:hover:bg-white/5 hover:text-foreground hover:shadow-sm"
               }`}
             >
-              <Icon className={`w-5 h-5 flex-shrink-0 transition-transform duration-300 ${isActive ? 'scale-110' : 'group-hover:scale-110 group-hover:text-primary'}`} />
-              {item.label}
               {isActive && (
-                <span className="ml-auto w-1.5 h-1.5 rounded-full bg-white/70" />
+                <motion.div
+                  layoutId="active-nav-pill"
+                  className="absolute inset-0 bg-gradient-to-r from-primary to-primary-dark rounded-xl shadow-[0_4px_15px_rgba(34,197,94,0.25)] -z-10"
+                  transition={{ type: "spring", stiffness: 350, damping: 28 }}
+                />
+              )}
+              <Icon className={`w-5 h-5 flex-shrink-0 transition-transform duration-300 ${isActive ? 'scale-110 text-white' : 'group-hover:scale-110 group-hover:text-primary'}`} />
+              <span className="relative z-10">{item.label}</span>
+              {isActive && (
+                <span className="relative z-10 ml-auto w-1.5 h-1.5 rounded-full bg-white/80" />
               )}
             </Link>
           );

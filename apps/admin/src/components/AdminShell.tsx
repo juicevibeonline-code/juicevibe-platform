@@ -15,7 +15,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
     <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
       <ToastProvider>
         <div className="admin-bg-gradient" />
-        <div className="flex min-h-screen relative w-full bg-[#F8FFF8]">
+        <div className="flex min-h-screen relative w-full bg-background">
           {/* Desktop Sidebar */}
           <div className="hidden md:block sticky top-0 h-screen w-[280px] p-4 z-50">
             <Sidebar />

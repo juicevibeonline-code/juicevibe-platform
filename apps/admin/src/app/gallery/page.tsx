@@ -10,10 +10,10 @@ const initialImages = [
   { id: "2", src: "/images/BG-R-Logo2.png", alt: "Juice Vibe Branding", category: "signature", size: "1200x800" },
   { id: "3", src: "/images/Logo.jpeg", alt: "Juice Vibe Logo", category: "interior", size: "800x800" },
   { id: "4", src: "/images/Menu.jpeg", alt: "Menu Board", category: "interior", size: "800x600" },
-  { id: "5", src: "", alt: "Fresh Orange Juice", category: "juices", size: "800x600" },
-  { id: "6", src: "", alt: "Tropical Smoothie", category: "smoothies", size: "800x800" },
-  { id: "7", src: "", alt: "Chocolate Milkshake", category: "milkshakes", size: "600x800" },
-  { id: "8", src: "", alt: "Signature Mocktail", category: "signature", size: "600x800" },
+  { id: "5", src: "/images/MenuItems/FreshJuicesMango .png", alt: "Fresh Mango Juice", category: "juices", size: "800x600" },
+  { id: "6", src: "/images/MenuItems/Special Smoothies-AandD.png", alt: "Tropical Smoothie", category: "smoothies", size: "800x800" },
+  { id: "7", src: "/images/MenuItems/Milkshakes-Strawberry.png", alt: "Strawberry Milkshake", category: "milkshakes", size: "600x800" },
+  { id: "8", src: "/images/MenuItems/Mocktails-Flavoured Mojito.png", alt: "Signature Mocktail", category: "signature", size: "600x800" },
 ];
 
 const categories = ["all", "juices", "smoothies", "milkshakes", "signature", "interior", "team"];

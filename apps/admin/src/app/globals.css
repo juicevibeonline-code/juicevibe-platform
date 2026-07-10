@@ -2,47 +2,47 @@
 
 @layer base {
   :root {
-    --background: #F8FFF8;
-    --foreground: #0F172A;
-    --card: #FFFFFF;
-    --card-foreground: #0F172A;
-    --primary: #22C55E;
-    --primary-dark: #16A34A;
-    --primary-light: #4ADE80;
+    --background: #F4FAF6; /* soft warm clean cream mint background */
+    --foreground: #1E293B; /* slate-800 */
+    --card: rgba(255, 255, 255, 0.75);
+    --card-foreground: #1E293B;
+    --primary: #10B981; /* rich emerald green */
+    --primary-dark: #059669;
+    --primary-light: #6EE7B7;
     --primary-foreground: #FFFFFF;
-    --dark-green: #14532D;
-    --orange: #FB923C;
-    --yellow: #FBBF24;
-    --pink: #F43F5E;
-    --sidebar: #FFFFFF;
-    --sidebar-hover: #F1F5F9;
+    --dark-green: #064E3B;
+    --orange: #F97316;
+    --yellow: #F59E0B;
+    --pink: #EF4444;
+    --sidebar: rgba(255, 255, 255, 0.85);
+    --sidebar-hover: rgba(16, 185, 129, 0.05);
     --muted: #64748B;
-    --border: #E2E8F0;
-    --glass-bg: rgba(255, 255, 255, 0.65);
-    --glass-border: rgba(255, 255, 255, 0.8);
-    --glass-shadow: rgba(0, 0, 0, 0.04);
+    --border: rgba(16, 185, 129, 0.08);
+    --glass-bg: rgba(255, 255, 255, 0.45);
+    --glass-border: rgba(255, 255, 255, 0.5);
+    --glass-shadow: rgba(0, 0, 0, 0.02);
   }
 
   .dark {
-    --background: #0B0F0C;
-    --foreground: #F8FFF8;
-    --card: #111813;
-    --card-foreground: #F8FFF8;
-    --primary: #22C55E;
-    --primary-dark: #16A34A;
-    --primary-light: #4ADE80;
-    --primary-foreground: #0B0F0C;
-    --dark-green: #14532D;
-    --orange: #FB923C;
-    --yellow: #FBBF24;
-    --pink: #F43F5E;
-    --sidebar: #111813;
-    --sidebar-hover: #1A241C;
+    --background: #060A07; /* deep forest carbon background */
+    --foreground: #ECFDF5;
+    --card: rgba(17, 24, 19, 0.8);
+    --card-foreground: #ECFDF5;
+    --primary: #10B981;
+    --primary-dark: #059669;
+    --primary-light: #6EE7B7;
+    --primary-foreground: #060A07;
+    --dark-green: #064E3B;
+    --orange: #F97316;
+    --yellow: #F59E0B;
+    --pink: #EF4444;
+    --sidebar: rgba(17, 24, 19, 0.9);
+    --sidebar-hover: rgba(16, 185, 129, 0.08);
     --muted: #94A3B8;
-    --border: #1F2922;
-    --glass-bg: rgba(17, 24, 19, 0.65);
-    --glass-border: rgba(255, 255, 255, 0.1);
-    --glass-shadow: rgba(0, 0, 0, 0.2);
+    --border: rgba(16, 185, 129, 0.12);
+    --glass-bg: rgba(17, 24, 19, 0.7);
+    --glass-border: rgba(255, 255, 255, 0.08);
+    --glass-shadow: rgba(0, 0, 0, 0.35);
   }
 }
 
@@ -81,8 +81,9 @@ body {
 
 /* Ambient Background Elements */
 .admin-bg-gradient {
-  background: radial-gradient(circle at 15% 50%, rgba(34, 197, 94, 0.05), transparent 25%),
-              radial-gradient(circle at 85% 30%, rgba(251, 146, 60, 0.05), transparent 25%);
+  background: radial-gradient(circle at 10% 20%, rgba(16, 185, 129, 0.06), transparent 45%),
+              radial-gradient(circle at 90% 80%, rgba(249, 115, 22, 0.04), transparent 45%),
+              radial-gradient(circle at 50% 50%, rgba(239, 68, 68, 0.02), transparent 50%);
   position: fixed;
   inset: 0;
   z-index: -1;
@@ -101,7 +102,17 @@ body {
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
   border: 1px solid var(--glass-border);
-  box-shadow: 0 8px 32px var(--glass-shadow);
+  box-shadow: 0 12px 40px var(--glass-shadow);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.glass-panel:hover {
+  border-color: rgba(16, 185, 129, 0.25);
+  box-shadow: 0 16px 48px rgba(16, 185, 129, 0.05);
+  transform: translateY(-2px);
+}
+.dark .glass-panel:hover {
+  border-color: rgba(16, 185, 129, 0.25);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.45);
 }
 
 /* Animations */

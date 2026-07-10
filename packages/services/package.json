@@ -9,10 +9,13 @@
   },
   "dependencies": {
     "@juice-vibe/types": "workspace:*",
+    "@juice-vibe/config": "workspace:*",
+    "@juice-vibe/utils": "workspace:*",
     "axios": "^1.7.0",
     "zustand": "^5.0.0"
   },
   "devDependencies": {
+    "@types/node": "^22.0.0",
     "typescript": "^5.7.0"
   }
 }
