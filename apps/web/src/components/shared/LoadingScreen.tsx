@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { Leaf } from "lucide-react";
+import Image from "next/image";
 
 interface LoadingScreenProps {
   isLoading: boolean;
@@ -19,17 +19,22 @@ export function LoadingScreen({ isLoading }: LoadingScreenProps) {
         >
           <motion.div
             animate={{
-              scale: [1, 1.2, 1],
-              rotate: [0, 15, -15, 0],
+              scale: [1, 1.1, 1],
             }}
             transition={{
               duration: 1.5,
               repeat: Infinity,
               ease: "easeInOut",
             }}
-            className="flex h-20 w-20 items-center justify-center rounded-2xl bg-primary shadow-xl shadow-primary/30"
+            className="relative h-24 w-24 overflow-hidden rounded-full shadow-2xl shadow-primary/40 ring-4 ring-primary/30"
           >
-            <Leaf className="h-10 w-10 text-white" />
+            <Image
+              src="/images/Logo.jpeg"
+              alt="Juice Vibe Logo"
+              fill
+              className="object-cover"
+              priority
+            />
           </motion.div>
           <motion.div
             initial={{ opacity: 0, y: 10 }}
