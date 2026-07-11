@@ -52,7 +52,7 @@ export const metadata: Metadata = {
       "Fresh juices, smoothies, burgers, coffee and tropical flavors crafted with love.",
     images: [
       {
-        url: "/og-image.jpg",
+        url: "/images/Logo.jpeg",
         width: 1200,
         height: 630,
         alt: "Juice Vibe",
@@ -64,7 +64,7 @@ export const metadata: Metadata = {
     title: "Juice Vibe - Sip the Good Vibes",
     description:
       "Fresh juices, smoothies, burgers, coffee and tropical flavors crafted with love.",
-    images: ["/og-image.jpg"],
+    images: ["/images/Logo.jpeg"],
     creator: "@juicevibe",
   },
   robots: {
@@ -79,9 +79,9 @@ export const metadata: Metadata = {
     },
   },
   icons: {
-    icon: "/favicon.ico",
-    shortcut: "/favicon.ico",
-    apple: "/apple-touch-icon.png",
+    icon: "/images/Logo.jpeg",
+    shortcut: "/images/Logo.jpeg",
+    apple: "/images/Logo.jpeg",
   },
 };
 
@@ -89,7 +89,7 @@ const jsonLd = {
   "@context": "https://schema.org",
   "@type": "Restaurant",
   name: "Juice Vibe",
-  image: "https://juicevibe.com/og-image.jpg",
+  image: "/images/Logo.jpeg",
   description:
     "Fresh juices, smoothies, burgers, coffee and tropical flavors crafted with love.",
   address: {
