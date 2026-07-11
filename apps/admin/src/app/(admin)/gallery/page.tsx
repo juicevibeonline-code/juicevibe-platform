@@ -8,6 +8,9 @@ import { galleryService, type GalleryImage } from "@juice-vibe/services";
 import { Modal } from "@/components/ui/Modal";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
+import { Select } from "@/components/ui/Select";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
+import { LoadingState, ErrorAlert, FilterBar, FilterTab, EmptyState } from "@/components/shared";
 
 const CATEGORIES = ["all", "juices", "smoothies", "milkshakes", "signature", "interior", "team"];
 
@@ -168,22 +171,17 @@ export default function GalleryPage() {
   );
 
   const uploadAction = (
-    <button
-      onClick={() => fileInputRef.current?.click()}
-      disabled={isUploading}
-      className="flex items-center gap-1.5 px-4 py-2.5 bg-primary hover:bg-primary-dark text-white rounded-lg transition-colors font-semibold text-xs shadow-sm cursor-pointer disabled:opacity-75"
-    >
+    <Button variant="primary" className="text-xs" onClick={() => fileInputRef.current?.click()} disabled={isUploading}>
       {isUploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
       Upload Images
-    </button>
+    </Button>
   );
 
   return (
-    <div className="space-y-6 max-w-7xl mx-auto px-4 pb-12">
+    <div className="space-y-6 max-w-7xl mx-auto pb-12">
       <PageHeader
         title="Gallery Management"
         subtitle="Manage your image gallery and assets"
-        accentColor="blue"
         action={uploadAction}
       />
 
@@ -218,54 +216,22 @@ export default function GalleryPage() {
         </div>
       </div>
 
-      {error && (
-        <div className="flex items-center gap-2 p-4 bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-500/20 rounded-lg text-xs font-semibold">
-          <AlertCircle className="w-4 h-4" />
-          <span>{error}</span>
-        </div>
-      )}
+      {error && <ErrorAlert message={error} />}
 
       {/* Category filter tabs Control Bar */}
-      <div className="bg-card border border-border/80 p-1.5 rounded-xl flex items-center gap-1 overflow-x-auto custom-scrollbar max-w-full shrink-0 shadow-sm">
-        {CATEGORIES.map((cat) => {
-          const isActive = activeCategory === cat;
-          return (
-            <button
-              key={cat}
-              onClick={() => setActiveCategory(cat)}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold capitalize transition-all cursor-pointer whitespace-nowrap ${
-                isActive
-                  ? "bg-primary text-white shadow-sm"
-                  : "text-muted hover:text-foreground hover:bg-background/50"
-              }`}
-            >
-              {cat}
-              <span className={`text-[9px] px-1.5 py-0.5 rounded-md font-extrabold ${
-                isActive 
-                  ? "bg-white/20 text-white" 
-                  : "bg-muted/15 text-muted-foreground"
-              }`}>
-                {countFor(cat)}
-              </span>
-            </button>
-          );
-        })}
-      </div>
+      <FilterBar>
+        {CATEGORIES.map((cat) => (
+          <FilterTab key={cat} active={activeCategory === cat} onClick={() => setActiveCategory(cat)} count={countFor(cat)}>
+            {cat}
+          </FilterTab>
+        ))}
+      </FilterBar>
 
       {/* Gallery grid */}
       {loading ? (
-        <div className="flex flex-col items-center justify-center py-24 gap-3 bg-card border border-border rounded-lg shadow-sm">
-          <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
-          <span className="text-xs font-bold text-muted uppercase tracking-wider animate-pulse">Loading gallery...</span>
-        </div>
+        <LoadingState label="Loading gallery..." />
       ) : filtered.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-24 text-center bg-card border border-border rounded-lg shadow-sm">
-          <div className="w-14 h-14 bg-background rounded-full flex items-center justify-center mb-4">
-            <ImageIcon className="w-7 h-7 text-muted" />
-          </div>
-          <p className="font-bold text-foreground">No images in this category</p>
-          <p className="text-sm text-muted mt-1">Upload some images or choose a different category.</p>
-        </div>
+        <EmptyState icon={ImageIcon} title="No images in this category" description="Upload some images or choose a different category." />
       ) : (
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {filtered.map((img) => (
@@ -311,7 +277,7 @@ export default function GalleryPage() {
                   <div className="flex gap-2">
                     <button
                       onClick={() => handleDelete(img.id)}
-                      className="px-3 py-1.5 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-md cursor-pointer transition-colors"
+                      className="px-3 py-1.5 bg-danger hover:bg-danger/80 text-white text-xs font-bold rounded-md cursor-pointer transition-colors"
                     >
                       Delete
                     </button>
@@ -345,20 +311,12 @@ export default function GalleryPage() {
             required
             placeholder="e.g. Signature Mango Shake"
           />
-          <div className="flex flex-col gap-1">
-            <label className="text-xs font-bold text-foreground mb-1.5">Category</label>
-            <select
-              value={renamingCategory}
-              onChange={(e) => setRenamingCategory(e.target.value)}
-              className="flex h-11 w-full rounded-lg border border-border bg-card px-3 py-2 text-xs text-foreground focus:outline-none focus:border-primary/50"
-            >
-              {CATEGORIES.filter((c) => c !== "all").map((cat) => (
-                <option key={cat} value={cat}>
-                  {cat}
-                </option>
-              ))}
-            </select>
-          </div>
+          <Select
+            label="Category"
+            value={renamingCategory}
+            onChange={(e) => setRenamingCategory(e.target.value)}
+            options={CATEGORIES.filter(c => c !== "all").map(c => ({ value: c, label: c }))}
+          />
           <div className="flex gap-2 pt-2 border-t border-border">
             <Button type="button" variant="ghost" className="flex-1 text-xs" onClick={() => setIsRenameOpen(false)}>
               Cancel

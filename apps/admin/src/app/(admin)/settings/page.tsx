@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { Save, Store, Clock, CreditCard, Share2 } from "lucide-react";
 import { PageHeader } from "@/components/PageHeader";
+import { Input } from "@/components/ui/Input";
 import { useToast } from "@/hooks/useToast";
 import { settingsService } from "@juice-vibe/services";
 
@@ -108,8 +109,8 @@ export default function SettingsPage() {
 
   if (loading) {
     return (
-      <div className="space-y-6 max-w-3xl mx-auto px-4 pb-12">
-        <PageHeader title="Settings" subtitle="Loading configurations..." accentColor="orange" />
+      <div className="space-y-6 max-w-3xl mx-auto pb-12">
+        <PageHeader title="Settings" subtitle="Loading configurations..." />
         <div className="space-y-6 animate-pulse">
           <div className="h-48 bg-card border border-border rounded-lg" />
           <div className="h-32 bg-card border border-border rounded-lg" />
@@ -119,11 +120,10 @@ export default function SettingsPage() {
   }
 
   return (
-    <form onSubmit={handleSave} className="space-y-6 max-w-3xl mx-auto px-4 pb-12">
+    <form onSubmit={handleSave} className="space-y-6 max-w-3xl mx-auto pb-12">
       <PageHeader
         title="Settings"
         subtitle="Manage your business configuration and preferences"
-        accentColor="orange"
       />
 
       <SettingsSection title="General Information" icon={Store}>
@@ -217,14 +217,12 @@ function FormField({
   className?: string;
 }) {
   return (
-    <div className={className}>
-      <label className="block text-[10px] font-extrabold uppercase tracking-wider text-muted mb-1.5">{label}</label>
-      <input
-        type={type}
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        className="w-full px-3 py-2 rounded-lg border border-border/80 bg-slate-50/50 focus:bg-background text-xs text-foreground focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all font-semibold placeholder:text-muted"
-      />
-    </div>
+    <Input
+      label={label}
+      type={type}
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      className={className}
+    />
   );
 }

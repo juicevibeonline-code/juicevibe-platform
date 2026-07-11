@@ -61,8 +61,8 @@ export function RevenueChart({ data, title = "Revenue Chart" }: RevenueChartProp
       </div>
       <div className="flex-1 w-full min-h-[220px] flex flex-col justify-center">
         {chartData.length === 0 ? (
-          <div className="flex-1 flex flex-col items-center justify-center text-center py-10 bg-slate-50/50 dark:bg-zinc-900/10 rounded-xl border border-dashed border-border/80">
-            <div className="w-10 h-10 rounded-full bg-slate-100 dark:bg-zinc-800 flex items-center justify-center text-muted mb-3 border border-border">
+          <div className="flex-1 flex flex-col items-center justify-center text-center py-10 bg-muted/30 rounded-xl border border-dashed border-border/80">
+            <div className="w-10 h-10 rounded-full bg-muted/50 flex items-center justify-center text-muted mb-3 border border-border">
               <BarChart3 className="w-5 h-5 text-muted" />
             </div>
             <p className="text-xs font-bold text-foreground uppercase tracking-wider">Awaiting Checkout Sales</p>
@@ -76,11 +76,11 @@ export function RevenueChart({ data, title = "Revenue Chart" }: RevenueChartProp
               <defs>
                 <linearGradient id="primaryGradient" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="0%" stopColor="var(--primary)" stopOpacity={1} />
-                  <stop offset="100%" stopColor="var(--primary-dark)" stopOpacity={0.8} />
+                  <stop offset="100%" stopColor="var(--primary)" stopOpacity={0.6} />
                 </linearGradient>
                 <linearGradient id="orangeGradient" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="0%" stopColor="var(--orange)" stopOpacity={1} />
-                  <stop offset="100%" stopColor="#C47D34" stopOpacity={0.8} />
+                  <stop offset="100%" stopColor="var(--orange)" stopOpacity={0.6} />
                 </linearGradient>
               </defs>
               <XAxis
@@ -113,7 +113,7 @@ interface CategorySalesProps {
 
 export function CategorySalesChart({ data }: CategorySalesProps) {
   const total = (data || []).reduce((sum, d) => sum + d.revenue, 0);
-  const colors = ["var(--primary)", "var(--orange)", "var(--primary-light)", "var(--pink)", "var(--muted)"];
+  const colors = ["var(--primary)", "var(--orange)", "var(--info)", "var(--pink)", "var(--muted)"];
 
   const categoryData = (data || [])
     .map((d, i) => ({
@@ -129,8 +129,8 @@ export function CategorySalesChart({ data }: CategorySalesProps) {
       <div className="text-xs text-muted mb-4 font-medium">Revenue split of top items</div>
 
       {categoryData.length === 0 ? (
-        <div className="flex-1 flex flex-col items-center justify-center text-center py-10 bg-slate-50/50 dark:bg-zinc-900/10 rounded-xl border border-dashed border-border/80">
-          <div className="w-10 h-10 rounded-full bg-slate-100 dark:bg-zinc-800 flex items-center justify-center text-muted mb-3 border border-border">
+        <div className="flex-1 flex flex-col items-center justify-center text-center py-10 bg-muted/30 rounded-xl border border-dashed border-border/80">
+          <div className="w-10 h-10 rounded-full bg-muted/50 flex items-center justify-center text-muted mb-3 border border-border">
             <PieChart className="w-5 h-5 text-muted" />
           </div>
           <p className="text-xs font-bold text-foreground uppercase tracking-wider">No Sales Records</p>

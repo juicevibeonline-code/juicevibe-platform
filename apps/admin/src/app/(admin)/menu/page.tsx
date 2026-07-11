@@ -6,8 +6,13 @@ import { Table } from "@/components/table";
 import { Modal } from "@/components/ui/Modal";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
+import { Select } from "@/components/ui/Select";
+import { TextArea } from "@/components/ui/TextArea";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
+import { Badge } from "@/components/ui/Badge";
 import { PageHeader } from "@/components/PageHeader";
 import { ActionMenu } from "@/components/ui";
+import { LoadingState, ErrorAlert, FilterBar, FilterTab, FormFooter } from "@/components/shared";
 import { menuService } from "@juice-vibe/services";
 import { useToast } from "@/hooks/useToast";
 import type { MenuItem, MenuCategory } from "@juice-vibe/types";
@@ -172,16 +177,13 @@ export default function MenuPage() {
       label: "Status",
       sortable: true,
       render: (item: MenuItem) => (
-        <span className={`inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded capitalize ${
-          item.status === "active" 
-            ? "bg-emerald-50 text-emerald-700 border border-emerald-100 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20" 
-            : item.status === "archived"
-            ? "bg-rose-50 text-rose-700 border border-rose-100 dark:bg-rose-500/10 dark:text-rose-400 dark:border-rose-500/20"
-            : "bg-background text-muted border border-border dark:text-muted"
-        }`}>
-          {item.status === "active" ? <Eye className="w-3 h-3" /> : <EyeOff className="w-3 h-3" />}
+        <Badge 
+          variant={item.status === "active" ? "success" : item.status === "archived" ? "danger" : "default"} 
+          className="capitalize font-semibold"
+        >
+          {item.status === "active" ? <Eye className="w-3.5 h-3.5 mr-1" /> : <EyeOff className="w-3.5 h-3.5 mr-1" />}
           {item.status}
-        </span>
+        </Badge>
       ),
     },
     {
@@ -194,7 +196,7 @@ export default function MenuPage() {
       label: "Stock",
       sortable: true,
       render: (item: MenuItem) => (
-        <span className="capitalize text-xs font-semibold">{item.availability.replace("_", " ")}</span>
+        <span className="capitalize text-xs font-medium">{item.availability.replaceAll("_", " ")}</span>
       )
     },
     {
@@ -239,69 +241,33 @@ export default function MenuPage() {
     : items.filter((item) => item.category?.slug === activeCategory && item.status !== "archived");
 
   const addBtn = (
-    <button 
-      onClick={() => setIsAddModalOpen(true)} 
-      className="flex items-center gap-1.5 px-4 py-2.5 bg-primary hover:bg-primary-dark text-white rounded-lg transition-colors font-semibold text-xs shadow-sm cursor-pointer"
-    >
+    <Button variant="primary" className="text-xs" onClick={() => setIsAddModalOpen(true)}>
       <Plus className="w-4 h-4" />
       Add New Item
-    </button>
+    </Button>
   );
 
   return (
-    <div className="space-y-6 max-w-7xl mx-auto px-4 pb-12">
-      <PageHeader title="Menu Management" subtitle="Manage your menu items, prices, and categories" accentColor="primary" action={addBtn} />
+    <div className="space-y-6 max-w-7xl mx-auto pb-12">
+      <PageHeader title="Menu Management" subtitle="Manage your menu items, prices, and categories" action={addBtn} />
 
       {/* Dynamic Category Tabs Control Bar */}
-      <div className="bg-card border border-border/80 p-1.5 rounded-xl flex items-center gap-1 overflow-x-auto custom-scrollbar max-w-full shrink-0 shadow-sm">
-        <button 
-          onClick={() => setActiveCategory("all")}
-          className={`px-4 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
-            activeCategory === "all" 
-              ? "bg-primary text-white shadow-sm" 
-              : "text-muted hover:text-foreground hover:bg-background/50"
-          }`}
-        >
-          All Items
-        </button>
+      <FilterBar>
+        <FilterTab active={activeCategory === "all"} onClick={() => setActiveCategory("all")}>All Items</FilterTab>
         {categories.map((cat) => (
-          <button 
-            key={cat.id} 
-            onClick={() => setActiveCategory(cat.slug)}
-            className={`px-4 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
-              cat.slug === activeCategory 
-                ? "bg-primary text-white shadow-sm" 
-                : "text-muted hover:text-foreground hover:bg-background/50"
-            }`}
-          >
+          <FilterTab key={cat.id} active={cat.slug === activeCategory} onClick={() => setActiveCategory(cat.slug)}>
             {cat.name}
-          </button>
+          </FilterTab>
         ))}
-        {/* Archived filter tab */}
-        <button 
-          onClick={() => setActiveCategory("archived")}
-          className={`px-4 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
-            activeCategory === "archived" 
-              ? "bg-rose-600 text-white shadow-sm shadow-rose-600/10" 
-              : "text-rose-600 dark:text-rose-400 hover:bg-rose-500/5 dark:hover:bg-rose-500/10"
-          }`}
-        >
+        <FilterTab active={activeCategory === "archived"} onClick={() => setActiveCategory("archived")} variant="danger">
           Archived / Soft-Deleted
-        </button>
-      </div>
+        </FilterTab>
+      </FilterBar>
 
-      {error && (
-        <div className="flex items-center gap-2 p-4 bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-500/20 rounded-lg text-sm">
-          <AlertCircle className="w-4 h-4" />
-          <span>{error}</span>
-        </div>
-      )}
+      {error && <ErrorAlert message={error} />}
 
       {loading ? (
-        <div className="flex flex-col items-center justify-center py-24 gap-3 bg-card border border-border rounded-lg shadow-sm">
-          <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
-          <span className="text-xs font-bold text-muted uppercase tracking-wider animate-pulse">Loading menu...</span>
-        </div>
+        <LoadingState label="Loading menu..." />
       ) : (
         <div>
           <Table columns={columns} data={filtered} searchable />
@@ -314,24 +280,16 @@ export default function MenuPage() {
           <Input label="Name" name="name" required placeholder="e.g. Avocado Shake" />
           <Input label="Price (LKR)" name="price" type="number" required placeholder="e.g. 750" min="0" />
           
-          <div className="flex flex-col gap-1">
-            <label className="text-xs font-bold text-foreground mb-1">Category</label>
-            <select name="categoryId" required className="flex h-11 w-full rounded-lg border border-border bg-card px-3 py-2 text-xs text-foreground focus:outline-none focus:border-primary/50">
-              {categories.map((cat) => (
-                <option key={cat.id} value={cat.id}>{cat.name}</option>
-              ))}
-            </select>
-          </div>
+          <Select 
+            label="Category"
+            name="categoryId"
+            required
+            options={categories.map(c => ({ value: c.id, label: c.name }))}
+          />
 
-          <div className="flex flex-col gap-1">
-            <label className="text-xs font-bold text-foreground mb-1">Description</label>
-            <textarea name="description" rows={3} className="flex w-full rounded-lg border border-border bg-card px-3 py-2 text-xs text-foreground focus:outline-none focus:border-primary/50 resize-none" placeholder="Details about this menu item..." />
-          </div>
+          <TextArea label="Description" name="description" rows={3} placeholder="Details about this menu item..." />
 
-          <div className="flex gap-2 pt-4 border-t border-border">
-            <Button type="button" variant="ghost" className="flex-1 text-xs" onClick={() => setIsAddModalOpen(false)}>Cancel</Button>
-            <Button type="submit" variant="primary" className="flex-1 text-xs" isLoading={submitting}>Create Item</Button>
-          </div>
+          <FormFooter onCancel={() => setIsAddModalOpen(false)} onSubmitLabel="Create Item" isLoading={submitting} />
         </form>
       </Modal>
 
@@ -342,44 +300,32 @@ export default function MenuPage() {
             <Input label="Name" name="name" defaultValue={editingItem.name} required />
             <Input label="Price (LKR)" name="price" type="number" defaultValue={editingItem.price.toString()} required min="0" />
             
-            <div className="flex flex-col gap-1">
-              <label className="text-xs font-bold text-foreground mb-1">Category</label>
-              <select name="categoryId" defaultValue={editingItem.categoryId} required className="flex h-11 w-full rounded-lg border border-border bg-card px-3 py-2 text-xs text-foreground focus:outline-none focus:border-primary/50">
-                {categories.map((cat) => (
-                  <option key={cat.id} value={cat.id}>{cat.name}</option>
-                ))}
-              </select>
-            </div>
+            <Select 
+              label="Category"
+              name="categoryId"
+              required
+              defaultValue={editingItem.categoryId}
+              options={categories.map(c => ({ value: c.id, label: c.name }))}
+            />
 
-            <div className="flex flex-col gap-1">
-              <label className="text-xs font-bold text-foreground mb-1">Description</label>
-              <textarea name="description" defaultValue={editingItem.description || ""} rows={3} className="flex w-full rounded-lg border border-border bg-card px-3 py-2 text-xs text-foreground focus:outline-none focus:border-primary/50 resize-none" />
-            </div>
+            <TextArea label="Description" name="description" defaultValue={editingItem.description || ""} rows={3} />
 
-            <div className="flex gap-2 pt-4 border-t border-border">
-              <Button type="button" variant="ghost" className="flex-1 text-xs" onClick={() => { setIsEditModalOpen(false); setEditingItem(null); }}>Cancel</Button>
-              <Button type="submit" variant="primary" className="flex-1 text-xs" isLoading={submitting}>Save Changes</Button>
-            </div>
+            <FormFooter onCancel={() => { setIsEditModalOpen(false); setEditingItem(null); }} onSubmitLabel="Save Changes" isLoading={submitting} />
           </form>
         )}
       </Modal>
 
       {/* Delete confirmation modal */}
-      <Modal isOpen={!!deleteConfirmId} onClose={() => setDeleteConfirmId(null)} title="Confirm Archive" size="sm">
-        <div className="space-y-4 text-xs">
-          <p className="text-foreground leading-relaxed">
-            Are you sure you want to archive this menu item? It will be hidden from customer ordering lists but historical records remain untouched.
-          </p>
-          <div className="flex gap-2 pt-2">
-            <Button type="button" variant="ghost" className="flex-1 text-xs" onClick={() => setDeleteConfirmId(null)}>
-              Cancel
-            </Button>
-            <Button type="button" variant="primary" className="flex-1 text-xs bg-rose-600 hover:bg-rose-700" isLoading={isDeleting} onClick={handleConfirmDelete}>
-              Archive
-            </Button>
-          </div>
-        </div>
-      </Modal>
+      <ConfirmDialog
+        isOpen={!!deleteConfirmId}
+        onClose={() => setDeleteConfirmId(null)}
+        onConfirm={handleConfirmDelete}
+        title="Confirm Archive"
+        message="Are you sure you want to archive this menu item? It will be hidden from customer ordering lists but historical records remain untouched."
+        confirmText="Archive"
+        variant="danger"
+        loading={isDeleting}
+      />
     </div>
   );
 }

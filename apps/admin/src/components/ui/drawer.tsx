@@ -18,15 +18,22 @@ export interface DrawerProps {
 export function Drawer({ isOpen, onClose, title, children, className, position = "right", size = "md" }: DrawerProps) {
   // Prevent scrolling when drawer is open
   React.useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        onClose();
+      }
+    };
     if (isOpen) {
       document.body.style.overflow = "hidden";
+      document.addEventListener("keydown", handleKeyDown);
     } else {
       document.body.style.overflow = "unset";
     }
     return () => {
       document.body.style.overflow = "unset";
+      document.removeEventListener("keydown", handleKeyDown);
     };
-  }, [isOpen]);
+  }, [isOpen, onClose]);
 
   const sizes = {
     sm: "max-w-xs",
@@ -73,8 +80,8 @@ export function Drawer({ isOpen, onClose, title, children, className, position =
             )}
           >
             {title && (
-              <div className="flex items-center justify-between px-6 py-4.5 border-b border-border bg-background/50">
-                <h2 className="text-sm font-bold text-foreground uppercase tracking-wider">{title}</h2>
+              <div className="flex items-center justify-between px-6 py-4 border-b border-border bg-muted-background/50">
+                <h2 className="text-lg font-semibold text-foreground">{title}</h2>
                 <button
                   onClick={onClose}
                   className="p-1.5 rounded-lg hover:bg-background transition-colors text-muted hover:text-foreground cursor-pointer"

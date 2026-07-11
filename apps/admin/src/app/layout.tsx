@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { Inter, Space_Grotesk, IBM_Plex_Mono } from "next/font/google";
 import "./globals.css";
-import { AdminShell } from "@/components/AdminShell";
-import { AuthGuard } from "@/components/AuthGuard";
+import { ThemeProvider } from "@/components/theme-provider";
+import { ToastProvider } from "@/hooks/useToast";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const spaceGrotesk = Space_Grotesk({ subsets: ["latin"], variable: "--font-display" });
@@ -14,13 +14,15 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-export default function AdminLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${inter.variable} ${spaceGrotesk.variable} ${ibmPlexMono.variable} font-sans`}>
-        <AuthGuard>
-          <AdminShell>{children}</AdminShell>
-        </AuthGuard>
+        <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
+          <ToastProvider>
+            {children}
+          </ToastProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

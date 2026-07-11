@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Mail, Phone, ShoppingBag, AlertCircle } from "lucide-react";
 import { Table } from "@/components/table";
 import { PageHeader } from "@/components/PageHeader";
+import { LoadingState, ErrorAlert } from "@/components/shared";
 import { authService } from "@juice-vibe/services";
 
 interface Customer {
@@ -169,25 +170,16 @@ export default function CustomersPage() {
   ];
 
   return (
-    <div className="space-y-6 max-w-7xl mx-auto px-4 pb-12">
+    <div className="space-y-6 max-w-7xl mx-auto pb-12">
       <PageHeader
         title="Customers"
         subtitle={`${customers.length} customers in your database`}
-        accentColor="pink"
       />
 
-      {error && (
-        <div className="flex items-center gap-2 p-4 bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-500/20 rounded-lg text-xs font-semibold">
-          <AlertCircle className="w-4 h-4" />
-          <span>{error}</span>
-        </div>
-      )}
+      {error && <ErrorAlert message={error} />}
 
       {loading ? (
-        <div className="flex flex-col items-center justify-center py-24 gap-3 bg-card border border-border rounded-lg shadow-sm">
-          <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
-          <span className="text-xs font-bold text-muted uppercase tracking-wider animate-pulse">Loading customers...</span>
-        </div>
+        <LoadingState label="Loading customers..." />
       ) : (
         <Table
           columns={columns}

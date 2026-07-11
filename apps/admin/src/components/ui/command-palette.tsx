@@ -13,6 +13,7 @@ import { cn } from "@juice-vibe/utils";
 export function CommandPalette() {
   const [isOpen, setIsOpen] = React.useState(false);
   const [search, setSearch] = React.useState("");
+  const [selectedIndex, setSelectedIndex] = React.useState(0);
   const router = useRouter();
   const { setTheme } = useTheme();
 
@@ -56,17 +57,35 @@ export function CommandPalette() {
     ? items.filter((item) => item.label.toLowerCase().includes(search.toLowerCase()))
     : items;
 
+  React.useEffect(() => {
+    setSelectedIndex(0);
+  }, [search]);
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      setSelectedIndex((prev) => (prev + 1) % filteredItems.length);
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      setSelectedIndex((prev) => (prev - 1 + filteredItems.length) % filteredItems.length);
+    } else if (e.key === "Enter" && filteredItems[selectedIndex]) {
+      e.preventDefault();
+      filteredItems[selectedIndex].action();
+      setIsOpen(false);
+    }
+  };
+
   return (
     <>
       <button
         onClick={() => setIsOpen(true)}
-        className="w-full flex items-center justify-between pl-3.5 pr-2.5 py-1.5 rounded-lg bg-slate-50 dark:bg-zinc-900/30 border border-border/80 hover:border-primary/50 text-xs transition-all duration-200 select-none shadow-sm cursor-pointer"
+        className="w-full flex items-center justify-between pl-3 pr-2 h-10 rounded-md bg-muted-background border border-border hover:border-ring text-sm transition-all duration-200 select-none shadow-sm cursor-pointer"
       >
         <div className="flex items-center gap-2 text-muted">
           <Search className="w-3.5 h-3.5 text-muted" />
           <span>Search or command...</span>
         </div>
-        <kbd className="hidden sm:inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded border border-border/80 bg-background text-[9px] font-bold text-muted shadow-sm font-mono">
+        <kbd className="hidden sm:inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded border border-border bg-background text-[10px] font-medium text-muted shadow-sm font-mono">
           <Command className="w-2.5 h-2.5" /> K
         </kbd>
       </button>
@@ -87,19 +106,20 @@ export function CommandPalette() {
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: -20 }}
               transition={{ type: "spring", damping: 25, stiffness: 300 }}
-              className="relative w-full max-w-2xl glass-panel shadow-2xl rounded-2xl overflow-hidden flex flex-col bg-white/90 dark:bg-black/90"
+              className="relative w-full max-w-xl bg-card border border-border shadow-2xl rounded-xl overflow-hidden flex flex-col"
             >
-              <div className="flex items-center px-4 py-3 border-b border-border/50">
-                <Search className="w-5 h-5 text-primary mr-3" />
+              <div className="flex items-center px-4 py-3 border-b border-border">
+                <Search className="w-5 h-5 text-muted mr-3" />
                 <input
                   type="text"
                   placeholder="Type a command or search..."
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  className="flex-1 bg-transparent border-none outline-none text-foreground placeholder:text-muted py-2"
+                  onKeyDown={handleKeyDown}
+                  className="flex-1 bg-transparent border-none outline-none text-foreground placeholder:text-muted py-2 text-sm"
                   autoFocus
                 />
-                <button onClick={() => setIsOpen(false)} className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-white/10 text-muted">
+                <button onClick={() => setIsOpen(false)} className="p-1.5 rounded-lg hover:bg-muted-background text-muted">
                   <X className="w-4 h-4" />
                 </button>
               </div>
@@ -118,10 +138,14 @@ export function CommandPalette() {
                           item.action();
                           setIsOpen(false);
                         }}
-                        className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-primary/10 hover:text-primary transition-colors text-left w-full group"
+                        onMouseEnter={() => setSelectedIndex(i)}
+                        className={cn(
+                          "flex items-center gap-3 px-4 py-3 rounded-md transition-colors text-left w-full group",
+                          selectedIndex === i ? "bg-muted-background text-foreground" : "hover:bg-muted-background text-muted"
+                        )}
                       >
-                        <span className="text-gray-400 group-hover:text-primary w-5 h-5">
-                          {React.cloneElement(item.icon as React.ReactElement<any>, { className: "w-5 h-5" })}
+                        <span className={cn("w-5 h-5", selectedIndex === i ? "text-foreground" : "text-muted")}>
+                          {React.cloneElement(item.icon as React.ReactElement<any>, { className: "w-4 h-4" })}
                         </span>
                         <span className="font-medium text-sm text-foreground">{item.label}</span>
                         <span className="ml-auto text-xs text-muted">{item.category}</span>

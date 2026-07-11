@@ -6,6 +6,9 @@ import { Table } from "@/components/table";
 import { PageHeader } from "@/components/PageHeader";
 import { Drawer } from "@/components/ui/drawer";
 import { ActionMenu } from "@/components/ui";
+import { Badge } from "@/components/ui/Badge";
+import { Button } from "@/components/ui/Button";
+import { LoadingState, ErrorAlert, SectionCard, SectionTitle } from "@/components/shared";
 import { contactService, type ContactMessage } from "@juice-vibe/services";
 import { useToast } from "@/hooks/useToast";
 
@@ -149,9 +152,9 @@ export default function MessagesPage() {
       label: "Status",
       sortable: true,
       render: (item: ContactMessage) => (
-        <span className="font-bold text-xs uppercase tracking-wider whitespace-nowrap">
-          {!item.isRead ? "🟡 Unread" : "🟢 Read"}
-        </span>
+        <Badge variant={!item.isRead ? "warning" : "default"} className="capitalize">
+          {!item.isRead ? "Unread" : "Read"}
+        </Badge>
       ),
     },
     {
@@ -185,25 +188,16 @@ export default function MessagesPage() {
   ];
 
   return (
-    <div className="space-y-6 max-w-7xl mx-auto px-4 pb-12">
+    <div className="space-y-6 max-w-7xl mx-auto pb-12">
       <PageHeader
         title={`Messages${unreadCount > 0 ? ` (${unreadCount} unread)` : ""}`}
         subtitle="View and manage contact form submissions"
-        accentColor="primary"
       />
 
-      {error && (
-        <div className="flex items-center gap-2 p-4 bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-500/20 rounded-lg text-xs font-semibold">
-          <AlertCircle className="w-4 h-4" />
-          <span>{error}</span>
-        </div>
-      )}
+      {error && <ErrorAlert message={error} />}
 
       {loading ? (
-        <div className="flex flex-col items-center justify-center py-24 gap-3 bg-card border border-border rounded-lg shadow-sm">
-          <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
-          <span className="text-xs font-bold text-muted uppercase tracking-wider animate-pulse">Loading messages...</span>
-        </div>
+        <LoadingState label="Loading messages..." />
       ) : (
         <Table
           columns={columns}
@@ -233,33 +227,32 @@ export default function MessagesPage() {
       >
         {selectedMessage && (
           <div className="space-y-4">
-            <div className="p-4 bg-background border border-border rounded-lg">
-              <p className="text-[10px] font-bold text-muted uppercase tracking-wider mb-3">Sender</p>
+            <SectionCard>
+              <SectionTitle>Sender</SectionTitle>
               <p className="font-bold text-foreground">{selectedMessage.name}</p>
               <p className="text-sm text-muted mt-0.5">{selectedMessage.email}</p>
               <p className="text-xs text-muted mt-1">{formatMessageDate(selectedMessage.createdAt)}</p>
-            </div>
+            </SectionCard>
 
-            <div className="p-4 bg-background border border-border rounded-lg">
-              <p className="text-[10px] font-bold text-muted uppercase tracking-wider mb-3">Message</p>
+            <SectionCard>
+              <SectionTitle>Message</SectionTitle>
               <p className="text-sm text-foreground leading-relaxed">{selectedMessage.message}</p>
-            </div>
+            </SectionCard>
 
             <div className="flex gap-3 pt-2">
               <a
                 href={`mailto:${selectedMessage.email}?subject=Re: ${encodeURIComponent(selectedMessage.subject)}`}
-                className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg bg-primary hover:bg-primary-dark text-white font-bold text-sm transition-colors"
+                className="flex-1"
               >
-                <Reply className="w-4 h-4" />
-                Reply via Email
+                <Button variant="primary" className="w-full text-xs">
+                  <Reply className="w-4 h-4" />
+                  Reply via Email
+                </Button>
               </a>
-              <button
-                onClick={() => handleDelete(selectedMessage.id)}
-                className="px-4 py-2.5 rounded-lg border border-rose-200 dark:border-rose-500/30 bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400 font-bold text-sm hover:bg-rose-100 dark:hover:bg-rose-500/20 transition-colors cursor-pointer flex items-center gap-2"
-              >
+              <Button variant="danger" className="text-xs" onClick={() => handleDelete(selectedMessage.id)}>
                 <Trash2 className="w-4 h-4" />
                 Delete
-              </button>
+              </Button>
             </div>
           </div>
         )}

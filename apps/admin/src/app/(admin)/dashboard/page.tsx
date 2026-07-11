@@ -5,6 +5,9 @@ import { Plus, ClipboardList, ImagePlus, RefreshCw, Loader2, Download, Settings 
 import { RevenueChart, CategorySalesChart } from "@/components/revenue-chart";
 import { RecentOrders } from "@/components/recent-orders";
 import { StatsCard, StatsStrip } from "@/components/stats-card";
+import { PageHeader } from "@/components/PageHeader";
+import { cn } from "@juice-vibe/utils";
+import { Card } from "@/components/ui/Card";
 import Link from "next/link";
 import { analyticsService, type DashboardStats } from "@juice-vibe/services";
 import { useToast } from "@/hooks/useToast";
@@ -94,20 +97,15 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="space-y-6 max-w-7xl mx-auto px-4 pb-12">
-      {/* Page Header Actions Block */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-border/60 mb-6">
-        <div>
-          <h1 className="text-2xl font-extrabold text-foreground tracking-tight">Dashboard</h1>
-          <p className="text-xs text-muted mt-1.5 font-semibold">
-            {greeting}, Admin. Here is your business overview today.
-          </p>
-        </div>
-
-        {/* Header Control Actions */}
-        <div className="flex items-center gap-2 flex-wrap">
+    <div className="space-y-6 max-w-7xl mx-auto pb-12">
+      {/* Page Header */}
+      <PageHeader
+        title="Dashboard"
+        subtitle={`${greeting}, Admin. Here is your business overview today.`}
+        action={
+          <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
           {/* Timeline Range selector */}
-          <div className="flex bg-slate-100/80 dark:bg-zinc-900/60 p-0.5 rounded-lg border border-border/60">
+          <div className="flex bg-muted-background p-1 rounded-md border border-border">
             {[
               { label: "7D", val: 7 },
               { label: "30D", val: 30 },
@@ -116,11 +114,12 @@ export default function DashboardPage() {
               <button
                 key={item.val}
                 onClick={() => setDaysRange(item.val)}
-                className={`px-2.5 py-1 rounded-md text-[10px] font-bold transition-all cursor-pointer ${
+                className={cn(
+                  "px-2.5 py-1 rounded-sm text-[10px] font-bold transition-all cursor-pointer",
                   daysRange === item.val
                     ? "bg-card text-foreground shadow-sm"
-                    : "text-muted hover:text-foreground"
-                }`}
+                    : "text-muted hover:text-foreground hover:bg-muted-background/50"
+                )}
               >
                 {item.label}
               </button>
@@ -130,7 +129,7 @@ export default function DashboardPage() {
           {/* Refresh Button */}
           <button
             onClick={() => loadData(true)}
-            className="p-2 rounded-lg bg-card border border-border hover:bg-slate-50 dark:hover:bg-zinc-900 text-muted hover:text-foreground transition-all cursor-pointer shadow-sm flex items-center justify-center shrink-0"
+            className="p-2 rounded-md bg-card border border-border hover:bg-muted-background text-muted hover:text-foreground transition-all cursor-pointer shadow-sm flex items-center justify-center shrink-0"
             title="Refresh metrics"
           >
             {refreshing ? (
@@ -143,7 +142,7 @@ export default function DashboardPage() {
           {/* Export Button */}
           <button
             onClick={handleExport}
-            className="p-2 rounded-lg bg-card border border-border hover:bg-slate-50 dark:hover:bg-zinc-900 text-muted hover:text-foreground transition-all cursor-pointer shadow-sm flex items-center justify-center shrink-0"
+            className="p-2 rounded-md bg-card border border-border hover:bg-muted-background text-muted hover:text-foreground transition-all cursor-pointer shadow-sm flex items-center justify-center shrink-0"
             title="Export summary"
           >
             <Download className="w-3.5 h-3.5" />
@@ -152,7 +151,7 @@ export default function DashboardPage() {
           {/* Settings Shortcut */}
           <Link
             href="/settings"
-            className="p-2 rounded-lg bg-card border border-border hover:bg-slate-50 dark:hover:bg-zinc-900 text-muted hover:text-foreground transition-all shadow-sm cursor-pointer shrink-0"
+            className="p-2 rounded-md bg-card border border-border hover:bg-muted-background text-muted hover:text-foreground transition-all shadow-sm cursor-pointer shrink-0"
             title="Workspace Settings"
           >
             <Settings className="w-3.5 h-3.5" />
@@ -161,19 +160,20 @@ export default function DashboardPage() {
           {/* Live Orders Board Button */}
           <Link
             href="/orders"
-            className="px-3.5 py-1.5 rounded-lg bg-primary hover:bg-primary-dark text-xs font-bold text-white transition-all shadow-md shadow-primary/10 cursor-pointer whitespace-nowrap flex items-center gap-1 group"
+            className="px-3.5 py-1.5 rounded-md bg-primary hover:bg-primary/90 text-xs font-bold text-primary-foreground transition-all shadow-sm cursor-pointer whitespace-nowrap flex items-center gap-1 group"
           >
             Live Board
             <span className="group-hover:translate-x-0.5 transition-transform duration-205">&rarr;</span>
           </Link>
-        </div>
-      </div>
+          </div>
+        }
+      />
 
       {/* Stats Ledger Strip */}
       {loading ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 animate-pulse">
           {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="h-[110px] bg-card border border-border/80 rounded-xl" />
+            <div key={i} className="h-[110px] bg-card border border-border rounded-lg" />
           ))}
         </div>
       ) : (
@@ -209,34 +209,34 @@ export default function DashboardPage() {
       {loading ? (
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 animate-pulse">
           <div className="lg:col-span-3 space-y-6">
-            <div className="h-[300px] bg-card border border-border/80 rounded-xl" />
-            <div className="h-[350px] bg-card border border-border/80 rounded-xl" />
+            <div className="h-[300px] bg-card border border-border rounded-lg" />
+            <div className="h-[350px] bg-card border border-border rounded-lg" />
           </div>
           <div className="space-y-6">
-            <div className="h-[250px] bg-card border border-border/80 rounded-xl" />
-            <div className="h-[250px] bg-card border border-border/80 rounded-xl" />
+            <div className="h-[250px] bg-card border border-border rounded-lg" />
+            <div className="h-[250px] bg-card border border-border rounded-lg" />
           </div>
         </div>
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 items-start">
           {/* Main Content Area (Timeline Charts & Lists) - Spans 3 cols */}
           <div className="lg:col-span-3 space-y-6">
-            <div className="premium-card p-6 shadow-sm">
+            <Card className="p-6">
               <RevenueChart
                 data={revenueData}
                 title={daysRange === 7 ? "Weekly Revenue" : daysRange === 30 ? "Monthly Revenue" : "Yearly Revenue"}
               />
-            </div>
-            <div className="premium-card p-6 shadow-sm">
+            </Card>
+            <Card className="p-6">
               <RecentOrders />
-            </div>
+            </Card>
           </div>
 
           {/* Sidebar Panels (Top Sellings & Quick Actions) - Spans 1 col */}
           <div className="space-y-6">
-            <div className="premium-card p-6 shadow-sm">
+            <Card className="p-6">
               <CategorySalesChart data={topSelling} />
-            </div>
+            </Card>
 
             <div className="space-y-4">
               <span className="text-[10px] font-bold text-muted uppercase tracking-widest block pl-1">Quick Actions</span>
@@ -245,7 +245,7 @@ export default function DashboardPage() {
                   <Link
                     key={s.title}
                     href={s.href}
-                    className={`premium-card p-4 flex items-start gap-3.5 group transition-all duration-300 ${s.hoverBorder}`}
+                    className="bg-card border border-border rounded-lg p-4 flex items-start gap-3.5 group transition-all duration-300 hover:border-ring shadow-sm"
                   >
                     <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 border transition-all duration-300 group-hover:scale-105 ${s.color}`}>
                       <s.icon size={15} />

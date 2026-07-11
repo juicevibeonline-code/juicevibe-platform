@@ -36,7 +36,7 @@ export function ActionMenu({ items }: ActionMenuProps) {
           e.stopPropagation();
           setIsOpen(!isOpen);
         }}
-        className="p-1.5 rounded-lg text-muted hover:text-foreground hover:bg-slate-100 dark:hover:bg-zinc-800 border border-transparent hover:border-border transition-colors cursor-pointer flex items-center justify-center"
+        className="p-1.5 rounded-lg text-muted hover:text-foreground hover:bg-muted-background border border-transparent hover:border-border transition-colors cursor-pointer flex items-center justify-center"
       >
         <MoreVertical className="w-4 h-4" />
       </button>
@@ -55,7 +55,7 @@ export function ActionMenu({ items }: ActionMenuProps) {
               className={`w-full flex items-center gap-2 px-3 py-2 text-xs font-semibold text-left transition-colors cursor-pointer ${
                 item.destructive
                   ? "text-rose-600 dark:text-rose-400 hover:bg-rose-500/5 dark:hover:bg-rose-500/10"
-                  : "text-foreground hover:bg-slate-100 dark:hover:bg-zinc-800"
+                  : "text-foreground hover:bg-muted-background"
               }`}
             >
               {item.icon && <span className="shrink-0 text-muted">{item.icon}</span>}

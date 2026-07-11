@@ -13,22 +13,22 @@ export interface ButtonProps extends Omit<HTMLMotionProps<"button">, "ref" | "ch
 
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant = "primary", size = "md", isLoading, children, disabled, ...props }, ref) => {
-    const baseStyles = "relative inline-flex items-center justify-center font-bold tracking-wide transition-colors focus:outline-none disabled:opacity-50 disabled:pointer-events-none overflow-hidden cursor-pointer";
+    const baseStyles = "relative inline-flex items-center justify-center font-medium tracking-tight transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none overflow-hidden cursor-pointer whitespace-nowrap";
     
     const variants = {
-      primary: "bg-primary text-primary-foreground hover:bg-primary-dark shadow-sm shadow-primary/10",
-      secondary: "bg-slate-100 text-slate-900 hover:bg-slate-200 dark:bg-zinc-800 dark:text-zinc-100 dark:hover:bg-zinc-700 border border-border/40",
-      outline: "border border-border/80 bg-transparent text-foreground hover:bg-slate-50 dark:hover:bg-zinc-900",
-      ghost: "bg-transparent text-foreground hover:bg-slate-100 dark:hover:bg-zinc-800",
-      danger: "bg-rose-600 text-white hover:bg-rose-700 shadow-sm shadow-rose-500/10",
+      primary: "bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm",
+      secondary: "bg-muted-background text-foreground hover:bg-muted/10 border border-border",
+      outline: "border border-border bg-transparent text-foreground hover:bg-muted/10",
+      ghost: "bg-transparent text-foreground hover:bg-muted/10",
+      danger: "bg-danger text-danger-foreground hover:bg-danger/90 shadow-sm",
       glass: "glass-panel text-foreground hover:bg-white/80 dark:hover:bg-white/10",
     };
 
     const sizes = {
-      sm: "h-8 px-3.5 text-[10px] rounded-lg",
-      md: "h-10 px-4 text-xs rounded-lg",
-      lg: "h-12 px-6 text-sm rounded-xl",
-      icon: "h-10 w-10 rounded-lg",
+      sm: "h-8 px-3 text-xs rounded-sm",
+      md: "h-10 px-4 text-sm rounded-md",
+      lg: "h-11 px-8 text-sm rounded-md",
+      icon: "h-10 w-10 rounded-md",
     };
 
     return (

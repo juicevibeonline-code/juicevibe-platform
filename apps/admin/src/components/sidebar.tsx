@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { cn } from "@juice-vibe/utils";
 import { usePathname, useRouter } from "next/navigation";
 import {
   LayoutDashboard,
@@ -56,19 +57,16 @@ export function Sidebar() {
   };
 
   return (
-    <aside className="h-full w-full bg-sidebar flex flex-col overflow-hidden rounded-2xl border border-border/10 shadow-xl relative">
-      {/* Subtle top background ambient green glow */}
-      <div className="absolute top-[-30px] left-[-30px] w-24 h-24 bg-primary/10 rounded-full blur-[30px] pointer-events-none" />
-
+    <aside className="h-full w-full bg-sidebar flex flex-col overflow-hidden rounded-xl border border-border shadow-sm relative">
       {/* Logo Section */}
-      <div className="p-5 pb-5 border-b border-border/10 relative z-10">
+      <div className="p-6 border-b border-border relative z-10">
         <Link href="/dashboard" className="flex items-center gap-3 group">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-primary to-primary-dark flex items-center justify-center shrink-0 shadow-md shadow-primary/20 group-hover:scale-[1.03] transition-transform duration-200">
-            <span className="text-xs font-black text-white tracking-wider font-display">JV</span>
+          <div className="w-8 h-8 rounded-md bg-primary flex items-center justify-center shrink-0 shadow-sm transition-transform duration-200">
+            <span className="text-xs font-bold text-primary-foreground">JV</span>
           </div>
           <div>
-            <h1 className="text-xs font-extrabold tracking-tight text-[#f8fafc] font-display group-hover:text-primary transition-colors">Juice Vibe</h1>
-            <p className="text-[8px] font-bold tracking-widest uppercase mt-0.5 text-slate-400">
+            <h1 className="text-sm font-semibold tracking-tight text-sidebar-foreground-hover transition-colors">Juice Vibe</h1>
+            <p className="text-[10px] font-medium tracking-wider uppercase text-muted">
               Admin Workspace
             </p>
           </div>
@@ -76,13 +74,13 @@ export function Sidebar() {
       </div>
 
       {/* Grouped Navigation Links */}
-      <nav className="flex-1 px-3.5 py-5 overflow-y-auto custom-scrollbar relative z-10 space-y-5">
+      <nav className="flex-1 px-4 py-6 overflow-y-auto custom-scrollbar relative z-10 space-y-6">
         {navigationGroups.map((group) => (
-          <div key={group.title} className="space-y-1.5">
-            <span className="text-[9px] font-extrabold text-slate-500 tracking-wider block px-3.5 uppercase">
+          <div key={group.title} className="space-y-2">
+            <span className="text-[10px] font-semibold text-muted tracking-wider block px-2 uppercase">
               {group.title}
             </span>
-            <div className="space-y-0.5">
+            <div className="space-y-1">
               {group.items.map((item) => {
                 const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
                 const Icon = item.icon;
@@ -90,13 +88,17 @@ export function Sidebar() {
                   <Link
                     key={item.href}
                     href={item.href}
-                    className={`relative flex items-center gap-3 px-3.5 py-2 rounded-xl text-xs font-bold tracking-wide transition-all group overflow-hidden ${
+                    className={cn(
+                      "flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors group relative",
                       isActive
-                        ? "bg-primary/20 text-[#10b981] border border-primary/30"
-                        : "text-slate-400 hover:text-slate-200 hover:bg-white/5 border border-transparent"
-                    }`}
+                        ? "bg-sidebar-hover text-sidebar-foreground-hover font-semibold"
+                        : "text-sidebar-foreground hover:bg-sidebar-hover hover:text-sidebar-foreground-hover"
+                    )}
                   >
-                    <Icon className={`w-4 h-4 flex-shrink-0 transition-transform group-hover:scale-105 duration-200 ${isActive ? "text-primary" : "text-slate-400 group-hover:text-slate-200"}`} />
+                    {isActive && (
+                      <span className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-4 rounded-r-full bg-primary" />
+                    )}
+                    <Icon className={cn("w-4 h-4 flex-shrink-0", isActive ? "text-sidebar-foreground-hover" : "text-muted group-hover:text-sidebar-foreground-hover")} />
                     <span>{item.label}</span>
                   </Link>
                 );
@@ -107,20 +109,20 @@ export function Sidebar() {
       </nav>
 
       {/* User Profile Info & Sign Out Footer */}
-      <div className="p-4 border-t border-border/10 relative z-10 shrink-0 bg-slate-950/20">
-        <div className="flex items-center justify-between gap-2.5">
-          <div className="flex items-center gap-2.5 min-w-0">
-            <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center shrink-0 border border-primary/30">
-              <span className="text-[10px] font-bold text-[#10b981] tracking-wider font-display">A</span>
+      <div className="p-4 border-t border-border relative z-10 shrink-0 bg-sidebar">
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center shrink-0">
+              <span className="text-xs font-bold text-primary-foreground">A</span>
             </div>
             <div className="min-w-0">
-              <p className="text-xs font-bold text-slate-200 leading-none truncate">Admin</p>
-              <p className="text-[9px] text-slate-400 mt-1 leading-none font-data truncate">admin@juicevibe.com</p>
+              <p className="text-sm font-medium text-sidebar-foreground-hover leading-none truncate">Admin</p>
+              <p className="text-[10px] text-muted mt-1 leading-none truncate">admin@juicevibe.com</p>
             </div>
           </div>
           <button 
             onClick={handleSignOut} 
-            className="p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 transition-colors cursor-pointer shrink-0"
+            className="p-2 rounded-md text-muted hover:text-danger hover:bg-danger/10 transition-colors cursor-pointer shrink-0"
             title="Sign Out"
           >
             <LogOut className="w-4 h-4" />

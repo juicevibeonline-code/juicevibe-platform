@@ -58,9 +58,14 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   );
 }
 
+const noopToast = (): void => {};
+
 export function useToast() {
   const ctx = useContext(ToastContext);
-  if (!ctx) throw new Error("useToast must be used within ToastProvider");
+  if (!ctx) {
+    // Return a no-op during SSR/hydration before the provider mounts
+    return { toasts: [], toast: noopToast as any, dismiss: noopToast as any };
+  }
   return ctx;
 }
 

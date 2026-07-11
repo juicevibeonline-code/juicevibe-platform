@@ -24,7 +24,7 @@ export const FAB = React.forwardRef<HTMLButtonElement, FABProps>(
         whileHover={{ scale: 1.1, rotate: 90 }}
         whileTap={{ scale: 0.9 }}
         className={cn(
-          "fixed z-50 flex items-center justify-center w-14 h-14 rounded-full bg-gradient-to-br from-primary to-primary-dark text-white shadow-[0_8px_30px_rgba(34,197,94,0.4)] focus:outline-none transition-shadow hover:shadow-[0_8px_40px_rgba(34,197,94,0.6)]",
+          "fixed z-50 flex items-center justify-center w-14 h-14 rounded-full bg-primary text-primary-foreground shadow-lg focus:outline-none transition-shadow hover:shadow-xl",
           positionStyles[position],
           className
         )}

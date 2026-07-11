@@ -7,7 +7,11 @@ import { PageHeader } from "@/components/PageHeader";
 import { Modal } from "@/components/ui/Modal";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
+import { Select } from "@/components/ui/Select";
+import { TextArea } from "@/components/ui/TextArea";
+import { Badge } from "@/components/ui/Badge";
 import { ActionMenu } from "@/components/ui";
+import { LoadingState, ErrorAlert, FilterBar, FilterTab, FormFooter } from "@/components/shared";
 import { blogService } from "@juice-vibe/services";
 import { useToast } from "@/hooks/useToast";
 import type { BlogPost } from "@juice-vibe/types";
@@ -132,27 +136,28 @@ export default function BlogPage() {
   };
 
   const columns = [
-    { key: "title", label: "Title" },
+    { key: "title", label: "Title", sortable: true },
     { 
       key: "author", 
       label: "Author",
-      render: (item: any) => <span>{item.author?.name || "Admin"}</span>
+      sortable: true,
+      render: (item: any) => <span>{typeof item.author === 'string' ? item.author : item.author?.name || "Admin"}</span>
     },
-    { key: "category", label: "Category" },
+    { key: "category", label: "Category", sortable: true },
     {
       key: "status",
       label: "Status",
+      sortable: true,
       render: (item: BlogPost) => (
-        <span className={`inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded capitalize ${
-          item.isPublished ? "bg-emerald-50 text-emerald-700 border border-emerald-100 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20" : "bg-amber-50 text-amber-700 border border-amber-100 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20"
-        }`}>
+        <Badge variant={item.isPublished ? "success" : "warning"} className="capitalize">
           {item.isPublished ? "Published" : "Draft"}
-        </span>
+        </Badge>
       ),
     },
     { 
       key: "createdAt", 
       label: "Created Date",
+      sortable: true,
       render: (item: BlogPost) => (
         <span>{new Date(item.createdAt).toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' })}</span>
       )
@@ -202,58 +207,29 @@ export default function BlogPage() {
   const filterOptions = ["all", "published", "draft"];
 
   const newPostBtn = (
-    <button 
-      onClick={() => setIsAddModalOpen(true)} 
-      className="flex items-center gap-1.5 px-4 py-2.5 bg-primary hover:bg-primary-dark text-white rounded-lg transition-colors font-semibold text-xs shadow-sm cursor-pointer"
-    >
+    <Button variant="primary" className="text-xs" onClick={() => setIsAddModalOpen(true)}>
       <Plus className="w-4 h-4" />
       New Post
-    </button>
+    </Button>
   );
 
   return (
-    <div className="space-y-6 max-w-7xl mx-auto px-4 pb-12">
-      <PageHeader title="Blog Management" subtitle="Manage blog posts and articles" accentColor="yellow" action={newPostBtn} />
+    <div className="space-y-6 max-w-7xl mx-auto pb-12">
+      <PageHeader title="Blog Management" subtitle="Manage blog posts and articles" action={newPostBtn} />
 
       {/* Filter tabs with count badges Control Bar */}
-      <div className="bg-card border border-border/80 p-1.5 rounded-xl flex items-center gap-1 overflow-x-auto custom-scrollbar max-w-full shrink-0 shadow-sm">
-        {filterOptions.map((f) => {
-          const isActive = filter === f;
-          return (
-            <button
-              key={f}
-              onClick={() => setFilter(f)}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold capitalize transition-all cursor-pointer whitespace-nowrap ${
-                isActive
-                  ? "bg-primary text-white shadow-sm"
-                  : "text-muted hover:text-foreground hover:bg-background/50"
-              }`}
-            >
-              {f}
-              <span className={`text-[9px] px-1.5 py-0.5 rounded-md font-extrabold ${
-                isActive 
-                  ? "bg-white/20 text-white" 
-                  : "bg-muted/15 text-muted-foreground"
-              }`}>
-                {countFor(f)}
-              </span>
-            </button>
-          );
-        })}
-      </div>
+      <FilterBar>
+        {filterOptions.map((f) => (
+          <FilterTab key={f} active={filter === f} onClick={() => setFilter(f)} count={countFor(f)}>
+            {f}
+          </FilterTab>
+        ))}
+      </FilterBar>
 
-      {error && (
-        <div className="flex items-center gap-2 p-4 bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-500/20 rounded-lg text-sm">
-          <AlertCircle className="w-4 h-4" />
-          <span>{error}</span>
-        </div>
-      )}
+      {error && <ErrorAlert message={error} />}
 
       {loading ? (
-        <div className="flex flex-col items-center justify-center py-24 gap-3 bg-card border border-border rounded-lg shadow-sm">
-          <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
-          <span className="text-xs font-bold text-muted uppercase tracking-wider animate-pulse">Loading posts...</span>
-        </div>
+        <LoadingState label="Loading posts..." />
       ) : (
         <div>
           <Table columns={columns} data={filtered} searchable />
@@ -267,42 +243,21 @@ export default function BlogPage() {
             
             <div className="grid grid-cols-2 gap-4">
               <Input label="Category" name="category" placeholder="e.g. Health" required />
-              <div className="flex flex-col gap-1">
-                <label className="text-xs font-bold text-foreground mb-1">Status</label>
-                <select name="status" className="flex h-11 w-full rounded-lg border border-border bg-card px-3 py-2 text-xs text-foreground focus:outline-none focus:border-primary/50">
-                  <option value="draft">Draft</option>
-                  <option value="published">Published</option>
-                </select>
-              </div>
-            </div>
-
-            <div className="flex flex-col gap-1">
-              <label className="text-xs font-bold text-foreground mb-1">Excerpt</label>
-              <textarea 
-                name="excerpt"
-                required
-                rows={2}
-                className="flex w-full rounded-lg border border-border bg-card px-3 py-2 text-xs text-foreground focus:outline-none focus:border-primary/50 resize-none"
-                placeholder="Brief summary of the article..."
+              <Select 
+                label="Status"
+                name="status"
+                options={[
+                  { value: "draft", label: "Draft" },
+                  { value: "published", label: "Published" },
+                ]}
               />
             </div>
 
-            <div className="flex flex-col gap-1">
-              <label className="text-xs font-bold text-foreground mb-1">Content</label>
-              <textarea 
-                name="content"
-                required
-                rows={6}
-                className="flex w-full rounded-lg border border-border bg-card px-3 py-2 text-xs text-foreground focus:outline-none focus:border-primary/50 resize-none font-mono"
-                placeholder="Write article details here..."
-              />
-            </div>
+            <TextArea label="Excerpt" name="excerpt" required rows={2} placeholder="Brief summary of the article..." />
+            <TextArea label="Content" name="content" required rows={6} placeholder="Write article details here..." className="font-mono" />
           </div>
 
-          <div className="flex gap-2 pt-4 border-t border-border">
-            <Button type="button" variant="ghost" className="flex-1 text-xs" onClick={() => setIsAddModalOpen(false)}>Cancel</Button>
-            <Button type="submit" variant="primary" className="flex-1 text-xs" isLoading={submitting}>Save Post</Button>
-          </div>
+            <FormFooter onCancel={() => setIsAddModalOpen(false)} onSubmitLabel="Save Post" isLoading={submitting} />
         </form>
       </Modal>
 
@@ -314,44 +269,22 @@ export default function BlogPage() {
               
               <div className="grid grid-cols-2 gap-4">
                 <Input label="Category" name="category" defaultValue={editingPost.category} placeholder="e.g. Health" required />
-                <div className="flex flex-col gap-1">
-                  <label className="text-xs font-bold text-foreground mb-1">Status</label>
-                  <select name="status" defaultValue={editingPost.isPublished ? "published" : "draft"} className="flex h-11 w-full rounded-lg border border-border bg-card px-3 py-2 text-xs text-foreground focus:outline-none focus:border-primary/50">
-                    <option value="draft">Draft</option>
-                    <option value="published">Published</option>
-                  </select>
-                </div>
-              </div>
-
-              <div className="flex flex-col gap-1">
-                <label className="text-xs font-bold text-foreground mb-1">Excerpt</label>
-                <textarea 
-                  name="excerpt"
-                  required
-                  defaultValue={editingPost.excerpt}
-                  rows={2}
-                  className="flex w-full rounded-lg border border-border bg-card px-3 py-2 text-xs text-foreground focus:outline-none focus:border-primary/50 resize-none"
-                  placeholder="Brief summary of the article..."
+                <Select 
+                  label="Status"
+                  name="status"
+                  defaultValue={editingPost.isPublished ? "published" : "draft"}
+                  options={[
+                    { value: "draft", label: "Draft" },
+                    { value: "published", label: "Published" },
+                  ]}
                 />
               </div>
 
-              <div className="flex flex-col gap-1">
-                <label className="text-xs font-bold text-foreground mb-1">Content</label>
-                <textarea 
-                  name="content"
-                  required
-                  defaultValue={editingPost.content}
-                  rows={6}
-                  className="flex w-full rounded-lg border border-border bg-card px-3 py-2 text-xs text-foreground focus:outline-none focus:border-primary/50 resize-none font-mono"
-                  placeholder="Write article details here..."
-                />
-              </div>
+              <TextArea label="Excerpt" name="excerpt" required defaultValue={editingPost.excerpt} rows={2} placeholder="Brief summary of the article..." />
+              <TextArea label="Content" name="content" required defaultValue={editingPost.content} rows={6} placeholder="Write article details here..." className="font-mono" />
             </div>
 
-            <div className="flex gap-2 pt-4 border-t border-border">
-              <Button type="button" variant="ghost" className="flex-1 text-xs" onClick={() => { setIsEditModalOpen(false); setEditingPost(null); }}>Cancel</Button>
-              <Button type="submit" variant="primary" className="flex-1 text-xs" isLoading={submitting}>Update Post</Button>
-            </div>
+              <FormFooter onCancel={() => { setIsEditModalOpen(false); setEditingPost(null); }} onSubmitLabel="Update Post" isLoading={submitting} />
           </form>
         )}
       </Modal>

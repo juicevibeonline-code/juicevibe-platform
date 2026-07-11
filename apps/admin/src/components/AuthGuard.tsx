@@ -1,34 +1,33 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { useAuthStore } from "@juice-vibe/services";
+import { AuthSpinner } from "@/components/shared";
 
 export function AuthGuard({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, tokens } = useAuthStore();
   const router = useRouter();
   const pathname = usePathname();
-  const [checked, setChecked] = useState(false);
+  const redirected = useRef(false);
 
   useEffect(() => {
-    if (pathname === "/login") {
-      setChecked(true);
-      return;
-    }
+    if (pathname === "/login") return;
 
     if (!isAuthenticated || !tokens?.accessToken) {
-      router.replace("/login");
-    } else {
-      setChecked(true);
+      if (!redirected.current) {
+        redirected.current = true;
+        router.replace("/login");
+      }
     }
   }, [isAuthenticated, tokens, router, pathname]);
 
-  if (!checked) {
-    return (
-      <div className="flex h-screen w-full items-center justify-center bg-background">
-        <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
-      </div>
-    );
+  if (pathname === "/login") {
+    return <>{children}</>;
+  }
+
+  if (!isAuthenticated || !tokens?.accessToken) {
+    return <AuthSpinner />;
   }
 
   return <>{children}</>;

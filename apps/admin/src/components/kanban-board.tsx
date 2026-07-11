@@ -95,7 +95,7 @@ export function KanbanBoard({ orders, onStatusChange, onOrderClick }: KanbanBoar
                     ref={provided.innerRef}
                     {...provided.droppableProps}
                     className={cn(
-                      "flex-1 min-h-[550px] p-2.5 rounded-lg border flex flex-col gap-2 transition-colors",
+                      "flex-1 min-h-[200px] p-2.5 rounded-lg border flex flex-col gap-2 transition-colors",
                       snapshot.isDraggingOver
                         ? "bg-background border-dashed border-primary/50"
                         : "bg-background/50 border-border"

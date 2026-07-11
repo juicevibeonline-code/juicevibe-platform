@@ -107,7 +107,7 @@ export default function LoginPage() {
                   onChange={(e) => setEmail(e.target.value)}
                   disabled={isLoading}
                   required
-                  className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-border bg-background/50 text-xs text-foreground focus:outline-none focus:border-primary/50 focus:ring-4 focus:ring-primary/5 transition-all font-medium"
+                  className="w-full h-10 pl-10 pr-4 rounded-lg border border-border/80 bg-slate-50/50 dark:bg-zinc-900/30 text-xs text-foreground focus:outline-none focus:bg-background focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all font-medium placeholder:text-muted disabled:cursor-not-allowed disabled:opacity-50"
                 />
               </div>
             </div>
@@ -128,7 +128,7 @@ export default function LoginPage() {
                   onChange={(e) => setPassword(e.target.value)}
                   disabled={isLoading}
                   required
-                  className="w-full pl-10 pr-10 py-2.5 rounded-lg border border-border bg-background/50 text-xs text-foreground focus:outline-none focus:border-primary/50 focus:ring-4 focus:ring-primary/5 transition-all font-medium"
+                  className="w-full h-10 pl-10 pr-10 rounded-lg border border-border/80 bg-slate-50/50 dark:bg-zinc-900/30 text-xs text-foreground focus:outline-none focus:bg-background focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all font-medium placeholder:text-muted disabled:cursor-not-allowed disabled:opacity-50"
                 />
                 <button
                   type="button"
@@ -141,23 +141,15 @@ export default function LoginPage() {
             </div>
 
             {/* Submit Button */}
-            <button
+            <Button
               type="submit"
-              disabled={isLoading}
-              className="flex items-center justify-center gap-2 w-full mt-6 py-3 rounded-lg bg-primary hover:bg-primary-dark text-white font-bold text-xs shadow-md shadow-primary/10 transition-colors cursor-pointer disabled:opacity-75 disabled:cursor-not-allowed"
+              isLoading={isLoading}
+              variant="primary"
+              className="w-full mt-6 py-3"
             >
-              {isLoading ? (
-                <>
-                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  Authenticating...
-                </>
-              ) : (
-                <>
-                  Sign In to Workspace
-                  <ArrowRight size={14} />
-                </>
-              )}
-            </button>
+              Sign In to Workspace
+              {!isLoading && <ArrowRight size={14} className="ml-1.5" />}
+            </Button>
           </form>
         </div>
 

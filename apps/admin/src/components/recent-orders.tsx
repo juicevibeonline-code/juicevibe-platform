@@ -8,18 +8,18 @@ import { ShoppingBag, Loader2 } from "lucide-react";
 
 const statusColor: Record<string, string> = {
   completed: "text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 border-emerald-500/20",
-  preparing: "text-orange bg-orange/10 border-orange/20",
-  pending: "text-pink bg-pink/10 border-pink/20",
-  ready: "text-blue bg-blue/10 border-blue/20",
+  preparing: "text-orange-600 dark:text-orange-400 bg-orange-500/10 border-orange-500/20",
+  pending: "text-pink-600 dark:text-pink-400 bg-pink-500/10 border-pink-500/20",
+  ready: "text-blue-600 dark:text-blue-400 bg-blue-500/10 border-blue-500/20",
   confirmed: "text-indigo-600 dark:text-indigo-400 bg-indigo-500/10 border-indigo-500/20",
   cancelled: "text-rose-600 dark:text-rose-400 bg-rose-500/10 border-rose-500/20",
 };
 
 const statusDotColor: Record<string, string> = {
   completed: "bg-emerald-500",
-  preparing: "bg-orange",
-  pending: "bg-pink",
-  ready: "bg-blue",
+  preparing: "bg-orange-500",
+  pending: "bg-pink-500",
+  ready: "bg-blue-500",
   confirmed: "bg-indigo-500",
   cancelled: "bg-rose-500",
 };
@@ -59,10 +59,10 @@ export function RecentOrders() {
   return (
     <div className="flex flex-col h-full">
       <div className="flex items-center justify-between pb-4 border-b border-border mb-2">
-        <h3 className="font-display font-bold text-sm text-foreground">Recent Orders</h3>
-        <Link href="/orders" className="text-xs font-bold text-primary hover:text-primary-dark transition-colors flex items-center gap-0.5 group">
+        <h3 className="font-semibold text-lg text-foreground">Recent Orders</h3>
+        <Link href="/orders" className="text-sm font-medium text-muted hover:text-foreground transition-colors flex items-center gap-1 group">
           View All 
-          <span className="group-hover:translate-x-0.5 transition-transform duration-200">&rarr;</span>
+          <span className="group-hover:translate-x-1 transition-transform duration-200">&rarr;</span>
         </Link>
       </div>
 
@@ -73,7 +73,7 @@ export function RecentOrders() {
         </div>
       ) : orders.length === 0 ? (
         <div className="flex-1 flex flex-col items-center justify-center text-center py-12">
-          <div className="w-10 h-10 rounded-full bg-slate-100 dark:bg-zinc-800 flex items-center justify-center text-muted mb-3 border border-border">
+          <div className="w-10 h-10 rounded-full bg-muted/50 flex items-center justify-center text-muted mb-3 border border-border">
             <ShoppingBag className="w-5 h-5 text-muted" />
           </div>
           <p className="text-xs font-bold text-foreground uppercase tracking-wider">No active orders</p>
@@ -91,13 +91,13 @@ export function RecentOrders() {
                 className="flex items-center justify-between py-3.5 gap-4 hover:bg-primary/[0.02] -mx-4 px-4 rounded-xl transition-colors duration-200"
               >
                 <div className="flex items-center gap-3.5 min-w-0">
-                  <div className="w-9 h-9 rounded-xl bg-background border border-border flex items-center justify-center shrink-0 shadow-sm">
-                    <span className="text-[10px] font-black text-foreground font-data">#{o.orderNumber.slice(-3)}</span>
+                  <div className="w-10 h-10 rounded-lg bg-muted-background border border-border flex items-center justify-center shrink-0 shadow-sm">
+                    <span className="text-xs font-medium text-foreground">#{String(o.orderNumber).slice(-4)}</span>
                   </div>
 
                   <div className="min-w-0">
-                    <div className="text-xs font-bold text-foreground truncate">{o.customerName}</div>
-                    <div className="text-[10px] font-semibold text-muted mt-0.5 flex items-center gap-1.5 font-data">
+                    <div className="text-sm font-medium text-foreground truncate">{o.customerName}</div>
+                    <div className="text-xs text-muted mt-1 flex items-center gap-1.5">
                       <span>{itemCount} {itemCount === 1 ? "item" : "items"}</span>
                       <span className="text-border">&middot;</span>
                       <span>{formatOrderTime(o.createdAt)}</span>
@@ -107,10 +107,10 @@ export function RecentOrders() {
 
                 <div className="flex items-center gap-4 shrink-0">
                   <div className="text-right">
-                    <div className="font-data text-xs font-black text-foreground">LKR {o.total.toLocaleString()}</div>
-                    <div className="text-[9px] font-bold text-muted mt-0.5 tracking-wider uppercase font-data">Amount</div>
+                    <div className="text-sm font-medium text-foreground">LKR {o.total.toLocaleString()}</div>
+                    <div className="text-xs text-muted mt-0.5 uppercase">Amount</div>
                   </div>
-                  <div className={`px-2.5 py-1 rounded-full border text-[9px] font-bold font-data flex items-center gap-1 shrink-0 ${statusColor[o.status] || ""}`}>
+                  <div className={`px-2.5 py-1 rounded-full border text-xs font-medium flex items-center gap-1.5 shrink-0 ${statusColor[o.status] || ""}`}>
                     <span className={`w-1 h-1 rounded-full ${statusDotColor[o.status] || "bg-muted"} ${o.status === "preparing" || o.status === "pending" ? "animate-pulse" : ""}`} />
                     <span className="capitalize">{o.status}</span>
                   </div>

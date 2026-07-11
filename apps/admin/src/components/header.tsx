@@ -5,8 +5,9 @@ import { Bell, ChevronDown, LogOut, User, Settings, Sun, Moon, Menu, Search } fr
 import { cn } from "@juice-vibe/utils";
 import { CommandPalette } from "@/components/ui/command-palette";
 import { useTheme } from "next-themes";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
+import { useAuthStore } from "@juice-vibe/services";
 
 const pageTitles: Record<string, string> = {
   "/dashboard": "Dashboard",
@@ -40,6 +41,13 @@ export function Header({ onMobileMenuClick }: HeaderProps) {
   const userMenuRef = useRef<HTMLDivElement>(null);
   const { theme, setTheme } = useTheme();
   const pathname = usePathname();
+  const router = useRouter();
+  const { logout } = useAuthStore();
+
+  const handleSignOut = () => {
+    logout();
+    router.push("/login");
+  };
 
   const unreadCount = notifications.filter((n) => n.unread).length;
 
@@ -61,20 +69,20 @@ export function Header({ onMobileMenuClick }: HeaderProps) {
   }, []);
 
   return (
-    <header className="sticky top-0 z-40 bg-background/80 backdrop-blur-xl border-b border-border w-full transition-colors mb-6">
+    <header className="sticky top-0 z-40 bg-background/80 backdrop-blur-xl border-b border-border w-full transition-colors">
       <div className="flex items-center justify-between h-16 px-4 md:px-8">
         <div className="flex items-center gap-3">
           {/* Mobile Menu Toggle */}
           <button
             onClick={onMobileMenuClick}
-            className="md:hidden p-2 bg-card rounded-lg text-muted hover:text-primary transition-colors shrink-0"
+            className="md:hidden p-2 bg-muted-background rounded-md text-muted hover:text-foreground transition-colors shrink-0"
             aria-label="Open menu"
           >
             <Menu className="w-5 h-5" />
           </button>
 
           {/* Page Breadcrumb */}
-          <span className="hidden md:flex items-center gap-2 font-data text-xs font-black tracking-widest uppercase text-muted shrink-0">
+          <span className="hidden md:flex items-center gap-2 font-mono text-xs font-semibold tracking-wider uppercase text-muted shrink-0">
             {currentPage}
           </span>
         </div>
@@ -91,7 +99,7 @@ export function Header({ onMobileMenuClick }: HeaderProps) {
           {/* Theme Toggle */}
           <button
             onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-            className="p-2 rounded-lg hover:bg-card text-muted hover:text-foreground transition-colors active:scale-95 flex items-center justify-center cursor-pointer"
+            className="p-2 rounded-md hover:bg-muted-background text-muted hover:text-foreground transition-colors flex items-center justify-center cursor-pointer"
             aria-label="Toggle theme"
           >
             {!mounted ? (
@@ -107,14 +115,14 @@ export function Header({ onMobileMenuClick }: HeaderProps) {
           <div className="relative" ref={notificationsRef}>
             <button
               onClick={() => setNotificationsOpen(!notificationsOpen)}
-              className="relative p-2 rounded-lg hover:bg-card transition-colors cursor-pointer"
+              className="relative p-2 rounded-md hover:bg-muted-background transition-colors cursor-pointer"
               aria-label="Notifications"
               aria-expanded={notificationsOpen}
             >
               <Bell className="w-5 h-5 text-muted hover:text-foreground transition-colors" />
               {unreadCount > 0 && (
                 <span
-                  className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-pink text-white text-[9px] font-bold rounded-full flex items-center justify-center"
+                  className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-danger text-white text-[9px] font-bold rounded-full flex items-center justify-center"
                   aria-label={`${unreadCount} unread notifications`}
                 >
                   {unreadCount}
@@ -133,13 +141,13 @@ export function Header({ onMobileMenuClick }: HeaderProps) {
                     <div
                       key={i}
                       className={cn(
-                        "px-4 py-3 hover:bg-card transition-colors border-b border-border/50 last:border-0 cursor-pointer",
-                        n.unread && "bg-primary/5"
+                        "px-4 py-3 hover:bg-muted-background transition-colors border-b border-border last:border-0 cursor-pointer",
+                        n.unread && "bg-muted-background/50"
                       )}
                     >
                       <p className={cn("text-xs font-semibold text-foreground", n.unread && "font-bold")}>{n.title}</p>
                       <p className="text-xs text-muted mt-0.5">{n.desc}</p>
-                      <p className="text-[10px] text-muted mt-1 font-data">{n.time}</p>
+                      <p className="text-[10px] text-muted mt-1 font-mono">{n.time}</p>
                     </div>
                   ))}
                 </div>
@@ -154,16 +162,16 @@ export function Header({ onMobileMenuClick }: HeaderProps) {
           <div className="relative" ref={userMenuRef}>
             <button
               onClick={() => setUserMenuOpen(!userMenuOpen)}
-              className="flex items-center gap-2 pl-2 pr-1.5 py-1 rounded-lg hover:bg-card transition-colors cursor-pointer"
+              className="flex items-center gap-2 pl-2 pr-1.5 py-1 rounded-md hover:bg-muted-background transition-colors cursor-pointer"
               aria-expanded={userMenuOpen}
               aria-haspopup="true"
             >
               <div className="w-7 h-7 rounded-full bg-primary flex items-center justify-center shadow-sm">
-                <span className="text-[10px] font-bold text-white tracking-wider font-display">A</span>
+                <span className="text-[10px] font-bold text-primary-foreground tracking-wider">A</span>
               </div>
               <div className="hidden md:block text-left">
                 <p className="text-xs font-medium text-foreground leading-none">Admin</p>
-                <p className="text-[10px] text-muted mt-0.5 leading-none font-data">admin@juicevibe.com</p>
+                <p className="text-[10px] text-muted mt-0.5 leading-none font-mono">admin@juicevibe.com</p>
               </div>
               <ChevronDown className={cn("w-3.5 h-3.5 text-muted transition-transform duration-200", userMenuOpen && "rotate-180")} />
             </button>
@@ -171,19 +179,22 @@ export function Header({ onMobileMenuClick }: HeaderProps) {
             {userMenuOpen && (
               <div className="absolute right-0 mt-2 w-48 bg-card rounded-lg border border-border shadow-lg py-2 z-50">
                 <div className="px-4 py-3 border-b border-border">
-                  <p className="font-semibold text-foreground text-xs font-display">Admin</p>
-                  <p className="text-[10px] text-muted mt-0.5 font-data">admin@juicevibe.com</p>
+                  <p className="font-semibold text-foreground text-xs">Admin</p>
+                  <p className="text-[10px] text-muted mt-0.5 font-mono">admin@juicevibe.com</p>
                 </div>
-                <Link href="/settings" className="flex items-center gap-2 px-4 py-2.5 text-xs text-foreground hover:bg-card transition-colors">
+                <Link href="/settings" className="flex items-center gap-2 px-4 py-2.5 text-xs text-foreground hover:bg-muted-background transition-colors">
                   <Settings className="w-3.5 h-3.5 text-muted" />
                   Settings
                 </Link>
-                <Link href="/settings" className="flex items-center gap-2 px-4 py-2.5 text-xs text-foreground hover:bg-card transition-colors">
+                <Link href="/settings" className="flex items-center gap-2 px-4 py-2.5 text-xs text-foreground hover:bg-muted-background transition-colors">
                   <User className="w-3.5 h-3.5 text-muted" />
                   Profile
                 </Link>
                 <hr className="my-1 border-border" />
-                <button className="flex items-center gap-2 px-4 py-2.5 text-xs text-pink hover:bg-pink/5 dark:hover:bg-pink/10 w-full cursor-pointer transition-colors text-left">
+                <button 
+                  onClick={handleSignOut}
+                  className="flex items-center gap-2 px-4 py-2.5 text-xs text-danger hover:bg-danger/10 w-full cursor-pointer transition-colors text-left"
+                >
                   <LogOut className="w-3.5 h-3.5" />
                   Sign Out
                 </button>

@@ -2,56 +2,83 @@
 
 @layer base {
   :root {
-    --background: #f8fafc; /* Slate-50 cool background */
-    --foreground: #0f172a; /* Slate-900 foreground */
+    --background: #ffffff; /* Vercel-like crisp white */
+    --foreground: #0a0a0a; /* Neutral-950 */
 
     --card: #ffffff;
-    --card-foreground: #0f172a;
+    --card-foreground: #0a0a0a;
 
-    --primary: #10b981; /* Premium Emerald-500 */
-    --primary-dark: #059669; /* Emerald-600 */
-    --primary-light: #34d399; /* Emerald-400 */
+    --primary: #0a0a0a; /* Premium SaaS primary is often black */
     --primary-foreground: #ffffff;
+    --primary-dark: #000000;
 
-    --dark-green: #064e3b;
-    --orange: #f59e0b;
-    --yellow: #eab308;
+    --success: #10b981; /* Emerald-500 */
+    --success-foreground: #ffffff;
+    --warning: #f59e0b;
+    --warning-foreground: #ffffff;
+    --danger: #ef4444;
+    --danger-foreground: #ffffff;
+    --info: #3b82f6;
+    --orange: #f97316;
     --pink: #ec4899;
-    --blue: #3b82f6;
 
-    --sidebar: #0f172a; /* Rich dark sidebar */
-    --sidebar-hover: #1e293b;
-    --muted: #64748b; /* Slate-500 */
-    --border: #e2e8f0; /* Slate-200 borders */
+    --sidebar: #fcfcfc; /* Very light gray for sidebar */
+    --sidebar-hover: #f3f4f6;
+    --sidebar-foreground: #404040;
+    --sidebar-foreground-hover: #0a0a0a;
 
-    --radius: 12px;
+    --muted: #737373; /* Neutral-500 */
+    --muted-background: #f5f5f5; /* Neutral-100 */
+    --border: #e5e5e5; /* Neutral-200 */
+    --input: #e5e5e5;
+    --ring: #0a0a0a;
+
+    --radius: 8px; /* md */
+    --radius-lg: 12px;
+    --radius-sm: 6px;
+
+    /* Spacing Tokens */
+    --page-px: 24px;
+    --page-py: 32px;
+    --section-gap: 32px;
+
+    /* Shadow Tokens */
     --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-    --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.08), 0 1px 2px -1px rgba(0, 0, 0, 0.06);
-    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -2px rgba(0, 0, 0, 0.06);
+    --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
   }
 
   .dark {
-    --background: #09090b; /* Zinc-950 */
-    --foreground: #f4f4f5; /* Zinc-100 */
+    --background: #0a0a0a;
+    --foreground: #fafafa;
 
-    --card: #18181b; /* Zinc-900 cards */
-    --card-foreground: #f4f4f5;
+    --card: #121212;
+    --card-foreground: #fafafa;
 
-    --primary: #10b981;
-    --primary-dark: #064e3b;
-    --primary-light: #34d399;
-    --primary-foreground: #09090b;
+    --primary: #fafafa;
+    --primary-foreground: #0a0a0a;
+    --primary-dark: #e5e5e5;
 
-    --dark-green: #022c22;
-    --orange: #f59e0b;
-    --yellow: #eab308;
+    --success: #10b981;
+    --success-foreground: #ffffff;
+    --warning: #f59e0b;
+    --warning-foreground: #ffffff;
+    --danger: #ef4444;
+    --danger-foreground: #ffffff;
+    --info: #3b82f6;
+    --orange: #f97316;
     --pink: #ec4899;
-    --blue: #3b82f6;
 
-    --sidebar: #09090b;
-    --sidebar-hover: #18181b;
-    --muted: #a1a1aa; /* Zinc-400 */
-    --border: #27272a; /* Zinc-800 borders */
+    --sidebar: #0f0f0f;
+    --sidebar-hover: #1a1a1a;
+    --sidebar-foreground: #a3a3a3;
+    --sidebar-foreground-hover: #fafafa;
+
+    --muted: #a3a3a3;
+    --muted-background: #171717;
+    --border: #262626;
+    --input: #262626;
+    --ring: #d4d4d4;
   }
 }
 
@@ -60,23 +87,38 @@
   --color-foreground: var(--foreground);
   --color-card: var(--card);
   --color-card-foreground: var(--card-foreground);
+  
   --color-primary: var(--primary);
-  --color-primary-dark: var(--primary-dark);
-  --color-primary-light: var(--primary-light);
   --color-primary-foreground: var(--primary-foreground);
-  --color-dark-green: var(--dark-green);
+  --color-primary-dark: var(--primary-dark);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-danger: var(--danger);
+  --color-danger-foreground: var(--danger-foreground);
+  --color-info: var(--info);
   --color-orange: var(--orange);
-  --color-yellow: var(--yellow);
   --color-pink: var(--pink);
-  --color-blue: var(--blue);
+
   --color-sidebar: var(--sidebar);
   --color-sidebar-hover: var(--sidebar-hover);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-foreground-hover: var(--sidebar-foreground-hover);
+
   --color-muted: var(--muted);
+  --color-muted-background: var(--muted-background);
   --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
 
   --radius-md: var(--radius);
-  --radius-lg: calc(var(--radius) + 4px);
-  --radius-sm: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius-lg);
+  --radius-sm: var(--radius-sm);
+  
+  --spacing-page-px: var(--page-px);
+  --spacing-page-py: var(--page-py);
+  --spacing-section: var(--section-gap);
 }
 
 * {
@@ -99,26 +141,27 @@ body {
   font-family: var(--font-data), "SF Mono", monospace;
 }
 
-/* Layout panels */
-.solid-panel {
-  background-color: var(--card);
-  border: 1px solid var(--border);
-  box-shadow: var(--shadow-sm);
-  border-radius: var(--radius);
-  transition: all 0.2s ease-in-out;
+/* Layout utilities */
+.page-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--section-gap);
+  width: 100%;
+  max-width: 1440px;
+  margin: 0 auto;
 }
 
 .premium-card {
   background: var(--card);
   border: 1px solid var(--border);
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05);
+  box-shadow: var(--shadow);
   border-radius: calc(var(--radius) + 4px);
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .premium-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 12px 20px -10px rgba(0, 0, 0, 0.08), 0 4px 10px -5px rgba(0, 0, 0, 0.04);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
   border-color: var(--primary);
 }
 
@@ -162,7 +205,7 @@ body {
   -webkit-backdrop-filter: blur(12px);
 }
 .dark .glass-panel {
-  background: rgba(26, 30, 24, 0.7);
+  background: rgba(18, 18, 18, 0.7);
 }
 
 /* Utility: slide-in animations for toasts */

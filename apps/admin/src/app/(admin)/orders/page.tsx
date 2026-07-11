@@ -8,6 +8,10 @@ import { KanbanBoard } from "@/components/kanban-board";
 import { Drawer } from "@/components/ui/drawer";
 import { PageHeader } from "@/components/PageHeader";
 import { ActionMenu } from "@/components/ui";
+import { Badge } from "@/components/ui/Badge";
+import { Button } from "@/components/ui/Button";
+import { LoadingState } from "@/components/shared";
+import { SectionCard, SectionTitle, KeyValueRow } from "@/components/shared";
 import { orderService } from "@juice-vibe/services";
 import type { Order, OrderItem, OrderStatus } from "@juice-vibe/types";
 
@@ -99,8 +103,8 @@ export default function OrdersPage() {
   };
 
   const columns = [
-    { key: "orderNumber", label: "Order ID", render: (item: Order) => <span className="font-bold">#{item.orderNumber}</span> },
-    { key: "customerName", label: "Customer" },
+    { key: "orderNumber", label: "Order ID", sortable: true, render: (item: Order) => <span className="font-bold">#{item.orderNumber}</span> },
+    { key: "customerName", label: "Customer", sortable: true },
     { 
       key: "items", 
       label: "Items",
@@ -111,38 +115,44 @@ export default function OrdersPage() {
     { 
       key: "total", 
       label: "Total",
+      sortable: true,
       render: (item: Order) => <span>LKR {item.total.toLocaleString()}</span>
     },
     {
       key: "status",
       label: "Status",
+      sortable: true,
       render: (item: Order) => {
         const statusLabels: Record<string, string> = {
-          completed: "🟢 Completed",
-          pending: "🟡 Pending",
-          preparing: "🟠 Preparing",
-          confirmed: "🔵 Confirmed",
-          ready: "🟣 Ready",
-          cancelled: "🔴 Cancelled",
+          completed: "Completed",
+          pending: "Pending",
+          preparing: "Preparing",
+          confirmed: "Confirmed",
+          ready: "Ready",
+          cancelled: "Cancelled",
         };
         return (
-          <span className="font-bold text-xs uppercase tracking-wider whitespace-nowrap">
+          <Badge variant={item.status === "completed" ? "success" : item.status === "cancelled" ? "danger" : item.status === "ready" ? "info" : "warning"} className="font-bold text-xs uppercase tracking-wider">
             {statusLabels[item.status] || item.status}
-          </span>
+          </Badge>
         );
       },
     },
     { 
       key: "paymentStatus", 
       label: "Payment",
+      sortable: true,
       render: (item: Order) => (
-        <span className="capitalize text-xs font-semibold">{item.paymentStatus}</span>
+        <Badge variant={item.paymentStatus === "paid" ? "success" : "warning"} className="capitalize text-xs font-semibold">
+          {item.paymentStatus}
+        </Badge>
       )
     },
     { key: "type", label: "Type", render: (item: Order) => <span className="capitalize">{item.type.replace("_", "-")}</span> },
     { 
       key: "createdAt", 
       label: "Time",
+      sortable: true,
       render: (item: Order) => (
         <span className="text-xs text-muted-foreground">
           {new Date(item.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
@@ -166,6 +176,26 @@ export default function OrdersPage() {
   ];
 
   const filters = ["all", "pending", "confirmed", "preparing", "ready", "completed", "cancelled"];
+
+  const filterActiveColors: Record<string, string> = {
+    all: "bg-foreground text-background",
+    pending: "bg-amber-500 text-white",
+    confirmed: "bg-indigo-500 text-white",
+    preparing: "bg-orange-500 text-white",
+    ready: "bg-blue-500 text-white",
+    completed: "bg-emerald-500 text-white",
+    cancelled: "bg-rose-500 text-white",
+  };
+
+  const filterCountBg: Record<string, string> = {
+    all: "bg-foreground/20 text-background",
+    pending: "bg-amber-500/20 text-amber-100",
+    confirmed: "bg-indigo-500/20 text-indigo-100",
+    preparing: "bg-orange-500/20 text-orange-100",
+    ready: "bg-blue-500/20 text-blue-100",
+    completed: "bg-emerald-500/20 text-emerald-100",
+    cancelled: "bg-rose-500/20 text-rose-100",
+  };
   
   // Table respects filter, Kanban Board displays all columns
   const filtered = filter === "all" ? orders : orders.filter((o) => o.status === filter);
@@ -194,11 +224,10 @@ export default function OrdersPage() {
   );
 
   return (
-    <div className="space-y-6 max-w-7xl mx-auto px-4 pb-12">
+    <div className="space-y-6 max-w-7xl mx-auto pb-12">
       <PageHeader
         title="Orders Management"
         subtitle="Manage and track customer orders in real-time"
-        accentColor="orange"
         action={viewToggle}
       />
 
@@ -212,7 +241,7 @@ export default function OrdersPage() {
               onClick={() => setFilter(f)}
               className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold capitalize transition-all cursor-pointer whitespace-nowrap ${
                 isActive
-                  ? "bg-primary text-white shadow-sm"
+                  ? `${filterActiveColors[f]} shadow-sm`
                   : "text-muted hover:text-foreground hover:bg-background/50"
               }`}
             >
@@ -220,7 +249,7 @@ export default function OrdersPage() {
               {f}
               <span className={`text-[9px] px-1.5 py-0.5 rounded-md font-extrabold ${
                 isActive 
-                  ? "bg-white/20 text-white" 
+                  ? filterCountBg[f]
                   : "bg-muted/15 text-muted-foreground"
               }`}>
                 {countByStatus(f)}
@@ -233,10 +262,7 @@ export default function OrdersPage() {
 
 
       {loading ? (
-        <div className="flex flex-col items-center justify-center py-24 gap-3 bg-card border border-border rounded-lg shadow-sm">
-          <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
-          <span className="text-xs font-bold text-muted uppercase tracking-wider animate-pulse">Loading orders...</span>
-        </div>
+        <LoadingState label="Loading orders..." />
       ) : (
         <div>
           {view === "board" ? (
@@ -260,33 +286,23 @@ export default function OrdersPage() {
       >
         {selectedOrder && (
           <div className="space-y-4 text-xs">
-            <div className="bg-card border border-border rounded-lg p-4 shadow-sm">
-              <h3 className="text-[10px] font-bold text-muted mb-3 uppercase tracking-wider">Customer Info</h3>
-              <div className="flex items-center justify-between mb-1.5">
-                <span className="text-muted">Name</span>
-                <span className="font-bold text-foreground">{selectedOrder.customerName}</span>
-              </div>
-              <div className="flex items-center justify-between mb-1.5">
-                <span className="text-muted">Phone</span>
-                <span className="font-bold text-foreground">{selectedOrder.customerPhone}</span>
-              </div>
+            <SectionCard>
+              <SectionTitle>Customer Info</SectionTitle>
+              <KeyValueRow label="Name">{selectedOrder.customerName}</KeyValueRow>
+              <KeyValueRow label="Phone">{selectedOrder.customerPhone}</KeyValueRow>
               {selectedOrder.customerEmail && (
-                <div className="flex items-center justify-between mb-1.5">
-                  <span className="text-muted">Email</span>
-                  <span className="font-bold text-foreground">{selectedOrder.customerEmail}</span>
-                </div>
+                <KeyValueRow label="Email">{selectedOrder.customerEmail}</KeyValueRow>
               )}
-              <div className="flex items-center justify-between">
-                <span className="text-muted">Time</span>
-                <span className="font-bold text-foreground flex items-center gap-1">
+              <KeyValueRow label="Time">
+                <span className="flex items-center gap-1">
                   <Clock className="w-3.5 h-3.5" />
                   {new Date(selectedOrder.createdAt).toLocaleString()}
                 </span>
-              </div>
-            </div>
+              </KeyValueRow>
+            </SectionCard>
 
-            <div className="bg-card border border-border rounded-lg p-4 shadow-sm">
-              <h3 className="text-[10px] font-bold text-muted mb-3 uppercase tracking-wider">Order Items</h3>
+            <SectionCard>
+              <SectionTitle>Order Items</SectionTitle>
               <div className="space-y-2">
                 {selectedOrder.items.map((item: OrderItem, idx: number) => (
                   <div key={idx} className="flex justify-between items-center border-b border-border/50 pb-1.5 last:border-0 last:pb-0">
@@ -298,55 +314,39 @@ export default function OrdersPage() {
                   </div>
                 ))}
               </div>
-            </div>
+            </SectionCard>
 
-            <div className="bg-card border border-border rounded-lg p-4 shadow-sm">
-              <h3 className="text-[10px] font-bold text-muted mb-3 uppercase tracking-wider">Order Info</h3>
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-muted">Status</span>
-                <span className="font-bold text-xs uppercase tracking-wider">
-                  {(() => {
-                    const statusLabels: Record<string, string> = {
-                      completed: "🟢 Completed",
-                      pending: "🟡 Pending",
-                      preparing: "🟠 Preparing",
-                      confirmed: "🔵 Confirmed",
-                      ready: "🟣 Ready",
-                      cancelled: "🔴 Cancelled",
-                    };
-                    return statusLabels[selectedOrder.status] || selectedOrder.status;
-                  })()}
-                </span>
-              </div>
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-muted">Type</span>
-                <span className="font-bold text-foreground capitalize">{selectedOrder.type.replace("_", "-")}</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-muted">Payment</span>
-                <span className={`inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded capitalize ${selectedOrder.paymentStatus === "paid" ? "bg-emerald-50 text-emerald-700 border border-emerald-100" : "bg-amber-50 text-amber-700 border border-amber-100"}`}>
+            <SectionCard>
+              <SectionTitle>Order Info</SectionTitle>
+              <KeyValueRow label="Status">
+                {(() => {
+                  const statusLabels: Record<string, string> = {
+                    completed: "Completed", pending: "Pending", preparing: "Preparing",
+                    confirmed: "Confirmed", ready: "Ready", cancelled: "Cancelled",
+                  };
+                  return statusLabels[selectedOrder.status] || selectedOrder.status;
+                })()}
+              </KeyValueRow>
+              <KeyValueRow label="Type">
+                <span className="capitalize">{selectedOrder.type.replace("_", "-")}</span>
+              </KeyValueRow>
+              <KeyValueRow label="Payment">
+                <Badge variant={selectedOrder.paymentStatus === "paid" ? "success" : "warning"} className="capitalize font-bold text-[10px]">
                   {selectedOrder.paymentStatus}
-                </span>
-              </div>
-            </div>
+                </Badge>
+              </KeyValueRow>
+            </SectionCard>
 
-            <div className="bg-card border border-border rounded-lg p-4 shadow-sm border-l-4 border-l-primary">
+            <SectionCard className="border-l-4 border-l-primary">
               <div className="flex items-center justify-between">
                 <span className="font-bold text-foreground">Total ({selectedOrder.items.reduce((acc: number, it: { quantity: number }) => acc + it.quantity, 0)} items)</span>
                 <span className="text-base font-bold text-primary">LKR {selectedOrder.total.toLocaleString()}</span>
               </div>
-            </div>
+            </SectionCard>
 
             <div className="pt-4 flex gap-2">
-              <button className="flex-1 bg-card border border-border hover:bg-background rounded-lg py-2.5 font-semibold text-foreground cursor-pointer transition-colors shadow-sm text-center">
-                Print Receipt
-              </button>
-              <button 
-                onClick={handleUpdateStatus}
-                className="flex-1 bg-primary hover:bg-primary-dark text-white rounded-lg py-2.5 font-semibold cursor-pointer transition-colors shadow-sm text-center"
-              >
-                Update Status
-              </button>
+              <Button variant="secondary" className="flex-1 text-xs" onClick={() => window.print()}>Print Receipt</Button>
+              <Button variant="primary" className="flex-1 text-xs" onClick={handleUpdateStatus}>Update Status</Button>
             </div>
           </div>
         )}

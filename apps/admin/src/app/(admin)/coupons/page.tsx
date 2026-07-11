@@ -7,7 +7,10 @@ import { PageHeader } from "@/components/PageHeader";
 import { Modal } from "@/components/ui/Modal";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
+import { Select } from "@/components/ui/Select";
+import { Badge } from "@/components/ui/Badge";
 import { ActionMenu } from "@/components/ui";
+import { LoadingState, ErrorAlert, FormFooter } from "@/components/shared";
 import { couponService } from "@juice-vibe/services";
 import { useToast } from "@/hooks/useToast";
 import type { Coupon } from "@juice-vibe/types";
@@ -82,10 +85,11 @@ export default function CouponsPage() {
   };
 
   const columns = [
-    { key: "code", label: "Code", render: (item: Coupon) => <span className="font-bold">{item.code}</span> },
+    { key: "code", label: "Code", sortable: true, render: (item: Coupon) => <span className="font-bold">{item.code}</span> },
     { 
       key: "value", 
       label: "Value",
+      sortable: true,
       render: (item: Coupon) => (
         <span>{item.type === "percentage" ? `${item.value}%` : `LKR ${item.value.toLocaleString()}`}</span>
       )
@@ -93,6 +97,7 @@ export default function CouponsPage() {
     { 
       key: "minOrderAmount", 
       label: "Min. Order",
+      sortable: true,
       render: (item: Coupon) => (
         <span>LKR {item.minOrderAmount.toLocaleString()}</span>
       )
@@ -100,6 +105,7 @@ export default function CouponsPage() {
     { 
       key: "usage", 
       label: "Usage",
+      sortable: true,
       render: (item: Coupon) => (
         <span>{item.usedCount} / {item.usageLimit}</span>
       )
@@ -107,19 +113,21 @@ export default function CouponsPage() {
     {
       key: "status",
       label: "Status",
+      sortable: true,
       render: (item: Coupon) => {
         const isExpired = item.expiresAt && new Date(item.expiresAt) < new Date();
         const active = item.isActive && !isExpired;
         return (
-          <span className="font-bold text-xs uppercase tracking-wider whitespace-nowrap">
-            {active ? "🟢 Active" : isExpired ? "🔴 Expired" : "⚪ Inactive"}
-          </span>
+          <Badge variant={active ? "success" : isExpired ? "danger" : "default"} className="font-bold text-xs uppercase tracking-wider">
+            {active ? "Active" : isExpired ? "Expired" : "Inactive"}
+          </Badge>
         );
       },
     },
     { 
       key: "expiresAt", 
       label: "Expires",
+      sortable: true,
       render: (item: Coupon) => (
         <span>{item.expiresAt ? new Date(item.expiresAt).toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' }) : "Never"}</span>
       )
@@ -142,31 +150,20 @@ export default function CouponsPage() {
   ];
 
   const createBtn = (
-    <button 
-      onClick={() => setIsAddModalOpen(true)} 
-      className="flex items-center gap-1.5 px-4 py-2.5 bg-primary hover:bg-primary-dark text-white rounded-lg transition-colors font-semibold text-xs shadow-sm cursor-pointer"
-    >
+    <Button variant="primary" className="text-xs" onClick={() => setIsAddModalOpen(true)}>
       <Plus className="w-4 h-4" />
       Create Coupon
-    </button>
+    </Button>
   );
 
   return (
-    <div className="space-y-6 max-w-7xl mx-auto px-4 pb-12">
-      <PageHeader title="Coupons" subtitle="Create and manage promotional coupons" accentColor="pink" action={createBtn} />
+    <div className="space-y-6 max-w-7xl mx-auto pb-12">
+      <PageHeader title="Coupons" subtitle="Create and manage promotional coupons" action={createBtn} />
       
-      {error && (
-        <div className="flex items-center gap-2 p-4 bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-500/20 rounded-lg text-sm">
-          <AlertCircle className="w-4 h-4" />
-          <span>{error}</span>
-        </div>
-      )}
+      {error && <ErrorAlert message={error} />}
 
       {loading ? (
-        <div className="flex flex-col items-center justify-center py-24 gap-3 bg-card border border-border rounded-lg shadow-sm">
-          <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
-          <span className="text-xs font-bold text-muted uppercase tracking-wider animate-pulse">Loading coupons...</span>
-        </div>
+        <LoadingState label="Loading coupons..." />
       ) : (
         <div>
           <Table columns={columns} data={coupons} searchable />
@@ -179,16 +176,14 @@ export default function CouponsPage() {
             <Input label="Coupon Code" name="code" placeholder="e.g. PROMO20" required />
             
             <div className="grid grid-cols-2 gap-4">
-              <div className="flex flex-col gap-1">
-                <label className="text-xs font-bold text-foreground mb-1">Discount Type</label>
-                <select 
-                  name="type" 
-                  className="flex h-11 w-full rounded-lg border border-border bg-card px-3 py-2 text-xs text-foreground focus:outline-none focus:border-primary/50"
-                >
-                  <option value="percentage">Percentage (%)</option>
-                  <option value="fixed">Fixed Amount (LKR)</option>
-                </select>
-              </div>
+              <Select
+                label="Discount Type"
+                name="type"
+                options={[
+                  { value: "percentage", label: "Percentage (%)" },
+                  { value: "fixed", label: "Fixed Amount (LKR)" },
+                ]}
+              />
               <Input label="Discount Value" name="value" type="number" placeholder="20" required />
             </div>
 
@@ -199,10 +194,7 @@ export default function CouponsPage() {
             </div>
           </div>
 
-          <div className="flex gap-2 pt-4 border-t border-border">
-            <Button type="button" variant="ghost" className="flex-1 text-xs" onClick={() => setIsAddModalOpen(false)}>Cancel</Button>
-            <Button type="submit" variant="primary" className="flex-1 text-xs" isLoading={submitting}>Create Coupon</Button>
-          </div>
+            <FormFooter onCancel={() => setIsAddModalOpen(false)} onSubmitLabel="Create Coupon" isLoading={submitting} />
         </form>
       </Modal>
     </div>

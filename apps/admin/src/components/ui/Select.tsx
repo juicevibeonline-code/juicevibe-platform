@@ -18,7 +18,7 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
     return (
       <div className="w-full">
         {label && (
-          <label htmlFor={selectId} className="block text-sm font-medium text-foreground mb-1.5">
+          <label htmlFor={selectId} className="block text-[10px] font-extrabold uppercase tracking-wider text-muted ml-0.5 mb-1.5">
             {label}
           </label>
         )}
@@ -26,10 +26,10 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
           ref={ref}
           id={selectId}
           className={cn(
-            "w-full px-3 py-2 rounded-lg border bg-card text-sm appearance-none",
-            "focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary",
+            "w-full h-10 px-3.5 rounded-lg border bg-slate-50/50 dark:bg-zinc-900/30 text-xs text-foreground appearance-none shadow-sm transition-all duration-200",
+            "focus:outline-none focus:bg-background focus:ring-1 focus:ring-primary/20 focus:border-primary",
             "disabled:bg-muted/10 disabled:cursor-not-allowed",
-            error ? "border-pink focus:border-pink focus:ring-pink/20" : "border-border",
+            error ? "border-pink focus:border-pink focus:ring-pink/20" : "border-border/80",
             className
           )}
           aria-invalid={error ? "true" : "false"}
@@ -44,12 +44,12 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
           ))}
         </select>
         {error && (
-          <p id={`${selectId}-error`} className="mt-1.5 text-sm text-pink" role="alert">
+          <p id={`${selectId}-error`} className="mt-1.5 text-xs text-pink" role="alert">
             {error}
           </p>
         )}
         {helperText && !error && (
-          <p id={`${selectId}-helper`} className="mt-1.5 text-sm text-muted">
+          <p id={`${selectId}-helper`} className="mt-1.5 text-xs text-muted">
             {helperText}
           </p>
         )}

@@ -5,6 +5,8 @@ import { Star, Check, X } from "lucide-react";
 import { Table } from "@/components/table";
 import { PageHeader } from "@/components/PageHeader";
 import { ActionMenu } from "@/components/ui";
+import { Badge } from "@/components/ui/Badge";
+import { LoadingState, FilterBar, FilterTab } from "@/components/shared";
 import { testimonialService } from "@juice-vibe/services";
 import type { Testimonial } from "@juice-vibe/types";
 
@@ -55,10 +57,11 @@ export default function TestimonialsPage() {
   };
 
   const columns = [
-    { key: "name", label: "Name" },
+    { key: "name", label: "Name", sortable: true },
     {
       key: "rating",
       label: "Rating",
+      sortable: true,
       render: (item: Testimonial) => (
         <div className="flex items-center gap-0.5">
           {Array.from({ length: 5 }).map((_, i) => (
@@ -71,18 +74,18 @@ export default function TestimonialsPage() {
     {
       key: "status",
       label: "Status",
+      sortable: true,
       render: (item: Testimonial) => (
-        <span className={`inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded capitalize ${
-          item.isApproved ? "bg-emerald-50 text-emerald-700 border border-emerald-100 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20" : "bg-amber-50 text-amber-700 border border-amber-100 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20"
-        }`}>
-          {item.isApproved ? <Check className="w-3 h-3" /> : null}
+        <Badge variant={item.isApproved ? "success" : "warning"} className="capitalize">
+          {item.isApproved ? <Check className="w-3.5 h-3.5 mr-1" /> : null}
           {item.isApproved ? "Approved" : "Pending"}
-        </span>
+        </Badge>
       ),
     },
     { 
       key: "createdAt", 
       label: "Date",
+      sortable: true,
       render: (item: Testimonial) => (
         <span>{new Date(item.createdAt).toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' })}</span>
       )
@@ -126,47 +129,25 @@ export default function TestimonialsPage() {
   ];
 
   return (
-    <div className="space-y-6 max-w-7xl mx-auto px-4 pb-12">
+    <div className="space-y-6 max-w-7xl mx-auto pb-12">
       <PageHeader
         title="Testimonials"
         subtitle={`Manage customer reviews — ${pendingCount} pending approval`}
-        accentColor="orange"
       />
 
       {/* Tabs list with count badges Control Bar */}
-      <div className="bg-card border border-border/80 p-1.5 rounded-xl flex items-center gap-1 overflow-x-auto custom-scrollbar max-w-full shrink-0 shadow-sm">
-        {tabs.map((tab) => {
-          const isActive = activeTab === tab.id;
-          return (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
-                isActive
-                  ? "bg-primary text-white shadow-sm"
-                  : "text-muted hover:text-foreground hover:bg-background/50"
-              }`}
-            >
-              {tab.label}
-              <span className={`text-[9px] px-1.5 py-0.5 rounded-md font-extrabold ${
-                isActive 
-                  ? "bg-white/20 text-white" 
-                  : "bg-muted/15 text-muted-foreground"
-              }`}>
-                {tab.count}
-              </span>
-            </button>
-          );
-        })}
-      </div>
+      <FilterBar>
+        {tabs.map((tab) => (
+          <FilterTab key={tab.id} active={activeTab === tab.id} onClick={() => setActiveTab(tab.id)} count={tab.count}>
+            {tab.label}
+          </FilterTab>
+        ))}
+      </FilterBar>
 
 
 
       {loading ? (
-        <div className="flex flex-col items-center justify-center py-24 gap-3 bg-card border border-border rounded-lg shadow-sm">
-          <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
-          <span className="text-xs font-bold text-muted uppercase tracking-wider animate-pulse">Loading testimonials...</span>
-        </div>
+        <LoadingState label="Loading testimonials..." />
       ) : (
         <div>
           <Table columns={columns} data={filtered} searchable />
