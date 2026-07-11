@@ -11,16 +11,32 @@ async function bootstrap() {
   const logger = new Logger("Bootstrap");
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
-  app.useStaticAssets(join(__dirname, "..", "public", "uploads"), {
-    prefix: "/uploads/",
-  });
+  // Only serve uploads from disk when running locally (not on Vercel serverless)
+  if (process.env.NODE_ENV !== "production") {
+    app.useStaticAssets(join(__dirname, "..", "public", "uploads"), {
+      prefix: "/uploads/",
+    });
+  }
 
   app.setGlobalPrefix("api");
 
   app.use(helmet());
 
+  const allowedOrigins = [
+    process.env.FRONTEND_URL || "http://localhost:3000",
+    process.env.ADMIN_URL || "http://localhost:3001",
+  ].filter(Boolean);
+
   app.enableCors({
-    origin: [process.env.FRONTEND_URL || "http://localhost:3000", process.env.ADMIN_URL || "http://localhost:3001"],
+    origin: (origin, callback) => {
+      // Allow requests with no origin (mobile apps, Postman, server-to-server)
+      if (!origin) return callback(null, true);
+      // Allow any vercel.app preview URL automatically
+      if (origin.endsWith(".vercel.app") || allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+      callback(new Error(`CORS: ${origin} not allowed`));
+    },
     credentials: true,
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
