@@ -9,6 +9,7 @@ import {
   Tooltip,
   Cell,
 } from "recharts";
+import { BarChart3, PieChart } from "lucide-react";
 
 function ChartTooltip({ active, payload, label }: any) {
   if (active && payload && payload.length) {
@@ -32,7 +33,6 @@ interface RevenueChartProps {
 
 export function RevenueChart({ data, title = "Revenue Chart" }: RevenueChartProps) {
   const chartData = (data || []).map((d) => {
-    // Format date string to a shorter presentation (e.g. Mon, or Jul 11)
     const dateObj = new Date(d.date);
     const label = isNaN(dateObj.getTime())
       ? d.date
@@ -48,19 +48,27 @@ export function RevenueChart({ data, title = "Revenue Chart" }: RevenueChartProp
 
   return (
     <div className="flex flex-col h-full">
-      <div className="flex items-baseline justify-between mb-1">
+      <div className="flex items-baseline justify-between mb-4">
         <div>
           <div className="font-display font-bold text-sm text-foreground">{title}</div>
           <div className="text-xs text-muted mt-0.5 font-medium">Revenue details over the selected period</div>
         </div>
-        <div className="font-data text-base font-black text-foreground">
-          LKR {totalRevenue.toLocaleString("en-LK")}
-        </div>
+        {chartData.length > 0 && (
+          <div className="font-data text-base font-black text-foreground">
+            LKR {totalRevenue.toLocaleString("en-LK")}
+          </div>
+        )}
       </div>
-      <div className="flex-1 w-full min-h-[220px]">
+      <div className="flex-1 w-full min-h-[220px] flex flex-col justify-center">
         {chartData.length === 0 ? (
-          <div className="flex items-center justify-center h-full text-xs text-muted font-bold uppercase tracking-wider">
-            No chart data available
+          <div className="flex-1 flex flex-col items-center justify-center text-center py-10 bg-slate-50/50 dark:bg-zinc-900/10 rounded-xl border border-dashed border-border/80">
+            <div className="w-10 h-10 rounded-full bg-slate-100 dark:bg-zinc-800 flex items-center justify-center text-muted mb-3 border border-border">
+              <BarChart3 className="w-5 h-5 text-muted" />
+            </div>
+            <p className="text-xs font-bold text-foreground uppercase tracking-wider">Awaiting Checkout Sales</p>
+            <p className="text-[10px] text-muted max-w-xs mt-1 leading-relaxed px-4">
+              We couldn't find any order transactions in the selected period. Publish menu items and start checking out.
+            </p>
           </div>
         ) : (
           <ResponsiveContainer width="100%" height="100%">
@@ -121,8 +129,14 @@ export function CategorySalesChart({ data }: CategorySalesProps) {
       <div className="text-xs text-muted mb-4 font-medium">Revenue split of top items</div>
 
       {categoryData.length === 0 ? (
-        <div className="flex-1 flex items-center justify-center text-xs text-muted font-bold uppercase tracking-wider py-16">
-          No sales data share
+        <div className="flex-1 flex flex-col items-center justify-center text-center py-10 bg-slate-50/50 dark:bg-zinc-900/10 rounded-xl border border-dashed border-border/80">
+          <div className="w-10 h-10 rounded-full bg-slate-100 dark:bg-zinc-800 flex items-center justify-center text-muted mb-3 border border-border">
+            <PieChart className="w-5 h-5 text-muted" />
+          </div>
+          <p className="text-xs font-bold text-foreground uppercase tracking-wider">No Sales Records</p>
+          <p className="text-[10px] text-muted max-w-[200px] mt-1 leading-relaxed">
+            Once orders are processed, the product sales distribution will appear here.
+          </p>
         </div>
       ) : (
         <>

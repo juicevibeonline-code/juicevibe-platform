@@ -192,25 +192,32 @@ export default function OrdersPage() {
         action={viewToggle}
       />
 
-      {/* Status Filters */}
-      <div className="flex gap-1.5 flex-wrap">
-        {filters.map((f) => (
-          <button
-            key={f}
-            onClick={() => setFilter(f)}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold capitalize border transition-colors cursor-pointer ${
-              filter === f
-                ? "bg-background border-border text-primary"
-                : "bg-card hover:bg-background text-muted hover:text-foreground border-border"
-            }`}
-          >
-            <span className={`w-1.5 h-1.5 rounded-full ${filterDots[f]}`} />
-            {f}
-            <span className={`text-[10px] px-1.5 py-0.5 rounded font-bold ${filter === f ? "bg-primary/10 text-primary-dark" : "bg-background text-muted"}`}>
-              {countByStatus(f)}
-            </span>
-          </button>
-        ))}
+      {/* Status Filters Control Bar */}
+      <div className="bg-card border border-border/80 p-1.5 rounded-xl flex items-center gap-1 overflow-x-auto custom-scrollbar max-w-full shrink-0 shadow-sm">
+        {filters.map((f) => {
+          const isActive = filter === f;
+          return (
+            <button
+              key={f}
+              onClick={() => setFilter(f)}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold capitalize transition-all cursor-pointer whitespace-nowrap ${
+                isActive
+                  ? "bg-primary text-white shadow-sm"
+                  : "text-muted hover:text-foreground hover:bg-background/50"
+              }`}
+            >
+              <span className={`w-1.5 h-1.5 rounded-full ${isActive ? "bg-white" : filterDots[f]}`} />
+              {f}
+              <span className={`text-[9px] px-1.5 py-0.5 rounded-md font-extrabold ${
+                isActive 
+                  ? "bg-white/20 text-white" 
+                  : "bg-muted/15 text-muted-foreground"
+              }`}>
+                {countByStatus(f)}
+              </span>
+            </button>
+          );
+        })}
       </div>
 
 

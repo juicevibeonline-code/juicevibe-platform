@@ -240,26 +240,26 @@ export default function MenuPage() {
     <div className="space-y-6 max-w-7xl mx-auto px-4 pb-12">
       <PageHeader title="Menu Management" subtitle="Manage your menu items, prices, and categories" accentColor="primary" action={addBtn} />
 
-      {/* Dynamic Category Tabs */}
-      <div className="flex gap-1.5 flex-wrap">
+      {/* Dynamic Category Tabs Control Bar */}
+      <div className="bg-card border border-border/80 p-1.5 rounded-xl flex items-center gap-1 overflow-x-auto custom-scrollbar max-w-full shrink-0 shadow-sm">
         <button 
           onClick={() => setActiveCategory("all")}
-          className={`px-4 py-2 rounded-lg text-xs font-bold transition-colors cursor-pointer border ${
+          className={`px-4 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
             activeCategory === "all" 
-              ? "bg-background border-border text-primary" 
-              : "bg-card hover:bg-background text-muted hover:text-foreground border-border"
+              ? "bg-primary text-white shadow-sm" 
+              : "text-muted hover:text-foreground hover:bg-background/50"
           }`}
         >
-          All
+          All Items
         </button>
         {categories.map((cat) => (
           <button 
             key={cat.id} 
             onClick={() => setActiveCategory(cat.slug)}
-            className={`px-4 py-2 rounded-lg text-xs font-bold transition-colors cursor-pointer border ${
+            className={`px-4 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
               cat.slug === activeCategory 
-                ? "bg-background border-border text-primary" 
-                : "bg-card hover:bg-background text-muted hover:text-foreground border-border"
+                ? "bg-primary text-white shadow-sm" 
+                : "text-muted hover:text-foreground hover:bg-background/50"
             }`}
           >
             {cat.name}
@@ -268,10 +268,10 @@ export default function MenuPage() {
         {/* Archived filter tab */}
         <button 
           onClick={() => setActiveCategory("archived")}
-          className={`px-4 py-2 rounded-lg text-xs font-bold transition-colors cursor-pointer border ${
+          className={`px-4 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
             activeCategory === "archived" 
-              ? "bg-rose-50 text-rose-600 border-rose-200 dark:bg-rose-500/10 dark:text-rose-400 dark:border-rose-500/20" 
-              : "bg-card hover:bg-background text-muted hover:text-foreground border-border"
+              ? "bg-rose-600 text-white shadow-sm shadow-rose-600/10" 
+              : "text-rose-600 dark:text-rose-400 hover:bg-rose-500/5 dark:hover:bg-rose-500/10"
           }`}
         >
           Archived / Soft-Deleted
