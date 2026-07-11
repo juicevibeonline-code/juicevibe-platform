@@ -28,7 +28,7 @@ export default function CouponsPage() {
       setLoading(true);
       setError(null);
       const data = await couponService.getCoupons();
-      setCoupons(data);
+      setCoupons(data ?? []);
     } catch (err: any) {
       console.error(err);
       setError(err.message || "Failed to load coupons.");

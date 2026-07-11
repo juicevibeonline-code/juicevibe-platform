@@ -21,7 +21,7 @@ export default function TestimonialsPage() {
       setLoading(true);
       setError(null);
       const response = await testimonialService.getAllTestimonials({ limit: 100 });
-      setTestimonials(response.testimonials);
+      setTestimonials(response.testimonials ?? []);
     } catch (err: any) {
       console.error(err);
       setError(err.message || "Failed to load testimonials.");

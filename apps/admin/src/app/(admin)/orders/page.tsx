@@ -48,7 +48,7 @@ export default function OrdersPage() {
       if (!silent) setLoading(true);
       setError(null);
       const response = await orderService.getOrders({ limit: 100 });
-      setOrders(response.orders);
+      setOrders(response.orders ?? []);
     } catch (err: any) {
       console.error(err);
       if (!silent) setError(err.message || "Failed to load orders from server.");

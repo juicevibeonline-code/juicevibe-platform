@@ -34,7 +34,7 @@ export default function GalleryPage() {
       setLoading(true);
       setError(null);
       const data = await galleryService.getImages();
-      setImages(data);
+      setImages(data ?? []);
     } catch (err: any) {
       console.error(err);
       setError(err.message || "Failed to load gallery assets.");

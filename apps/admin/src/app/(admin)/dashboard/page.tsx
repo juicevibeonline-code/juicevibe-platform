@@ -67,9 +67,9 @@ export default function DashboardPage() {
         analyticsService.getTopSelling(),
       ]);
 
-      setStats(statsRes);
-      setRevenueData(chartRes);
-      setTopSelling(topSellingRes);
+      setStats(statsRes ?? null);
+      setRevenueData(chartRes ?? []);
+      setTopSelling(topSellingRes ?? []);
     } catch (err: any) {
       console.error(err);
       toast({

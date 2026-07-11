@@ -69,7 +69,7 @@ export default function BlogPage() {
       setLoading(true);
       setError(null);
       const response = await blogService.getAllPosts({ limit: 100 });
-      setPosts(response.posts);
+      setPosts(response.posts ?? []);
     } catch (err: any) {
       console.error(err);
       setError(err.message || "Failed to load blog posts.");
