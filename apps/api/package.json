@@ -6,7 +6,7 @@
     "dev": "nest start --watch",
     "build": "nest build",
     "start": "node dist/main",
-    "vercel-build": "nest build",
+    "vercel-build": "cd ../.. && pnpm --filter @juice-vibe/types build && pnpm --filter @juice-vibe/utils build && pnpm --filter @juice-vibe/database build && cd apps/api && nest build",
     "lint": "eslint \"{src,test}/**/*.ts\""
   },
   "dependencies": {
