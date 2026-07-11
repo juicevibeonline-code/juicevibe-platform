@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useState, useCallback, ReactNode } from "react";
+import { createContext, useContext, useState, useCallback, useRef, useEffect, ReactNode } from "react";
 
 interface Toast {
   id: string;
@@ -20,16 +20,33 @@ const ToastContext = createContext<ToastContextType | undefined>(undefined);
 
 export function ToastProvider({ children }: { children: ReactNode }) {
   const [toasts, setToasts] = useState<Toast[]>([]);
+  const timeoutsRef = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map());
+
+  useEffect(() => {
+    return () => {
+      timeoutsRef.current.forEach((t) => clearTimeout(t));
+      timeoutsRef.current.clear();
+    };
+  }, []);
 
   const toast = useCallback((t: Omit<Toast, "id">) => {
     const id = Math.random().toString(36).slice(2);
     setToasts((prev) => [...prev, { ...t, id }]);
     if (t.duration !== 0) {
-      setTimeout(() => setToasts((prev) => prev.filter((toast) => toast.id !== id)), t.duration ?? 5000);
+      const timeoutId = setTimeout(() => {
+        setToasts((prev) => prev.filter((toast) => toast.id !== id));
+        timeoutsRef.current.delete(id);
+      }, t.duration ?? 5000);
+      timeoutsRef.current.set(id, timeoutId);
     }
   }, []);
 
   const dismiss = useCallback((id: string) => {
+    const timeoutId = timeoutsRef.current.get(id);
+    if (timeoutId) {
+      clearTimeout(timeoutId);
+      timeoutsRef.current.delete(id);
+    }
     setToasts((prev) => prev.filter((toast) => toast.id !== id));
   }, []);
 
@@ -72,10 +89,10 @@ function ToastContainer({ toasts, onDismiss }: { toasts: Toast[]; onDismiss: (id
   };
 
   const bgColors = {
-    success: "bg-green-50 border-green-200",
-    error: "bg-red-50 border-red-200",
-    warning: "bg-yellow-50 border-yellow-200",
-    info: "bg-blue-50 border-blue-200",
+    success: "bg-green-50 border-green-200 dark:bg-emerald-500/10 dark:border-emerald-500/20",
+    error: "bg-red-50 border-red-200 dark:bg-rose-500/10 dark:border-rose-500/20",
+    warning: "bg-yellow-50 border-yellow-200 dark:bg-amber-500/10 dark:border-amber-500/20",
+    info: "bg-blue-50 border-blue-200 dark:bg-blue-500/10 dark:border-blue-500/20",
   };
 
   return (
@@ -88,12 +105,12 @@ function ToastContainer({ toasts, onDismiss }: { toasts: Toast[]; onDismiss: (id
         >
           <div className="flex-shrink-0 mt-0.5">{icons[toast.type]}</div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-gray-900">{toast.title}</p>
-            {toast.message && <p className="text-sm text-gray-500 mt-0.5">{toast.message}</p>}
+            <p className="text-sm font-medium text-foreground">{toast.title}</p>
+            {toast.message && <p className="text-sm text-muted mt-0.5">{toast.message}</p>}
           </div>
           <button
             onClick={() => onDismiss(toast.id)}
-            className="flex-shrink-0 p-1 text-gray-400 hover:text-gray-600 transition-colors"
+            className="flex-shrink-0 p-1 text-muted hover:text-foreground transition-colors"
             aria-label="Dismiss"
           >
             <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">

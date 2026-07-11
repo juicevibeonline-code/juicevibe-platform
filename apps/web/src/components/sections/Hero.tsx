@@ -363,7 +363,7 @@ export function Hero() {
               </AnimatePresence>
 
               {/* Subtle cup shadow */}
-              <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 w-3/5 h-6 bg-black/8 rounded-full blur-xl -z-10" />
+              <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 w-3/5 h-6 bg-black/10 rounded-full blur-xl -z-10" />
             </motion.div>
 
             {/* Floating Card 1: Bestseller */}

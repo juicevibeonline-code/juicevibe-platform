@@ -1,76 +1,182 @@
 "use client";
 
-import { useState } from "react";
-import { Plus, Edit, Trash2, Eye, EyeOff, Star } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Plus, Edit, Trash2, Eye, EyeOff, Star, AlertCircle, RefreshCw } from "lucide-react";
 import { Table } from "@/components/table";
 import { Modal } from "@/components/ui/Modal";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 import { PageHeader } from "@/components/PageHeader";
-
-const initialItems = [
-  { id: "1", name: "Chocolate Milkshake", category: "Milkshakes", price: "LKR 300", status: "active", popular: true, stock: "In Stock" },
-  { id: "2", name: "Mango Smoothie", category: "Smoothies", price: "LKR 350", status: "active", popular: true, stock: "In Stock" },
-  { id: "3", name: "Fresh Orange Juice", category: "Fresh Juices", price: "LKR 250", status: "active", popular: false, stock: "In Stock" },
-  { id: "4", name: "Classic Lassi", category: "Lassi", price: "LKR 200", status: "inactive", popular: false, stock: "Out of Stock" },
-  { id: "5", name: "Virgin Mojito", category: "Mocktails", price: "LKR 400", status: "active", popular: true, stock: "In Stock" },
-];
-
-const categories = ["All", "Milkshakes", "Fresh Juices", "Smoothies", "Mocktails", "Lassi", "Tea", "Coffee"];
+import { menuService } from "@juice-vibe/services";
+import { useToast } from "@/hooks/useToast";
+import type { MenuItem, MenuCategory } from "@juice-vibe/types";
 
 export default function MenuPage() {
-  const [items, setItems] = useState(initialItems);
-  const [activeCategory, setActiveCategory] = useState("All");
+  const [items, setItems] = useState<MenuItem[]>([]);
+  const [categories, setCategories] = useState<MenuCategory[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [activeCategory, setActiveCategory] = useState("all");
+  
+  // Modals state
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editingItem, setEditingItem] = useState<MenuItem | null>(null);
+  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
+  
+  const [submitting, setSubmitting] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const { toast } = useToast();
 
-  const handleDelete = (id: string) => {
-    setItems((prev) => prev.filter((item) => item.id !== id));
+  const handleEditItemClick = (item: MenuItem) => {
+    setEditingItem(item);
+    setIsEditModalOpen(true);
   };
 
-  const handleAddItem = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleUpdateItem = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!editingItem) return;
+    const formData = new FormData(e.currentTarget);
+    const name = formData.get("name") as string;
+    const price = Number(formData.get("price"));
+    const categoryId = formData.get("categoryId") as string;
+    const description = formData.get("description") as string;
+
+    try {
+      setSubmitting(true);
+      await menuService.updateItem(editingItem.id, {
+        name,
+        price,
+        categoryId,
+        description,
+      } as any);
+
+      toast({ type: "success", title: "Updated", message: "Menu item updated successfully." });
+      await fetchData();
+      setIsEditModalOpen(false);
+      setEditingItem(null);
+    } catch (err: any) {
+      console.error(err);
+      toast({ type: "error", title: "Update failed", message: err.message || "Failed to update menu item." });
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const isArchived = activeCategory === "archived";
+      const [itemsRes, catsRes] = await Promise.all([
+        menuService.getMenuItems({ status: isArchived ? "archived" : "all" }),
+        menuService.getCategories(),
+      ]);
+      setItems(itemsRes || []);
+      setCategories(catsRes || []);
+    } catch (err: any) {
+      console.error(err);
+      setError(err.message || "Failed to load menu items.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, [activeCategory]);
+
+  const handleDeleteClick = (id: string) => {
+    setDeleteConfirmId(id);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!deleteConfirmId) return;
+    setIsDeleting(true);
+    try {
+      await menuService.deleteItem(deleteConfirmId);
+      toast({ type: "success", title: "Archived", message: "Menu item archived successfully." });
+      setDeleteConfirmId(null);
+      await fetchData();
+    } catch (err: any) {
+      console.error(err);
+      toast({ type: "error", title: "Archive failed", message: err.message || "Failed to archive menu item." });
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  const handleRestore = async (id: string) => {
+    try {
+      await menuService.restoreItem(id);
+      toast({ type: "success", title: "Restored", message: "Menu item restored successfully." });
+      await fetchData();
+    } catch (err: any) {
+      console.error(err);
+      toast({ type: "error", title: "Restore failed", message: err.message || "Failed to restore item." });
+    }
+  };
+
+  const handleAddItem = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
     const name = formData.get("name") as string;
-    const price = formData.get("price") as string;
-    const categoryVal = formData.get("category") as string;
-    
-    // Map internal key to display name
-    const categoryMap: Record<string, string> = {
-      milkshakes: "Milkshakes",
-      smoothies: "Smoothies",
-      "fresh-juices": "Fresh Juices",
-      lassi: "Lassi",
-      mocktails: "Mocktails",
-      tea: "Tea",
-      coffee: "Coffee",
-    };
-    
-    const displayCategory = categoryMap[categoryVal] || "Milkshakes";
+    const price = Number(formData.get("price"));
+    const categoryId = formData.get("categoryId") as string;
+    const description = formData.get("description") as string;
 
-    const newItem = {
-      id: String(items.length + 1),
-      name,
-      category: displayCategory,
-      price: `LKR ${price}`,
-      status: "active",
-      popular: false,
-      stock: "In Stock",
-    };
+    try {
+      setSubmitting(true);
+      await menuService.createMenuItem({
+        name,
+        price,
+        categoryId,
+        description,
+        availability: "in_stock",
+        status: "active",
+        isPopular: false,
+        isFeatured: false,
+        ingredients: [],
+        tags: [],
+        images: [],
+      } as any);
 
-    setItems([newItem, ...items]);
-    setIsAddModalOpen(false);
+      await fetchData();
+      setIsAddModalOpen(false);
+      toast({ type: "success", title: "Created", message: "Menu item created successfully." });
+    } catch (err: any) {
+      console.error(err);
+      toast({ type: "error", title: "Create failed", message: err.message || "Failed to create menu item." });
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const columns = [
-    { key: "name", label: "Item Name" },
-    { key: "category", label: "Category" },
-    { key: "price", label: "Price" },
+    { key: "name", label: "Item Name", sortable: true },
+    { 
+      key: "category", 
+      label: "Category",
+      sortable: true,
+      render: (item: MenuItem) => <span>{item.category?.name || "Uncategorized"}</span>
+    },
+    { 
+      key: "price", 
+      label: "Price",
+      sortable: true,
+      render: (item: MenuItem) => <span>LKR {item.price.toLocaleString()}</span>
+    },
     {
       key: "status",
       label: "Status",
-      render: (item: any) => (
-        <span className={`inline-flex items-center gap-1 text-xs font-medium px-2 py-1 rounded-full ${
-          item.status === "active" ? "bg-primary/10 text-primary" : "bg-gray-100 dark:bg-white/5 text-gray-500 dark:text-gray-400"
+      sortable: true,
+      render: (item: MenuItem) => (
+        <span className={`inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded capitalize ${
+          item.status === "active" 
+            ? "bg-emerald-50 text-emerald-700 border border-emerald-100 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20" 
+            : item.status === "archived"
+            ? "bg-rose-50 text-rose-700 border border-rose-100 dark:bg-rose-500/10 dark:text-rose-400 dark:border-rose-500/20"
+            : "bg-background text-muted border border-border dark:text-muted"
         }`}>
           {item.status === "active" ? <Eye className="w-3 h-3" /> : <EyeOff className="w-3 h-3" />}
           {item.status}
@@ -78,101 +184,189 @@ export default function MenuPage() {
       ),
     },
     {
-      key: "popular",
+      key: "isPopular",
       label: "Popular",
-      render: (item: any) => item.popular ? <Star className="w-4 h-4 text-yellow fill-yellow" /> : null,
+      render: (item: MenuItem) => item.isPopular ? <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500" /> : null,
     },
-    { key: "stock", label: "Stock" },
+    { 
+      key: "availability", 
+      label: "Stock",
+      sortable: true,
+      render: (item: MenuItem) => (
+        <span className="capitalize text-xs font-semibold">{item.availability.replace("_", " ")}</span>
+      )
+    },
     {
       key: "actions",
       label: "Actions",
-      render: (item: any) => (
-        <div className="flex items-center gap-2">
-          <button className="p-1.5 rounded-lg hover:bg-blue-500/10 text-blue-600 transition-colors cursor-pointer"><Edit className="w-4 h-4" /></button>
-          <button onClick={() => handleDelete(item.id)} className="p-1.5 rounded-lg hover:bg-pink/10 text-pink transition-colors cursor-pointer"><Trash2 className="w-4 h-4" /></button>
+      render: (item: MenuItem) => (
+        <div className="flex items-center gap-1">
+          {item.status === "archived" ? (
+            <button
+              onClick={() => handleRestore(item.id)}
+              className="px-2.5 py-1 text-[10px] bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg cursor-pointer transition-colors shadow-sm"
+            >
+              Restore
+            </button>
+          ) : (
+            <>
+              <button onClick={() => handleEditItemClick(item)} className="p-1 rounded hover:bg-blue-50 dark:hover:bg-blue-500/10 text-blue-600 dark:text-blue-400 cursor-pointer" title="Edit"><Edit className="w-4 h-4" /></button>
+              <button onClick={() => handleDeleteClick(item.id)} className="p-1 rounded hover:bg-rose-50 dark:hover:bg-rose-500/10 text-rose-600 dark:text-rose-400 cursor-pointer" title="Archive"><Trash2 className="w-4 h-4" /></button>
+            </>
+          )}
         </div>
       ),
     },
   ];
 
-  const filtered = activeCategory === "All" ? items : items.filter((item) => item.category === activeCategory);
+  // Apply category filtering on items. Archived tab displays all archived.
+  const filtered = activeCategory === "archived"
+    ? items
+    : activeCategory === "all"
+    ? items.filter((item) => item.status !== "archived")
+    : items.filter((item) => item.category?.slug === activeCategory && item.status !== "archived");
 
   const addBtn = (
-    <button onClick={() => setIsAddModalOpen(true)} className="flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-primary to-primary-dark text-white rounded-xl shadow-[0_4px_15px_rgba(34,197,94,0.3)] hover:scale-105 transition-all duration-300 font-bold cursor-pointer">
-      <Plus className="w-5 h-5" />
+    <button 
+      onClick={() => setIsAddModalOpen(true)} 
+      className="flex items-center gap-1.5 px-4 py-2.5 bg-primary hover:bg-primary-dark text-white rounded-lg transition-colors font-semibold text-xs shadow-sm cursor-pointer"
+    >
+      <Plus className="w-4 h-4" />
       Add New Item
     </button>
   );
 
   return (
-    <div className="space-y-6 max-w-7xl mx-auto px-2 animate-fade-in pb-12">
+    <div className="space-y-6 max-w-7xl mx-auto px-4 pb-12">
       <PageHeader title="Menu Management" subtitle="Manage your menu items, prices, and categories" accentColor="primary" action={addBtn} />
 
-      {/* Category Tabs */}
-      <div className="flex gap-2 flex-wrap px-2">
+      {/* Dynamic Category Tabs */}
+      <div className="flex gap-1.5 flex-wrap">
+        <button 
+          onClick={() => setActiveCategory("all")}
+          className={`px-4 py-2 rounded-lg text-xs font-bold transition-colors cursor-pointer border ${
+            activeCategory === "all" 
+              ? "bg-background border-border text-primary" 
+              : "bg-card hover:bg-background text-muted hover:text-foreground border-border"
+          }`}
+        >
+          All
+        </button>
         {categories.map((cat) => (
           <button 
-            key={cat} 
-            onClick={() => setActiveCategory(cat)}
-            className={`px-5 py-2 rounded-xl text-sm font-bold transition-all duration-300 hover:-translate-y-0.5 cursor-pointer ${
-              cat === activeCategory 
-                ? "bg-gradient-to-r from-primary to-primary-dark text-white shadow-[0_4px_15px_rgba(34,197,94,0.3)]" 
-                : "bg-white/60 dark:bg-white/5 text-muted hover:bg-white dark:hover:bg-white/10 hover:text-foreground border border-transparent dark:border-white/10 shadow-sm"
+            key={cat.id} 
+            onClick={() => setActiveCategory(cat.slug)}
+            className={`px-4 py-2 rounded-lg text-xs font-bold transition-colors cursor-pointer border ${
+              cat.slug === activeCategory 
+                ? "bg-background border-border text-primary" 
+                : "bg-card hover:bg-background text-muted hover:text-foreground border-border"
             }`}
           >
-            {cat}
+            {cat.name}
           </button>
         ))}
+        {/* Archived filter tab */}
+        <button 
+          onClick={() => setActiveCategory("archived")}
+          className={`px-4 py-2 rounded-lg text-xs font-bold transition-colors cursor-pointer border ${
+            activeCategory === "archived" 
+              ? "bg-rose-50 text-rose-600 border-rose-200 dark:bg-rose-500/10 dark:text-rose-400 dark:border-rose-500/20" 
+              : "bg-card hover:bg-background text-muted hover:text-foreground border-border"
+          }`}
+        >
+          Archived / Soft-Deleted
+        </button>
       </div>
 
-      <div className="px-2">
-        <Table columns={columns} data={filtered} searchable />
-      </div>
+      {error && (
+        <div className="flex items-center gap-2 p-4 bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-500/20 rounded-lg text-sm">
+          <AlertCircle className="w-4 h-4" />
+          <span>{error}</span>
+        </div>
+      )}
 
+      {loading ? (
+        <div className="flex flex-col items-center justify-center py-24 gap-3 bg-card border border-border rounded-lg shadow-sm">
+          <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+          <span className="text-xs font-bold text-muted uppercase tracking-wider animate-pulse">Loading menu...</span>
+        </div>
+      ) : (
+        <div>
+          <Table columns={columns} data={filtered} searchable />
+        </div>
+      )}
+
+      {/* Add New Item Modal */}
       <Modal isOpen={isAddModalOpen} onClose={() => setIsAddModalOpen(false)} title="Add New Item" size="md">
-        <form className="space-y-6" onSubmit={handleAddItem}>
-          {/* Image Upload Placeholder */}
-          <div className="w-full h-40 rounded-2xl border-2 border-dashed border-border/60 bg-gray-50/50 dark:bg-neutral-900/50 flex flex-col items-center justify-center cursor-pointer hover:bg-gray-100 dark:hover:bg-neutral-900/70 hover:border-primary/50 transition-colors group">
-            <div className="w-12 h-12 rounded-xl bg-white dark:bg-black/20 shadow-sm flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
-              <Plus className="w-6 h-6 text-muted group-hover:text-primary transition-colors" />
-            </div>
-            <span className="text-sm font-bold text-muted group-hover:text-primary transition-colors">Upload Image</span>
+        <form className="space-y-4 text-xs" onSubmit={handleAddItem}>
+          <Input label="Name" name="name" required placeholder="e.g. Avocado Shake" />
+          <Input label="Price (LKR)" name="price" type="number" required placeholder="e.g. 750" min="0" />
+          
+          <div className="flex flex-col gap-1">
+            <label className="text-xs font-bold text-foreground mb-1">Category</label>
+            <select name="categoryId" required className="flex h-11 w-full rounded-lg border border-border bg-card px-3 py-2 text-xs text-foreground focus:outline-none focus:border-primary/50">
+              {categories.map((cat) => (
+                <option key={cat.id} value={cat.id}>{cat.name}</option>
+              ))}
+            </select>
           </div>
 
-          <div className="space-y-4">
-            <Input label="Item Name" name="name" placeholder="e.g. Avocado Magic Smoothie" required />
+          <div className="flex flex-col gap-1">
+            <label className="text-xs font-bold text-foreground mb-1">Description</label>
+            <textarea name="description" rows={3} className="flex w-full rounded-lg border border-border bg-card px-3 py-2 text-xs text-foreground focus:outline-none focus:border-primary/50 resize-none" placeholder="Details about this menu item..." />
+          </div>
+
+          <div className="flex gap-2 pt-4 border-t border-border">
+            <Button type="button" variant="ghost" className="flex-1 text-xs" onClick={() => setIsAddModalOpen(false)}>Cancel</Button>
+            <Button type="submit" variant="primary" className="flex-1 text-xs" isLoading={submitting}>Create Item</Button>
+          </div>
+        </form>
+      </Modal>
+
+      {/* Edit Item Modal */}
+      <Modal isOpen={isEditModalOpen} onClose={() => { setIsEditModalOpen(false); setEditingItem(null); }} title="Edit Menu Item" size="md">
+        {editingItem && (
+          <form className="space-y-4 text-xs" onSubmit={handleUpdateItem}>
+            <Input label="Name" name="name" defaultValue={editingItem.name} required />
+            <Input label="Price (LKR)" name="price" type="number" defaultValue={editingItem.price.toString()} required min="0" />
             
-            <div className="grid grid-cols-2 gap-4">
-              <Input label="Price (LKR)" name="price" type="number" placeholder="450" required />
-              <div className="flex flex-col gap-1">
-                <label className="text-sm font-bold text-gray-700 dark:text-gray-300 ml-1">Category</label>
-                <select name="category" className="flex h-12 w-full rounded-xl border border-transparent bg-white/60 dark:bg-white/5 px-4 py-2 text-sm text-foreground shadow-sm transition-all duration-300 focus:outline-none focus:bg-white dark:focus:bg-black/40 focus:border-primary/50 focus:shadow-[0_0_15px_rgba(34,197,94,0.15)]">
-                  <option value="milkshakes">Milkshakes</option>
-                  <option value="smoothies">Smoothies</option>
-                  <option value="fresh-juices">Fresh Juices</option>
-                  <option value="lassi">Lassi</option>
-                  <option value="mocktails">Mocktails</option>
-                  <option value="tea">Tea</option>
-                  <option value="coffee">Coffee</option>
-                </select>
-              </div>
+            <div className="flex flex-col gap-1">
+              <label className="text-xs font-bold text-foreground mb-1">Category</label>
+              <select name="categoryId" defaultValue={editingItem.categoryId} required className="flex h-11 w-full rounded-lg border border-border bg-card px-3 py-2 text-xs text-foreground focus:outline-none focus:border-primary/50">
+                {categories.map((cat) => (
+                  <option key={cat.id} value={cat.id}>{cat.name}</option>
+                ))}
+              </select>
             </div>
 
             <div className="flex flex-col gap-1">
-              <label className="text-sm font-bold text-gray-700 dark:text-gray-300 ml-1">Description</label>
-              <textarea 
-                name="description"
-                className="flex min-h-[100px] w-full rounded-xl border border-transparent bg-white/60 dark:bg-white/5 px-4 py-3 text-sm text-foreground shadow-sm transition-all duration-300 focus:outline-none focus:bg-white dark:focus:bg-black/40 focus:border-primary/50 focus:shadow-[0_0_15px_rgba(34,197,94,0.15)] resize-none"
-                placeholder="Brief description of the item..."
-              ></textarea>
+              <label className="text-xs font-bold text-foreground mb-1">Description</label>
+              <textarea name="description" defaultValue={editingItem.description || ""} rows={3} className="flex w-full rounded-lg border border-border bg-card px-3 py-2 text-xs text-foreground focus:outline-none focus:border-primary/50 resize-none" />
             </div>
-          </div>
 
-          <div className="flex gap-3 pt-4 border-t border-border/50">
-            <Button type="button" variant="ghost" className="flex-1" onClick={() => setIsAddModalOpen(false)}>Cancel</Button>
-            <Button type="submit" variant="primary" className="flex-1">Save Item</Button>
+            <div className="flex gap-2 pt-4 border-t border-border">
+              <Button type="button" variant="ghost" className="flex-1 text-xs" onClick={() => { setIsEditModalOpen(false); setEditingItem(null); }}>Cancel</Button>
+              <Button type="submit" variant="primary" className="flex-1 text-xs" isLoading={submitting}>Save Changes</Button>
+            </div>
+          </form>
+        )}
+      </Modal>
+
+      {/* Delete confirmation modal */}
+      <Modal isOpen={!!deleteConfirmId} onClose={() => setDeleteConfirmId(null)} title="Confirm Archive" size="sm">
+        <div className="space-y-4 text-xs">
+          <p className="text-foreground leading-relaxed">
+            Are you sure you want to archive this menu item? It will be hidden from customer ordering lists but historical records remain untouched.
+          </p>
+          <div className="flex gap-2 pt-2">
+            <Button type="button" variant="ghost" className="flex-1 text-xs" onClick={() => setDeleteConfirmId(null)}>
+              Cancel
+            </Button>
+            <Button type="button" variant="primary" className="flex-1 text-xs bg-rose-600 hover:bg-rose-700" isLoading={isDeleting} onClick={handleConfirmDelete}>
+              Archive
+            </Button>
           </div>
-        </form>
+        </div>
       </Modal>
     </div>
   );

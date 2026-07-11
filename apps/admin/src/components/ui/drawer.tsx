@@ -58,7 +58,7 @@ export function Drawer({ isOpen, onClose, title, children, className, position =
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+            className="absolute inset-0 bg-black/50"
           />
           <motion.div
             initial={slideVariants[position].initial}
@@ -66,30 +66,29 @@ export function Drawer({ isOpen, onClose, title, children, className, position =
             exit={slideVariants[position].exit}
             transition={{ type: "spring", damping: 25, stiffness: 300 }}
             className={cn(
-              "relative h-full w-full glass-panel shadow-2xl flex flex-col bg-white/80 dark:bg-black/80",
+              "relative h-full w-full bg-card shadow-2xl flex flex-col border-l border-border",
               position === "right" ? "ml-auto" : "mr-auto",
-              position === "right" ? "rounded-l-3xl border-l" : "rounded-r-3xl border-r",
               sizes[size],
               className
             )}
           >
             {title && (
-              <div className="flex items-center justify-between px-6 py-5 border-b border-border/50 bg-white/50 dark:bg-black/20">
-                <h2 className="text-xl font-bold">{title}</h2>
+              <div className="flex items-center justify-between px-6 py-4.5 border-b border-border bg-background/50">
+                <h2 className="text-sm font-bold text-foreground uppercase tracking-wider">{title}</h2>
                 <button
                   onClick={onClose}
-                  className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-white/10 transition-colors"
+                  className="p-1.5 rounded-lg hover:bg-background transition-colors text-muted hover:text-foreground cursor-pointer"
                 >
-                  <X className="w-5 h-5" />
+                  <X className="w-4 h-4" />
                 </button>
               </div>
             )}
             {!title && (
               <button
                 onClick={onClose}
-                className="absolute top-4 right-4 p-2 z-10 rounded-full hover:bg-gray-100 dark:hover:bg-white/10 transition-colors bg-white/50 backdrop-blur-md"
+                className="absolute top-4 right-4 p-1.5 z-10 rounded-lg hover:bg-background transition-colors text-muted hover:text-foreground cursor-pointer bg-card border border-border shadow-sm"
               >
-                <X className="w-5 h-5" />
+                <X className="w-4 h-4" />
               </button>
             )}
             <div className="p-6 overflow-y-auto custom-scrollbar flex-1">

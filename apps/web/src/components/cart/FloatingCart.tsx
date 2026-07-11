@@ -26,7 +26,7 @@ export function FloatingCart() {
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.8, y: 20 }}
           transition={{ type: "spring", stiffness: 260, damping: 20 }}
-          className="fixed bottom-6 right-6 z-50 md:bottom-10 md:right-10"
+          className="fixed bottom-6 right-6 z-50 md:bottom-6 md:right-6"
         >
           <button
             onClick={() => setIsOpen(true)}

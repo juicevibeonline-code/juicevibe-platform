@@ -1,63 +1,73 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
 
 const orders = [
-  { id: "#JV-001", customer: "Priya Sharma", items: 3, total: "LKR 1,200", status: "completed", time: "2 min ago" },
-  { id: "#JV-002", customer: "Rahul Verma", items: 2, total: "LKR 850", status: "preparing", time: "15 min ago" },
-  { id: "#JV-003", customer: "Ananya Patel", items: 1, total: "LKR 350", status: "pending", time: "28 min ago" },
-  { id: "#JV-004", customer: "Arjun Nair", items: 4, total: "LKR 2,100", status: "ready", time: "45 min ago" },
-  { id: "#JV-005", customer: "Neha Gupta", items: 2, total: "LKR 950", status: "completed", time: "1 hr ago" },
+  { id: "JV-001", name: "Priya Sharma", items: 3, time: "2 min ago", amount: "1,200", status: "Completed" as const },
+  { id: "JV-002", name: "Rahul Verma", items: 2, time: "15 min ago", amount: "850", status: "Preparing" as const },
+  { id: "JV-003", name: "Ananya Patel", items: 1, time: "28 min ago", amount: "350", status: "Pending" as const },
+  { id: "JV-004", name: "Arjun Nair", items: 4, time: "45 min ago", amount: "2,100", status: "Ready" as const },
+  { id: "JV-005", name: "Neha Gupta", items: 2, time: "1 hr ago", amount: "950", status: "Completed" as const },
 ];
 
-const statusColors: Record<string, string> = {
-  completed: "bg-primary/10 text-primary",
-  preparing: "bg-orange/10 text-orange",
-  pending: "bg-yellow/10 text-yellow",
-  ready: "bg-blue-100 text-blue-600",
-  cancelled: "bg-pink/10 text-pink",
+const statusColor: Record<string, string> = {
+  Completed: "text-primary bg-primary/10 border-primary/20",
+  Preparing: "text-orange bg-orange/10 border-orange/20",
+  Pending: "text-pink bg-pink/10 border-pink/20",
+  Ready: "text-blue bg-blue/10 border-blue/20",
+};
+
+const statusDotColor: Record<string, string> = {
+  Completed: "bg-primary",
+  Preparing: "bg-orange",
+  Pending: "bg-pink",
+  Ready: "bg-blue",
 };
 
 export function RecentOrders() {
   return (
-    <div className="bg-transparent flex flex-col h-full">
-      <div className="flex items-center justify-between mb-5">
-        <h3 className="text-xl font-bold tracking-tight text-foreground">Recent Orders</h3>
-        <span className="text-xs font-semibold text-muted bg-gray-100 dark:bg-white/5 px-2.5 py-1 rounded-full">
-          {orders.length} orders
-        </span>
+    <div className="flex flex-col h-full">
+      <div className="flex items-center justify-between pb-4 border-b border-border mb-2">
+        <h3 className="font-display font-bold text-sm text-foreground">Recent Orders</h3>
+        <Link href="/orders" className="text-xs font-bold text-primary hover:text-primary-dark transition-colors flex items-center gap-0.5 group">
+          View All 
+          <span className="group-hover:translate-x-0.5 transition-transform duration-200">&rarr;</span>
+        </Link>
       </div>
-      <div className="space-y-3 flex-1">
-        {orders.map((order) => (
-          <div key={order.id} className="flex items-center justify-between p-4 rounded-2xl bg-white/40 dark:bg-white/5 hover:bg-white/80 dark:hover:bg-white/10 border border-white/60 dark:border-white/5 hover:shadow-md transition-all duration-300 group cursor-pointer">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-gray-100 to-gray-200 dark:from-white/5 dark:to-white/10 flex items-center justify-center group-hover:scale-105 transition-transform duration-300 shadow-inner shrink-0">
-                <span className="text-sm font-black text-muted-foreground">{order.customer[0]}</span>
+      <div className="flex flex-col flex-1 divide-y divide-border/60">
+        {orders.map((o) => (
+          <div
+            key={o.id}
+            className="flex items-center justify-between py-3.5 gap-4 hover:bg-primary/[0.02] -mx-4 px-4 rounded-xl transition-colors duration-200"
+          >
+            <div className="flex items-center gap-3.5 min-w-0">
+              <div className="w-9 h-9 rounded-xl bg-background border border-border flex items-center justify-center shrink-0 shadow-sm">
+                <span className="text-[10px] font-black text-foreground font-data">{o.id.split("-")[1]}</span>
               </div>
-              <div>
-                <p className="text-sm font-bold text-foreground group-hover:text-primary transition-colors">{order.customer}</p>
-                <p className="text-xs font-medium text-muted mt-0.5">{order.id} · {order.items} items · {order.time}</p>
+
+              <div className="min-w-0">
+                <div className="text-xs font-bold text-foreground truncate">{o.name}</div>
+                <div className="text-[10px] font-semibold text-muted mt-0.5 flex items-center gap-1.5 font-data">
+                  <span>{o.items} {o.items === 1 ? "item" : "items"}</span>
+                  <span className="text-border">&middot;</span>
+                  <span>{o.time}</span>
+                </div>
               </div>
             </div>
-            <div className="flex flex-col items-end gap-1.5">
-              <span className="text-sm font-black text-foreground">{order.total}</span>
-              <span className={`text-[10px] font-extrabold px-2 py-0.5 rounded-md capitalize tracking-wider ${statusColors[order.status]}`}>
-                {order.status}
-              </span>
+
+            <div className="flex items-center gap-4 shrink-0">
+              <div className="text-right">
+                <div className="font-data text-xs font-black text-foreground">LKR {o.amount}</div>
+                <div className="text-[9px] font-bold text-muted mt-0.5 tracking-wider uppercase font-data">Amount</div>
+              </div>
+              <div className={`px-2.5 py-1 rounded-full border text-[9px] font-bold font-data flex items-center gap-1 shrink-0 ${statusColor[o.status]}`}>
+                <span className={`w-1 h-1 rounded-full ${statusDotColor[o.status]} ${o.status === "Preparing" || o.status === "Pending" ? "animate-pulse" : ""}`} />
+                {o.status}
+              </div>
             </div>
           </div>
         ))}
       </div>
-
-      {/* View All Link */}
-      <Link
-        href="/orders"
-        className="mt-5 flex items-center justify-center gap-2 py-2.5 rounded-xl border border-border/60 hover:border-primary/40 text-sm font-bold text-muted hover:text-primary transition-all duration-300 group"
-      >
-        View All Orders
-        <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-      </Link>
     </div>
   );
 }

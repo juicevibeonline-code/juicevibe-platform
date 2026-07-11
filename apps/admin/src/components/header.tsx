@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { Bell, ChevronDown, LogOut, User, Settings, Sun, Moon, Menu } from "lucide-react";
+import { Bell, ChevronDown, LogOut, User, Settings, Sun, Moon, Menu, Search } from "lucide-react";
 import { cn } from "@juice-vibe/utils";
 import { CommandPalette } from "@/components/ui/command-palette";
 import { useTheme } from "next-themes";
@@ -43,7 +43,6 @@ export function Header({ onMobileMenuClick }: HeaderProps) {
 
   const unreadCount = notifications.filter((n) => n.unread).length;
 
-  // Get the current page title from the path
   const currentPage =
     Object.entries(pageTitles).find(([key]) => pathname === key || pathname.startsWith(key + "/"))?.[1] ?? "Dashboard";
 
@@ -62,23 +61,23 @@ export function Header({ onMobileMenuClick }: HeaderProps) {
   }, []);
 
   return (
-    <header className="sticky top-4 mx-4 md:mx-8 z-40 bg-white/70 dark:bg-[#111813]/70 backdrop-blur-xl border border-white/80 dark:border-white/10 shadow-[0_4px_20px_rgba(0,0,0,0.02)] rounded-2xl mb-8 transition-all duration-300">
-      <div className="flex items-center justify-between h-16 px-4 md:px-6">
+    <header className="sticky top-0 z-40 bg-background/80 backdrop-blur-xl border-b border-border w-full transition-colors mb-6">
+      <div className="flex items-center justify-between h-16 px-4 md:px-8">
         <div className="flex items-center gap-3 w-full max-w-md">
           {/* Mobile Menu Toggle */}
           <button
             onClick={onMobileMenuClick}
-            className="md:hidden p-2 bg-white/50 dark:bg-white/5 rounded-lg text-gray-600 dark:text-gray-400 hover:bg-white hover:text-primary transition-colors shrink-0"
+            className="md:hidden p-2 bg-card rounded-lg text-muted hover:text-primary transition-colors shrink-0"
             aria-label="Open menu"
           >
             <Menu className="w-5 h-5" />
           </button>
 
-          {/* Page Breadcrumb — desktop only */}
-          <span className="hidden md:block text-sm font-semibold text-muted shrink-0">
+          {/* Page Breadcrumb */}
+          <span className="hidden md:flex items-center gap-2 font-data text-xs tracking-wider uppercase text-muted shrink-0">
             {currentPage}
+            <span className="text-border">/</span>
           </span>
-          <span className="hidden md:block text-muted/40 shrink-0">/</span>
 
           {/* Search / Command Palette */}
           <div className="relative w-full group">
@@ -87,19 +86,19 @@ export function Header({ onMobileMenuClick }: HeaderProps) {
         </div>
 
         {/* Actions */}
-        <div className="flex items-center gap-2 md:gap-3 ml-3">
+        <div className="flex items-center gap-3 ml-3">
           {/* Theme Toggle */}
           <button
             onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-            className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-white/5 text-muted hover:text-foreground transition-all duration-300 active:scale-95 flex items-center justify-center cursor-pointer"
+            className="p-2 rounded-lg hover:bg-card text-muted hover:text-foreground transition-colors active:scale-95 flex items-center justify-center cursor-pointer"
             aria-label="Toggle theme"
           >
             {!mounted ? (
               <span className="w-5 h-5" />
             ) : theme === "dark" ? (
-              <Sun className="w-5 h-5 text-yellow-500 animate-fade-in" />
+              <Sun className="w-5 h-5 text-orange transition-transform duration-500 hover:rotate-45" />
             ) : (
-              <Moon className="w-5 h-5 text-slate-700 animate-fade-in" />
+              <Moon className="w-5 h-5 transition-transform duration-500 hover:-rotate-12" />
             )}
           </button>
 
@@ -107,41 +106,44 @@ export function Header({ onMobileMenuClick }: HeaderProps) {
           <div className="relative" ref={notificationsRef}>
             <button
               onClick={() => setNotificationsOpen(!notificationsOpen)}
-              className="relative p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-white/5 transition-colors cursor-pointer"
+              className="relative p-2 rounded-lg hover:bg-card transition-colors cursor-pointer"
               aria-label="Notifications"
               aria-expanded={notificationsOpen}
             >
               <Bell className="w-5 h-5 text-muted hover:text-foreground transition-colors" />
               {unreadCount > 0 && (
-                <span className="absolute -top-1 -right-1 w-4 h-4 bg-pink text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+                <span
+                  className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-pink text-white text-[9px] font-bold rounded-full flex items-center justify-center"
+                  aria-label={`${unreadCount} unread notifications`}
+                >
                   {unreadCount}
                 </span>
               )}
             </button>
 
             {notificationsOpen && (
-              <div className="absolute right-0 mt-2 w-80 bg-white dark:bg-[#111813] rounded-xl border border-border dark:border-white/10 shadow-lg py-2 animate-slide-down z-50">
-                <div className="px-4 py-3 border-b border-border dark:border-white/10 flex items-center justify-between">
-                  <h3 className="font-semibold text-foreground">Notifications</h3>
-                  <button className="text-sm text-primary hover:underline">Mark all read</button>
+              <div className="absolute right-0 mt-2 w-80 bg-card rounded-lg border border-border shadow-lg py-2 z-50">
+                <div className="px-4 py-3 border-b border-border flex items-center justify-between">
+                  <h3 className="font-semibold text-foreground text-sm font-display">Notifications</h3>
+                  <button className="text-xs text-primary hover:underline font-bold">Mark all read</button>
                 </div>
                 <div className="max-h-64 overflow-y-auto custom-scrollbar">
                   {notifications.map((n, i) => (
                     <div
                       key={i}
                       className={cn(
-                        "px-4 py-3 hover:bg-gray-50 dark:hover:bg-white/5 border-b border-border/50 dark:border-white/5 last:border-0 cursor-pointer transition-colors",
-                        n.unread && "bg-primary/5 dark:bg-primary/10"
+                        "px-4 py-3 hover:bg-card transition-colors border-b border-border/50 last:border-0 cursor-pointer",
+                        n.unread && "bg-primary/5"
                       )}
                     >
-                      <p className={cn("text-sm font-medium text-foreground", n.unread && "font-bold")}>{n.title}</p>
+                      <p className={cn("text-xs font-semibold text-foreground", n.unread && "font-bold")}>{n.title}</p>
                       <p className="text-xs text-muted mt-0.5">{n.desc}</p>
-                      <p className="text-xs text-muted mt-1">{n.time}</p>
+                      <p className="text-[10px] text-muted mt-1 font-data">{n.time}</p>
                     </div>
                   ))}
                 </div>
-                <div className="px-4 py-2 border-t border-border dark:border-white/10">
-                  <button className="text-sm text-primary hover:underline w-full text-left">View all notifications</button>
+                <div className="px-4 py-2 border-t border-border">
+                  <button className="text-xs text-primary hover:underline w-full text-left font-bold">View all notifications</button>
                 </div>
               </div>
             )}
@@ -151,37 +153,37 @@ export function Header({ onMobileMenuClick }: HeaderProps) {
           <div className="relative" ref={userMenuRef}>
             <button
               onClick={() => setUserMenuOpen(!userMenuOpen)}
-              className="flex items-center gap-2.5 pl-3 pr-2 py-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-white/5 transition-colors cursor-pointer"
+              className="flex items-center gap-2 pl-2 pr-1.5 py-1 rounded-lg hover:bg-card transition-colors cursor-pointer"
               aria-expanded={userMenuOpen}
               aria-haspopup="true"
             >
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-primary-dark flex items-center justify-center shadow-sm">
-                <span className="text-xs font-black text-white tracking-wider">JV</span>
+              <div className="w-7 h-7 rounded-full bg-primary flex items-center justify-center shadow-sm">
+                <span className="text-[10px] font-bold text-white tracking-wider font-display">A</span>
               </div>
               <div className="hidden md:block text-left">
-                <p className="text-sm font-semibold text-foreground leading-none">Admin</p>
-                <p className="text-xs text-muted mt-0.5 leading-none">admin@juicevibe.com</p>
+                <p className="text-xs font-medium text-foreground leading-none">Admin</p>
+                <p className="text-[10px] text-muted mt-0.5 leading-none font-data">admin@juicevibe.com</p>
               </div>
-              <ChevronDown className={cn("w-4 h-4 text-muted transition-transform duration-200", userMenuOpen && "rotate-180")} />
+              <ChevronDown className={cn("w-3.5 h-3.5 text-muted transition-transform duration-200", userMenuOpen && "rotate-180")} />
             </button>
 
             {userMenuOpen && (
-              <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-[#111813] rounded-xl border border-border dark:border-white/10 shadow-lg py-2 animate-slide-down z-50">
-                <div className="px-4 py-3 border-b border-border dark:border-white/10">
-                  <p className="font-semibold text-foreground text-sm">Admin</p>
-                  <p className="text-xs text-muted mt-0.5">admin@juicevibe.com</p>
+              <div className="absolute right-0 mt-2 w-48 bg-card rounded-lg border border-border shadow-lg py-2 z-50">
+                <div className="px-4 py-3 border-b border-border">
+                  <p className="font-semibold text-foreground text-xs font-display">Admin</p>
+                  <p className="text-[10px] text-muted mt-0.5 font-data">admin@juicevibe.com</p>
                 </div>
-                <Link href="/settings" className="flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors">
-                  <Settings className="w-4 h-4" />
+                <Link href="/settings" className="flex items-center gap-2 px-4 py-2.5 text-xs text-foreground hover:bg-card transition-colors">
+                  <Settings className="w-3.5 h-3.5 text-muted" />
                   Settings
                 </Link>
-                <Link href="/settings" className="flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors">
-                  <User className="w-4 h-4" />
+                <Link href="/settings" className="flex items-center gap-2 px-4 py-2.5 text-xs text-foreground hover:bg-card transition-colors">
+                  <User className="w-3.5 h-3.5 text-muted" />
                   Profile
                 </Link>
-                <hr className="my-1 border-border dark:border-white/10" />
-                <button className="flex items-center gap-2 px-4 py-2.5 text-sm text-pink hover:bg-pink/5 w-full cursor-pointer transition-colors">
-                  <LogOut className="w-4 h-4" />
+                <hr className="my-1 border-border" />
+                <button className="flex items-center gap-2 px-4 py-2.5 text-xs text-pink hover:bg-pink/5 dark:hover:bg-pink/10 w-full cursor-pointer transition-colors text-left">
+                  <LogOut className="w-3.5 h-3.5" />
                   Sign Out
                 </button>
               </div>

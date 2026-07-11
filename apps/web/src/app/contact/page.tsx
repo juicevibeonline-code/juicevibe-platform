@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { MapPin, Phone, Mail, Clock, Send, MessageCircle } from "lucide-react";
+import { MapPin, Phone, Mail, Clock, Send, MessageCircle, CheckCircle, AlertCircle } from "lucide-react";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { ScrollProgress } from "@/components/shared/ScrollProgress";
@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
+import { submitContactForm } from "@/lib/api";
 
 const contactInfo = [
   {
@@ -47,12 +48,28 @@ export default function ContactPage() {
   });
 
   const [submitted, setSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitted(true);
-    setTimeout(() => setSubmitted(false), 3000);
-    setFormState({ name: "", email: "", subject: "", message: "" });
+    setIsSubmitting(true);
+    setError(null);
+    try {
+      await submitContactForm({
+        name: formState.name,
+        email: formState.email,
+        subject: formState.subject,
+        message: formState.message,
+      });
+      setSubmitted(true);
+      setFormState({ name: "", email: "", subject: "", message: "" });
+      setTimeout(() => setSubmitted(false), 5000);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to send message. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -146,10 +163,16 @@ export default function ContactPage() {
                         onChange={(e) => setFormState({ ...formState, message: e.target.value })}
                         required
                       />
-                      <Button variant="primary" size="lg" className="w-full" type="submit">
+                      <Button variant="primary" size="lg" className="w-full" type="submit" disabled={isSubmitting}>
                         <Send className="h-4 w-4" />
-                        Send Message
+                        {isSubmitting ? "Sending..." : "Send Message"}
                       </Button>
+                      {error && (
+                        <div className="flex items-center gap-2 rounded-lg bg-red-50 p-3 text-sm text-red-600">
+                          <AlertCircle className="h-4 w-4 shrink-0" />
+                          {error}
+                        </div>
+                      )}
                     </form>
                   )}
                 </Card>

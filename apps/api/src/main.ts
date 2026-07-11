@@ -4,9 +4,16 @@ import { SwaggerModule, DocumentBuilder } from "@nestjs/swagger";
 import helmet from "helmet";
 import { AppModule } from "./app.module";
 
+import { NestExpressApplication } from "@nestjs/platform-express";
+import { join } from "path";
+
 async function bootstrap() {
   const logger = new Logger("Bootstrap");
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
+
+  app.useStaticAssets(join(__dirname, "..", "public", "uploads"), {
+    prefix: "/uploads/",
+  });
 
   app.setGlobalPrefix("api");
 
@@ -38,7 +45,7 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup("api/docs", app, document);
 
-  const port = process.env.PORT || 4000;
+  const port = process.env.PORT ?? 4000;
   await app.listen(port);
   logger.log(`Server running on port ${port}`);
   logger.log(`API docs available at http://localhost:${port}/api/docs`);

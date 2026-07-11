@@ -30,7 +30,7 @@ export function GalleryCard({ image, onOpen, index }: GalleryCardProps) {
           src={encodeURI(image.src)}
           alt={image.alt}
           fill
-          sizes="(max-w-768px) 100vw, (max-w-1200px) 50vw, 33vw"
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           className="object-cover transition-transform duration-700 group-hover:scale-110"
         />
       </div>

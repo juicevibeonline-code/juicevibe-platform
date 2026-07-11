@@ -1,83 +1,183 @@
 "use client";
 
-import { useState } from "react";
-import { Mail, MailOpen, Trash2, MessageSquare } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Mail, MailOpen, Trash2, MessageSquare, Reply, AlertCircle } from "lucide-react";
 import { Table } from "@/components/table";
 import { PageHeader } from "@/components/PageHeader";
 import { Drawer } from "@/components/ui/drawer";
+import { contactService, type ContactMessage } from "@juice-vibe/services";
+import { useToast } from "@/hooks/useToast";
 
-const initialMessages = [
-  { id: "1", name: "Sarah Johnson", email: "sarah@example.com", subject: "Catering Inquiry", message: "Hi, I'm interested in catering for a corporate event of about 50 people next month. Could you provide a quote for your fresh juice packages?", status: "unread", date: "2 hours ago" },
-  { id: "2", name: "Mike Chen", email: "mike@example.com", subject: "Feedback", message: "Loved the smoothies! Just wanted to say the Mango Detox was absolutely incredible. Will be back every week.", status: "unread", date: "5 hours ago" },
-  { id: "3", name: "Emily Davis", email: "emily@example.com", subject: "Booking Request", message: "I'd like to reserve a table for 6 people this Saturday evening around 7PM. Is that possible?", status: "read", date: "Yesterday" },
-  { id: "4", name: "John Smith", email: "john@example.com", subject: "Partnership Proposal", message: "We'd love to collaborate with Juice Vibe on a wellness event we're organizing.", status: "read", date: "2 days ago" },
-];
+function formatMessageDate(dateStr: string) {
+  const date = new Date(dateStr);
+  const now = new Date();
+  const diff = now.getTime() - date.getTime();
+  const hours = Math.floor(diff / 3600000);
+  if (hours < 1) return "Just now";
+  if (hours < 24) return `${hours}h ago`;
+  const days = Math.floor(hours / 24);
+  if (days === 1) return "Yesterday";
+  return date.toLocaleDateString([], { month: "short", day: "numeric" });
+}
 
 export default function MessagesPage() {
-  const [messages, setMessages] = useState(initialMessages);
-  const [selectedMessage, setSelectedMessage] = useState<(typeof initialMessages)[0] | null>(null);
+  const [messages, setMessages] = useState<ContactMessage[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedMessage, setSelectedMessage] = useState<ContactMessage | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const { toast } = useToast();
 
-  const unreadCount = messages.filter((m) => m.status === "unread").length;
+  // Search and pagination state
+  const [searchQuery, setSearchQuery] = useState("");
+  const [sortField, setSortField] = useState("createdAt");
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
-  const handleDelete = (id: string) => {
+  const fetchMessages = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const res = await contactService.getMessages({ limit: 100 });
+      setMessages(res.items || []);
+    } catch (err: any) {
+      console.error(err);
+      setError(err.message || "Failed to load messages from server.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchMessages();
+  }, []);
+
+  const unreadCount = messages.filter((m) => !m.isRead).length;
+
+  const handleDelete = async (id: string) => {
+    const prevMessages = [...messages];
     setMessages((prev) => prev.filter((m) => m.id !== id));
     if (selectedMessage?.id === id) setSelectedMessage(null);
+    try {
+      await contactService.deleteMessage(id);
+      toast({ type: "success", title: "Deleted", message: "Message deleted successfully." });
+    } catch (err) {
+      console.error("Failed to delete message:", err);
+      setMessages(prevMessages);
+      toast({ type: "error", title: "Error", message: "Failed to delete message from server." });
+    }
   };
 
-  const handleMarkRead = (id: string) => {
-    setMessages((prev) => prev.map((m) => m.id === id ? { ...m, status: "read" } : m));
+  const handleMarkRead = async (msg: ContactMessage) => {
+    setSelectedMessage(msg);
+    if (msg.isRead) return;
+
+    const prevMessages = [...messages];
+    setMessages((prev) =>
+      prev.map((m) => (m.id === msg.id ? { ...m, isRead: true } : m))
+    );
+    try {
+      await contactService.markAsRead(msg.id);
+    } catch (err) {
+      console.error("Failed to mark message as read:", err);
+      setMessages(prevMessages);
+    }
   };
+
+  // 1. Filter
+  const filtered = messages.filter((m) => {
+    const q = searchQuery.toLowerCase();
+    return (
+      m.name.toLowerCase().includes(q) ||
+      m.email.toLowerCase().includes(q) ||
+      m.subject.toLowerCase().includes(q) ||
+      m.message.toLowerCase().includes(q)
+    );
+  });
+
+  // 2. Sort
+  const sorted = [...filtered].sort((a, b) => {
+    let fieldA = a[sortField as keyof ContactMessage];
+    let fieldB = b[sortField as keyof ContactMessage];
+
+    if (fieldA === undefined) fieldA = "";
+    if (fieldB === undefined) fieldB = "";
+
+    if (typeof fieldA === "boolean") {
+      fieldA = fieldA ? 1 : 0;
+      fieldB = fieldB ? 1 : 0;
+    }
+
+    if (fieldA < fieldB) return sortDirection === "asc" ? -1 : 1;
+    if (fieldA > fieldB) return sortDirection === "asc" ? 1 : -1;
+    return 0;
+  });
+
+  // 3. Paginate
+  const totalPages = Math.ceil(sorted.length / itemsPerPage);
+  const paginated = sorted.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
   const columns = [
     {
       key: "name",
       label: "From",
-      render: (item: any) => (
+      sortable: true,
+      render: (item: ContactMessage) => (
         <div className="flex items-center gap-2">
-          {item.status === "unread" && <span className="w-2 h-2 rounded-full bg-primary shrink-0" />}
+          {!item.isRead && <span className="w-2 h-2 rounded-full bg-primary shrink-0" />}
           <div>
-            <p className={`text-sm ${item.status === "unread" ? "font-bold text-foreground" : "font-medium text-foreground"}`}>{item.name}</p>
+            <p className={`text-sm ${!item.isRead ? "font-bold text-foreground" : "font-medium text-foreground"}`}>{item.name}</p>
             <p className="text-xs text-muted">{item.email}</p>
           </div>
         </div>
       ),
     },
-    { key: "subject", label: "Subject" },
+    { key: "subject", label: "Subject", sortable: true },
     {
       key: "message",
       label: "Preview",
-      render: (item: any) => (
+      render: (item: ContactMessage) => (
         <span className="text-sm text-muted truncate max-w-[200px] block">{item.message}</span>
       ),
     },
     {
-      key: "status",
+      key: "isRead",
       label: "Status",
-      render: (item: any) => (
-        <span className={`inline-flex items-center gap-1 text-xs font-medium px-2 py-1 rounded-full ${
-          item.status === "unread" ? "bg-primary/10 text-primary" : "bg-gray-100 dark:bg-white/5 text-gray-500"
+      sortable: true,
+      render: (item: ContactMessage) => (
+        <span className={`inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded border ${
+          !item.isRead
+            ? "bg-primary/10 text-primary border-primary/20"
+            : "bg-background text-muted border-border"
         }`}>
-          {item.status === "unread" ? <Mail className="w-3 h-3" /> : <MailOpen className="w-3 h-3" />}
-          {item.status}
+          {!item.isRead ? <Mail className="w-3 h-3" /> : <MailOpen className="w-3 h-3" />}
+          {!item.isRead ? "Unread" : "Read"}
         </span>
       ),
     },
-    { key: "date", label: "Date" },
+    {
+      key: "createdAt",
+      label: "Date",
+      sortable: true,
+      render: (item: ContactMessage) => (
+        <span className="text-xs text-muted">{formatMessageDate(item.createdAt)}</span>
+      ),
+    },
     {
       key: "actions",
       label: "",
-      render: (item: any) => (
+      render: (item: ContactMessage) => (
         <div className="flex items-center gap-1">
           <button
-            onClick={() => { setSelectedMessage(item); handleMarkRead(item.id); }}
-            className="p-1.5 rounded-lg hover:bg-primary/10 text-primary transition-colors"
-            title="View"
+            onClick={() => handleMarkRead(item)}
+            className="p-1.5 rounded hover:bg-primary/10 text-primary transition-colors cursor-pointer"
+            title="View Message"
           >
             <MessageSquare className="w-4 h-4" />
           </button>
           <button
             onClick={() => handleDelete(item.id)}
-            className="p-1.5 rounded-lg hover:bg-pink/10 text-pink transition-colors"
+            className="p-1.5 rounded hover:bg-rose-50 dark:hover:bg-rose-500/10 text-rose-600 transition-colors cursor-pointer"
             title="Delete"
           >
             <Trash2 className="w-4 h-4" />
@@ -88,15 +188,43 @@ export default function MessagesPage() {
   ];
 
   return (
-    <div className="space-y-6 max-w-7xl mx-auto px-2 animate-fade-in pb-12">
+    <div className="space-y-6 max-w-7xl mx-auto px-4 pb-12">
       <PageHeader
-        title={`Messages ${unreadCount > 0 ? `(${unreadCount} unread)` : ""}`}
+        title={`Messages${unreadCount > 0 ? ` (${unreadCount} unread)` : ""}`}
         subtitle="View and manage contact form submissions"
         accentColor="primary"
       />
-      <div className="px-2">
-        <Table columns={columns} data={messages} searchable />
-      </div>
+
+      {error && (
+        <div className="flex items-center gap-2 p-4 bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-500/20 rounded-lg text-xs font-semibold">
+          <AlertCircle className="w-4 h-4" />
+          <span>{error}</span>
+        </div>
+      )}
+
+      {loading ? (
+        <div className="flex flex-col items-center justify-center py-24 gap-3 bg-card border border-border rounded-lg shadow-sm">
+          <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+          <span className="text-xs font-bold text-muted uppercase tracking-wider animate-pulse">Loading messages...</span>
+        </div>
+      ) : (
+        <Table
+          columns={columns}
+          data={paginated}
+          searchable
+          onSearch={(q) => {
+            setSearchQuery(q);
+            setCurrentPage(1);
+          }}
+          onSort={(key, dir) => {
+            setSortField(key);
+            setSortDirection(dir);
+          }}
+          page={currentPage}
+          totalPages={totalPages || 1}
+          onPageChange={(p) => setCurrentPage(p)}
+        />
+      )}
 
       {/* Message detail drawer */}
       <Drawer
@@ -107,26 +235,33 @@ export default function MessagesPage() {
         size="md"
       >
         {selectedMessage && (
-          <div className="space-y-5">
-            <div className="glass-panel rounded-2xl p-4 bg-gray-50/50 dark:bg-white/5">
-              <p className="text-xs font-bold text-muted uppercase tracking-wider mb-3">Sender</p>
+          <div className="space-y-4">
+            <div className="p-4 bg-background border border-border rounded-lg">
+              <p className="text-[10px] font-bold text-muted uppercase tracking-wider mb-3">Sender</p>
               <p className="font-bold text-foreground">{selectedMessage.name}</p>
               <p className="text-sm text-muted mt-0.5">{selectedMessage.email}</p>
-              <p className="text-xs text-muted mt-1">{selectedMessage.date}</p>
+              <p className="text-xs text-muted mt-1">{formatMessageDate(selectedMessage.createdAt)}</p>
             </div>
-            <div className="glass-panel rounded-2xl p-4 bg-gray-50/50 dark:bg-white/5">
-              <p className="text-xs font-bold text-muted uppercase tracking-wider mb-3">Message</p>
+
+            <div className="p-4 bg-background border border-border rounded-lg">
+              <p className="text-[10px] font-bold text-muted uppercase tracking-wider mb-3">Message</p>
               <p className="text-sm text-foreground leading-relaxed">{selectedMessage.message}</p>
             </div>
+
             <div className="flex gap-3 pt-2">
-              <button className="flex-1 py-3 rounded-xl bg-gradient-to-r from-primary to-primary-dark text-white font-bold text-sm shadow-lg hover:-translate-y-0.5 transition-all">
+              <a
+                href={`mailto:${selectedMessage.email}?subject=Re: ${encodeURIComponent(selectedMessage.subject)}`}
+                className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg bg-primary hover:bg-primary-dark text-white font-bold text-sm transition-colors"
+              >
+                <Reply className="w-4 h-4" />
                 Reply via Email
-              </button>
+              </a>
               <button
                 onClick={() => handleDelete(selectedMessage.id)}
-                className="px-4 py-3 rounded-xl bg-pink/10 text-pink font-bold text-sm hover:bg-pink hover:text-white transition-all"
+                className="px-4 py-2.5 rounded-lg border border-rose-200 dark:border-rose-500/30 bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400 font-bold text-sm hover:bg-rose-100 dark:hover:bg-rose-500/20 transition-colors cursor-pointer flex items-center gap-2"
               >
                 <Trash2 className="w-4 h-4" />
+                Delete
               </button>
             </div>
           </div>

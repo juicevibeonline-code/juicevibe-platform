@@ -1,46 +1,94 @@
-"use client";
-
-import { type LucideIcon, TrendingUp, TrendingDown } from "lucide-react";
+import { ArrowUpRight, ArrowDownRight, TrendingUp, ShoppingBag, Users, CreditCard } from "lucide-react";
 
 interface StatsCardProps {
   title: string;
-  value: string | number;
-  change: number;
-  icon: LucideIcon;
-  variant?: "primary" | "orange" | "pink" | "yellow";
+  value: string;
+  delta: string;
+  up: boolean;
 }
 
-const variants = {
-  primary: { bg: "bg-gradient-to-br from-primary to-primary-dark", icon: "text-white", shadow: "shadow-[0_8px_20px_rgba(16,185,129,0.25)]", glow: "from-primary/20" },
-  orange: { bg: "bg-gradient-to-br from-orange to-[#EA580C]", icon: "text-white", shadow: "shadow-[0_8px_20px_rgba(249,115,22,0.25)]", glow: "from-orange/20" },
-  pink: { bg: "bg-gradient-to-br from-pink to-[#BE123C]", icon: "text-white", shadow: "shadow-[0_8px_20px_rgba(239,68,68,0.25)]", glow: "from-pink/20" },
-  yellow: { bg: "bg-gradient-to-br from-yellow to-[#B45309]", icon: "text-white", shadow: "shadow-[0_8px_20px_rgba(245,158,11,0.25)]", glow: "from-yellow/20" },
-};
+export function StatsCard({ title, value, delta, up }: StatsCardProps) {
+  const getStyle = () => {
+    const t = title.toLowerCase();
+    if (t.includes("revenue")) {
+      return {
+        icon: TrendingUp,
+        color: "text-orange",
+        bgColor: "bg-orange/10",
+        borderColor: "border-orange/20",
+        borderLeft: "border-l-orange",
+        glow: "bg-orange"
+      };
+    }
+    if (t.includes("orders")) {
+      return {
+        icon: ShoppingBag,
+        color: "text-blue",
+        bgColor: "bg-blue/10",
+        borderColor: "border-blue/20",
+        borderLeft: "border-l-blue",
+        glow: "bg-blue"
+      };
+    }
+    if (t.includes("customers")) {
+      return {
+        icon: Users,
+        color: "text-primary",
+        bgColor: "bg-primary/10",
+        borderColor: "border-primary/20",
+        borderLeft: "border-l-primary",
+        glow: "bg-primary"
+      };
+    }
+    return {
+      icon: CreditCard,
+      color: "text-pink",
+      bgColor: "bg-pink/10",
+      borderColor: "border-pink/20",
+      borderLeft: "border-l-pink",
+      glow: "bg-pink"
+    };
+  };
 
-export function StatsCard({ title, value, change, icon: Icon, variant = "primary" }: StatsCardProps) {
-  const isPositive = change >= 0;
-  const v = variants[variant];
+  const style = getStyle();
+  const Icon = style.icon;
 
   return (
-    <div className="relative glass-panel rounded-3xl p-6 group hover:-translate-y-1 transition-all duration-500 overflow-hidden">
-      {/* Decorative ambient glow */}
-      <div className={`absolute -top-10 -right-10 w-32 h-32 rounded-full blur-3xl opacity-50 bg-gradient-to-br ${v.glow} to-transparent pointer-events-none group-hover:scale-150 transition-transform duration-700`} />
-      
-      <div className="relative z-10">
-        <div className="flex items-start justify-between mb-6">
-          <div className={`w-14 h-14 rounded-2xl ${v.bg} flex items-center justify-center ${v.icon} ${v.shadow} group-hover:scale-110 transition-transform duration-500`}>
-            <Icon className="w-7 h-7" />
-          </div>
-          <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold ${isPositive ? "bg-primary/10 text-primary-dark" : "bg-pink/10 text-pink"}`}>
-            {isPositive ? <TrendingUp className="w-3.5 h-3.5" /> : <TrendingDown className="w-3.5 h-3.5" />}
-            {Math.abs(change)}%
-          </div>
+    <div className={`premium-card p-5 flex items-center justify-between relative overflow-hidden group border-l-4 ${style.borderLeft}`}>
+      {/* Background soft color glow */}
+      <div className={`absolute top-0 right-0 w-24 h-24 rounded-full blur-[35px] opacity-15 pointer-events-none transition-all duration-500 group-hover:scale-150 ${style.glow}`} />
+
+      <div className="space-y-2 relative z-10">
+        <span className="text-[10px] font-extrabold tracking-widest uppercase text-muted block group-hover:text-foreground transition-colors duration-300">
+          {title}
+        </span>
+        <div className="flex items-baseline gap-2">
+          <span className="font-data text-2xl font-black text-foreground">{value}</span>
+          <span
+            className={`flex items-center text-[10px] font-bold font-data px-1.5 py-0.5 rounded-full ${
+              up 
+                ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400" 
+                : "bg-rose-500/10 text-rose-600 dark:text-rose-400"
+            }`}
+          >
+            {up ? <ArrowUpRight className="w-3 h-3 mr-0.5" /> : <ArrowDownRight className="w-3 h-3 mr-0.5" />}
+            {delta}
+          </span>
         </div>
-        <div>
-          <h3 className="text-3xl font-black text-foreground tracking-tight">{value}</h3>
-          <p className="text-sm font-medium text-muted mt-1">{title}</p>
-        </div>
+      </div>
+
+      <div className={`w-11 h-11 rounded-xl flex items-center justify-center relative z-10 shrink-0 shadow-inner transition-transform duration-300 group-hover:scale-110 ${style.bgColor} ${style.color} border ${style.borderColor}`}>
+        <Icon className="w-5 h-5" />
       </div>
     </div>
   );
 }
+
+export function StatsStrip({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+      {children}
+    </div>
+  );
+}
+

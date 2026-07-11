@@ -37,3 +37,37 @@ export async function createOrder(payload: CreateOrderPayload): Promise<OrderRes
   const data = await res.json();
   return data.data;
 }
+
+export interface ContactPayload {
+  name: string;
+  email: string;
+  phone?: string;
+  subject: string;
+  message: string;
+}
+
+export async function submitContactForm(payload: ContactPayload): Promise<void> {
+  const res = await fetch(`${API_URL}/contact`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+
+  if (!res.ok) {
+    const error = await res.json().catch(() => ({ message: "Failed to send message" }));
+    throw new Error(error.message || "Failed to send message");
+  }
+}
+
+export async function subscribeToNewsletter(email: string): Promise<void> {
+  const res = await fetch(`${API_URL}/contact/subscribe`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email }),
+  });
+
+  if (!res.ok) {
+    const error = await res.json().catch(() => ({ message: "Failed to subscribe" }));
+    throw new Error(error.message || "Failed to subscribe");
+  }
+}

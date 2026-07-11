@@ -2,24 +2,9 @@ import { Controller, Post, Body, Get, UseGuards, HttpCode, HttpStatus } from "@n
 import { ApiTags, ApiBearerAuth, ApiOperation } from "@nestjs/swagger";
 import { AuthService } from "./auth.service";
 import { CurrentUser } from "../common/decorators";
-import { JwtAuthGuard } from "../common/guards";
+import { JwtAuthGuard, RolesGuard, Roles } from "../common/guards";
 import { ApiResponseDto } from "../common/dto";
-
-class LoginDto {
-  email: string;
-  password: string;
-}
-
-class RegisterDto {
-  name: string;
-  email: string;
-  password: string;
-  phone?: string;
-}
-
-class RefreshDto {
-  refreshToken: string;
-}
+import { RegisterDto, LoginDto, RefreshDto } from "../common/dto";
 
 @ApiTags("Authentication")
 @Controller("auth")
@@ -56,6 +41,27 @@ export class AuthController {
   async getMe(@CurrentUser("sub") userId: string) {
     const user = await this.authService.getMe(userId);
     return ApiResponseDto.ok(user);
+  }
+
+  @Get("test-prisma")
+  testPrisma() {
+    const db = require("@juice-vibe/database");
+    return {
+      dbKeys: Object.keys(db),
+      dbType: typeof db,
+      prismaType: typeof db.prisma,
+      prismaObject: db.prisma ? "defined" : "undefined",
+    };
+  }
+
+  @Get("customers")
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles("admin", "manager")
+  @ApiBearerAuth()
+  @ApiOperation({ summary: "Get all customers" })
+  async getCustomers() {
+    const customers = await this.authService.getCustomers();
+    return ApiResponseDto.ok(customers);
   }
 
   @Post("logout")

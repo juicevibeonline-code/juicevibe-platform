@@ -14,7 +14,17 @@
     "jsx": "preserve",
     "incremental": true,
     "plugins": [{ "name": "next" }],
-    "paths": { "@/*": ["./src/*"] }
+    "paths": {
+      "@/*": ["./src/*"],
+      "@juice-vibe/ui/components": ["../../packages/ui/src/components"],
+      "@juice-vibe/ui/components/*": ["../../packages/ui/src/components/*"],
+      "@juice-vibe/ui/components/ui": ["../../packages/ui/src/components/ui"],
+      "@juice-vibe/ui/components/ui/*": ["../../packages/ui/src/components/ui/*"],
+      "@juice-vibe/ui/lib": ["../../packages/ui/src/lib"],
+      "@juice-vibe/ui/lib/*": ["../../packages/ui/src/lib/*"],
+      "@juice-vibe/ui/hooks": ["../../packages/ui/src/hooks"],
+      "@juice-vibe/ui/hooks/*": ["../../packages/ui/src/hooks/*"]
+    }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
   "exclude": ["node_modules"]

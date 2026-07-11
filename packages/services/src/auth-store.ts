@@ -25,6 +25,13 @@ export const useAuthStore = create<AuthState>()(
       setLoading: (isLoading) => set({ isLoading }),
       logout: () => set({ user: null, tokens: null, isAuthenticated: false }),
     }),
-    { name: "juice-vibe-auth", partialize: (state) => ({ tokens: state.tokens }) }
+    {
+      name: "juice-vibe-auth",
+      partialize: (state) => ({
+        tokens: state.tokens,
+        user: state.user,
+        isAuthenticated: state.isAuthenticated,
+      }),
+    }
   )
 );

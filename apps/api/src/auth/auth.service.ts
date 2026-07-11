@@ -39,6 +39,7 @@ export class AuthService {
   }
 
   async login(input: { email: string; password: string }) {
+    console.log("PRISMA OBJECT:", prisma);
     const user = await prisma.user.findUnique({ where: { email: input.email } });
     if (!user) throw new UnauthorizedException("Invalid credentials");
 
@@ -58,7 +59,7 @@ export class AuthService {
 
   async refresh(refreshToken: string) {
     try {
-      const payload = this.jwtService.verify(refreshToken, { secret: process.env.JWT_REFRESH_SECRET || "juice-vibe-refresh-secret" });
+      const payload = this.jwtService.verify(refreshToken, { secret: process.env.JWT_REFRESH_SECRET ?? (() => { throw new Error("JWT_REFRESH_SECRET environment variable is required"); })() });
       const user = await prisma.user.findUnique({ where: { id: payload.sub } });
       if (!user || !user.refreshToken) throw new UnauthorizedException("Invalid refresh token");
 
@@ -80,16 +81,36 @@ export class AuthService {
     return this.sanitizeUser(user);
   }
 
+  async getCustomers() {
+    const users = await prisma.user.findMany({
+      where: { role: "customer" },
+      include: {
+        customer: true,
+      },
+      orderBy: { createdAt: "desc" },
+    });
+    return users.map((user) => ({
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      phone: user.phone || undefined,
+      orderCount: user.customer?.totalOrders ?? 0,
+      totalSpent: user.customer?.totalSpent ?? 0,
+      createdAt: user.createdAt.toISOString(),
+    }));
+  }
+
   async logout(userId: string) {
     await prisma.user.update({ where: { id: userId }, data: { refreshToken: null } });
   }
+
 
   private generateTokens(userId: string, email: string, role: string) {
     const payload = { sub: userId, email, role };
     return {
       accessToken: this.jwtService.sign(payload),
       refreshToken: this.jwtService.sign(payload, {
-        secret: process.env.JWT_REFRESH_SECRET || "juice-vibe-refresh-secret",
+        secret: process.env.JWT_REFRESH_SECRET ?? (() => { throw new Error("JWT_REFRESH_SECRET environment variable is required"); })(),
         expiresIn: "30d",
       }),
     };

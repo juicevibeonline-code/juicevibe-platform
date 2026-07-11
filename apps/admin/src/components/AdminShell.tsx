@@ -7,15 +7,25 @@ import { Sidebar } from "@/components/sidebar";
 import { Header } from "@/components/header";
 import { ToastProvider } from "@/hooks/useToast";
 import { ThemeProvider } from "@/components/theme-provider";
+import { injectAuthStore, useAuthStore } from "@juice-vibe/services";
+import { usePathname } from "next/navigation";
+
+// Inject the auth store for token handling
+injectAuthStore(useAuthStore as any);
 
 export function AdminShell({ children }: { children: React.ReactNode }) {
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+  const pathname = usePathname();
+
+  const isLoginPage = pathname === "/login";
 
   return (
     <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
       <ToastProvider>
-        <div className="admin-bg-gradient" />
-        <div className="flex min-h-screen relative w-full bg-background">
+        {isLoginPage ? (
+          children
+        ) : (
+          <div className="flex min-h-screen relative w-full bg-background">
           {/* Desktop Sidebar */}
           <div className="hidden md:block sticky top-0 h-screen w-[280px] p-4 z-50">
             <Sidebar />
@@ -59,6 +69,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
             <main className="p-4 md:p-8 w-full">{children}</main>
           </div>
         </div>
+        )}
       </ToastProvider>
     </ThemeProvider>
   );

@@ -3,6 +3,7 @@ import { ApiTags, ApiBearerAuth, ApiOperation } from "@nestjs/swagger";
 import { MenuService } from "./menu.service";
 import { JwtAuthGuard, RolesGuard, Roles, OptionalAuthGuard } from "../common/guards";
 import { ApiResponseDto } from "../common/dto";
+import { CreateMenuItemDto, CreateCategoryDto, ReorderItemsDto } from "../common/dto";
 
 @ApiTags("Menu")
 @Controller("menu")
@@ -31,7 +32,7 @@ export class MenuController {
   @Roles("admin", "manager", "editor")
   @ApiBearerAuth()
   @ApiOperation({ summary: "Create a category" })
-  async createCategory(@Body() body: any) {
+  async createCategory(@Body() body: CreateCategoryDto) {
     const category = await this.menuService.createCategory(body);
     return ApiResponseDto.ok(category, "Category created");
   }
@@ -41,7 +42,7 @@ export class MenuController {
   @Roles("admin", "manager", "editor")
   @ApiBearerAuth()
   @ApiOperation({ summary: "Update a category" })
-  async updateCategory(@Param("id") id: string, @Body() body: any) {
+  async updateCategory(@Param("id") id: string, @Body() body: CreateCategoryDto) {
     const category = await this.menuService.updateCategory(id, body);
     return ApiResponseDto.ok(category, "Category updated");
   }
@@ -63,6 +64,7 @@ export class MenuController {
     @Query("search") search?: string,
     @Query("popular") popular?: string,
     @Query("featured") featured?: string,
+    @Query("status") status?: string,
     @Query("page") page?: number,
     @Query("limit") limit?: number,
   ) {
@@ -71,6 +73,7 @@ export class MenuController {
       search,
       popular: popular === "true",
       featured: featured === "true",
+      status,
       page: page ? Number(page) : undefined,
       limit: limit ? Number(limit) : undefined,
     });
@@ -89,7 +92,7 @@ export class MenuController {
   @Roles("admin", "manager", "editor")
   @ApiBearerAuth()
   @ApiOperation({ summary: "Create a menu item" })
-  async createMenuItem(@Body() body: any) {
+  async createMenuItem(@Body() body: CreateMenuItemDto) {
     const item = await this.menuService.createMenuItem(body);
     return ApiResponseDto.ok(item, "Menu item created");
   }
@@ -99,7 +102,7 @@ export class MenuController {
   @Roles("admin", "manager", "editor")
   @ApiBearerAuth()
   @ApiOperation({ summary: "Update a menu item" })
-  async updateMenuItem(@Param("id") id: string, @Body() body: any) {
+  async updateMenuItem(@Param("id") id: string, @Body() body: CreateMenuItemDto) {
     const item = await this.menuService.updateMenuItem(id, body);
     return ApiResponseDto.ok(item, "Menu item updated");
   }
@@ -114,12 +117,22 @@ export class MenuController {
     return ApiResponseDto.ok(null, "Menu item deleted");
   }
 
+  @Patch("items/:id/restore")
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles("admin", "manager")
+  @ApiBearerAuth()
+  @ApiOperation({ summary: "Restore an archived menu item" })
+  async restoreMenuItem(@Param("id") id: string) {
+    const item = await this.menuService.restoreMenuItem(id);
+    return ApiResponseDto.ok(item, "Menu item restored");
+  }
+
   @Put("items/reorder")
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles("admin", "manager")
   @ApiBearerAuth()
   @ApiOperation({ summary: "Reorder menu items" })
-  async reorderItems(@Body() body: { items: { id: string; order: number }[] }) {
+  async reorderItems(@Body() body: ReorderItemsDto) {
     await this.menuService.reorderItems(body.items);
     return ApiResponseDto.ok(null, "Items reordered");
   }

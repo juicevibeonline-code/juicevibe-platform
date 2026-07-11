@@ -1,9 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import Image from "next/image";
-import { motion } from "framer-motion";
 import {
   LayoutDashboard,
   ShoppingBag,
@@ -17,6 +16,7 @@ import {
   Star,
   FileText,
 } from "lucide-react";
+import { useAuthStore } from "@juice-vibe/services";
 
 const navItems = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -33,29 +33,36 @@ const navItems = [
 
 export function Sidebar() {
   const pathname = usePathname();
+  const router = useRouter();
+  const { logout } = useAuthStore();
+
+  const handleSignOut = () => {
+    logout();
+    router.push("/login");
+  };
 
   return (
-    <aside className="h-full w-full glass-panel rounded-[2rem] flex flex-col overflow-hidden animate-slide-in border border-white/60 dark:border-white/10 shadow-xl">
+    <aside className="h-full w-full bg-sidebar flex flex-col overflow-hidden rounded-2xl border border-white/5 shadow-2xl relative">
+      {/* Decorative background blur */}
+      <div className="absolute top-[-50px] left-[-50px] w-[150px] h-[150px] bg-primary/10 rounded-full blur-[40px] pointer-events-none" />
+
       {/* Logo */}
-      <div className="p-6 pb-4 mb-2">
+      <div className="p-6 pb-6 border-b border-white/10 relative z-10">
         <Link href="/dashboard" className="flex items-center gap-3 group">
-          <div className="relative w-11 h-11 rounded-full overflow-hidden ring-2 ring-primary/30 shadow-[0_4px_20px_rgba(34,197,94,0.3)] group-hover:scale-105 transition-transform duration-300 shrink-0">
-            <Image
-              src="/images/Logo.jpeg"
-              alt="Juice Vibe Logo"
-              fill
-              className="object-cover"
-            />
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-primary to-primary-light flex items-center justify-center shrink-0 shadow-lg shadow-primary/20 group-hover:scale-105 transition-transform duration-350">
+            <span className="text-sm font-black text-white tracking-wider font-display">JV</span>
           </div>
           <div>
-            <h1 className="text-xl font-black tracking-tight text-foreground group-hover:text-primary transition-colors">Juice Vibe</h1>
-            <p className="text-[10px] font-extrabold text-muted uppercase tracking-widest">Admin Workspace</p>
+            <h1 className="text-sm font-extrabold tracking-tight text-white font-display group-hover:text-primary-light transition-colors">Juice Vibe</h1>
+            <p className="text-[9px] font-bold tracking-widest uppercase mt-0.5" style={{ color: "#8FA695" }}>
+              Admin Workspace
+            </p>
           </div>
         </Link>
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 px-4 space-y-1.5 overflow-y-auto pb-4 custom-scrollbar relative">
+      <nav className="flex-1 px-4 py-4 space-y-1 overflow-y-auto custom-scrollbar relative z-10">
         {navItems.map((item) => {
           const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
           const Icon = item.icon;
@@ -63,33 +70,31 @@ export function Sidebar() {
             <Link
               key={item.href}
               href={item.href}
-              className={`relative flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all duration-300 group border border-transparent ${
+              className={`relative flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold tracking-wide transition-all group overflow-hidden ${
                 isActive
-                  ? "text-white"
-                  : "text-muted hover:bg-white/50 dark:hover:bg-white/5 hover:text-foreground hover:shadow-sm"
+                  ? "bg-gradient-to-r from-primary to-primary-dark text-white shadow-md shadow-primary/15"
+                  : "text-[#B7C4BB] hover:bg-white/5 hover:text-white"
               }`}
             >
+              {/* Inner active glow effect */}
               {isActive && (
-                <motion.div
-                  layoutId="active-nav-pill"
-                  className="absolute inset-0 bg-gradient-to-r from-primary to-primary-dark rounded-xl shadow-[0_4px_15px_rgba(34,197,94,0.25)] -z-10"
-                  transition={{ type: "spring", stiffness: 350, damping: 28 }}
-                />
+                <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 rounded-r bg-orange" />
               )}
-              <Icon className={`w-5 h-5 flex-shrink-0 transition-transform duration-300 ${isActive ? 'scale-110 text-white' : 'group-hover:scale-110 group-hover:text-primary'}`} />
-              <span className="relative z-10">{item.label}</span>
-              {isActive && (
-                <span className="relative z-10 ml-auto w-1.5 h-1.5 rounded-full bg-white/80" />
-              )}
+              
+              <Icon className={`w-4 h-4 flex-shrink-0 transition-transform group-hover:scale-110 duration-200 ${isActive ? "text-white" : "text-[#8FA695] group-hover:text-white"}`} />
+              <span>{item.label}</span>
             </Link>
           );
         })}
       </nav>
 
       {/* Logout */}
-      <div className="p-4 mt-auto border-t border-border/50 bg-white/40 dark:bg-white/5">
-        <button className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-bold text-pink hover:bg-pink hover:text-white transition-all duration-300 w-full group shadow-sm bg-white dark:bg-black/20 hover:shadow-md">
-          <LogOut className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+      <div className="p-4 border-t border-white/10 relative z-10">
+        <button 
+          onClick={handleSignOut} 
+          className="flex items-center gap-2 px-3.5 py-2.5 rounded-xl text-xs font-bold text-[#B7C4BB] hover:bg-rose-500/10 hover:text-rose-400 transition-all w-full cursor-pointer group"
+        >
+          <LogOut className="w-4 h-4 text-[#8FA695] group-hover:text-rose-400 transition-colors" />
           Sign Out
         </button>
       </div>

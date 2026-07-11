@@ -2,7 +2,10 @@
 
 import * as React from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Search, Monitor, Moon, Sun, LayoutDashboard, ShoppingBag, Settings, X, Command } from "lucide-react";
+import {
+  Search, Monitor, Moon, Sun, LayoutDashboard, ShoppingBag, ClipboardList,
+  Users, ImageIcon, FileText, Star, Tag, Mail, Settings, X, Command
+} from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
 import { cn } from "@juice-vibe/utils";
@@ -35,7 +38,14 @@ export function CommandPalette() {
 
   const items = [
     { label: "Dashboard", icon: <LayoutDashboard />, action: () => router.push("/dashboard"), category: "Navigation" },
-    { label: "Orders", icon: <ShoppingBag />, action: () => router.push("/orders"), category: "Navigation" },
+    { label: "Menu", icon: <ShoppingBag />, action: () => router.push("/menu"), category: "Navigation" },
+    { label: "Orders", icon: <ClipboardList />, action: () => router.push("/orders"), category: "Navigation" },
+    { label: "Customers", icon: <Users />, action: () => router.push("/customers"), category: "Navigation" },
+    { label: "Gallery", icon: <ImageIcon />, action: () => router.push("/gallery"), category: "Navigation" },
+    { label: "Blog", icon: <FileText />, action: () => router.push("/blog"), category: "Navigation" },
+    { label: "Testimonials", icon: <Star />, action: () => router.push("/testimonials"), category: "Navigation" },
+    { label: "Coupons", icon: <Tag />, action: () => router.push("/coupons"), category: "Navigation" },
+    { label: "Messages", icon: <Mail />, action: () => router.push("/messages"), category: "Navigation" },
     { label: "Settings", icon: <Settings />, action: () => router.push("/settings"), category: "Navigation" },
     { label: "Light Theme", icon: <Sun />, action: () => setTheme("light"), category: "Preferences" },
     { label: "Dark Theme", icon: <Moon />, action: () => setTheme("dark"), category: "Preferences" },

@@ -7,7 +7,7 @@ export const menuService = {
     return data.data;
   },
 
-  async getMenuItems(params?: { category?: string; search?: string; popular?: boolean }): Promise<MenuItem[]> {
+  async getMenuItems(params?: { category?: string; search?: string; popular?: boolean; status?: string }): Promise<MenuItem[]> {
     const { data } = await apiClient.get("/menu/items", { params });
     return data.data;
   },
@@ -29,6 +29,11 @@ export const menuService = {
     return data.data;
   },
 
+  async createMenuItem(input: any): Promise<MenuItem> {
+    const { data } = await apiClient.post("/menu/items", input);
+    return data.data;
+  },
+
   async updateItem(id: string, input: Partial<MenuItem>): Promise<MenuItem> {
     const { data } = await apiClient.patch(`/menu/items/${id}`, input);
     return data.data;
@@ -36,6 +41,11 @@ export const menuService = {
 
   async deleteItem(id: string): Promise<void> {
     await apiClient.delete(`/menu/items/${id}`);
+  },
+
+  async restoreItem(id: string): Promise<MenuItem> {
+    const { data } = await apiClient.patch(`/menu/items/${id}/restore`);
+    return data.data;
   },
 
   async reorderItems(items: { id: string; order: number }[]): Promise<void> {

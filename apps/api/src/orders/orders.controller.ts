@@ -4,6 +4,7 @@ import { OrdersService } from "./orders.service";
 import { CurrentUser } from "../common/decorators";
 import { JwtAuthGuard, RolesGuard, Roles, OptionalAuthGuard } from "../common/guards";
 import { ApiResponseDto } from "../common/dto";
+import { CreateOrderDto, UpdateOrderStatusDto } from "../common/dto";
 import { Prisma } from "@juice-vibe/database";
 
 type OrderWithItems = Prisma.OrderGetPayload<{ include: { items: true } }>;
@@ -17,8 +18,8 @@ export class OrdersController {
   @Post()
   @UseGuards(OptionalAuthGuard)
   @ApiOperation({ summary: "Create a new order" })
-  async createOrder(@Body() body: any, @CurrentUser("sub") userId?: string): Promise<ApiResponseDto<OrderWithItems>> {
-    const order = await this.ordersService.createOrder({ ...body, userId });
+  async createOrder(@Body() body: CreateOrderDto, @CurrentUser("sub") userId?: string): Promise<ApiResponseDto<OrderWithItems>> {
+    const order = await this.ordersService.createOrder({ ...body, userId } as any);
     return ApiResponseDto.ok(order, "Order created successfully");
   }
 
@@ -56,6 +57,8 @@ export class OrdersController {
   }
 
   @Get(":id")
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @ApiOperation({ summary: "Get order by ID" })
   async getOrder(@Param("id") id: string): Promise<ApiResponseDto<OrderWithItems>> {
     const order = await this.ordersService.getOrder(id);
@@ -67,7 +70,7 @@ export class OrdersController {
   @Roles("admin", "manager", "cashier", "kitchen")
   @ApiBearerAuth()
   @ApiOperation({ summary: "Update order status" })
-  async updateOrderStatus(@Param("id") id: string, @Body() body: { status: string }): Promise<ApiResponseDto<OrderWithItems>> {
+  async updateOrderStatus(@Param("id") id: string, @Body() body: UpdateOrderStatusDto): Promise<ApiResponseDto<OrderWithItems>> {
     const order = await this.ordersService.updateOrderStatus(id, body.status);
     return ApiResponseDto.ok(order, "Order status updated");
   }

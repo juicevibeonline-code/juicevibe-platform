@@ -3,6 +3,7 @@ import { ApiTags, ApiBearerAuth, ApiOperation } from "@nestjs/swagger";
 import { ContactService } from "./contact.service";
 import { JwtAuthGuard, RolesGuard, Roles } from "../common/guards";
 import { ApiResponseDto } from "../common/dto";
+import { CreateContactMessageDto, SubscribeDto } from "../common/dto";
 
 @ApiTags("Contact")
 @Controller("contact")
@@ -11,14 +12,14 @@ export class ContactController {
 
   @Post()
   @ApiOperation({ summary: "Submit contact form message" })
-  async submitMessage(@Body() body: { name: string; email: string; phone?: string; subject: string; message: string }) {
+  async submitMessage(@Body() body: CreateContactMessageDto) {
     await this.contactService.submitMessage(body);
     return ApiResponseDto.ok(null, "Message sent successfully");
   }
 
   @Post("subscribe")
   @ApiOperation({ summary: "Subscribe to newsletter" })
-  async subscribe(@Body() body: { email: string }) {
+  async subscribe(@Body() body: SubscribeDto) {
     await this.contactService.subscribe(body.email);
     return ApiResponseDto.ok(null, "Subscribed successfully");
   }

@@ -2,9 +2,11 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { Mail, Phone, MapPin, Send } from "lucide-react";
+import { Mail, Phone, MapPin, Send, CheckCircle, AlertCircle } from "lucide-react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { subscribeToNewsletter } from "@/lib/api";
 
 const FacebookIcon = ({ className }: { className?: string }) => (
   <svg viewBox="0 0 24 24" fill="currentColor" className={className}>
@@ -38,6 +40,28 @@ const socialLinks = [
 ];
 
 export function Footer() {
+  const [email, setEmail] = useState("");
+  const [subscribed, setSubscribed] = useState(false);
+  const [subscribeError, setSubscribeError] = useState<string | null>(null);
+  const [isSubscribing, setIsSubscribing] = useState(false);
+
+  const handleSubscribe = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email) return;
+    setIsSubscribing(true);
+    setSubscribeError(null);
+    try {
+      await subscribeToNewsletter(email);
+      setSubscribed(true);
+      setEmail("");
+      setTimeout(() => setSubscribed(false), 5000);
+    } catch (err) {
+      setSubscribeError(err instanceof Error ? err.message : "Failed to subscribe");
+    } finally {
+      setIsSubscribing(false);
+    }
+  };
+
   return (
     <footer className="relative overflow-hidden bg-dark-green text-white">
       <div className="pointer-events-none absolute inset-0 opacity-5">
@@ -130,19 +154,31 @@ export function Footer() {
             <p className="mb-4 text-sm text-gray-300">
               Subscribe for exclusive offers and new flavors.
             </p>
-            <form
-              onSubmit={(e) => e.preventDefault()}
-              className="flex gap-2"
-            >
+            <form onSubmit={handleSubscribe} className="flex gap-2">
               <Input
                 type="email"
                 placeholder="Your email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 className="h-11 border-white/20 bg-white/10 text-white placeholder:text-gray-400"
+                required
               />
-              <Button variant="primary" size="sm" className="h-11 w-11 shrink-0 p-0">
+              <Button variant="primary" size="sm" className="h-11 w-11 shrink-0 p-0" type="submit" disabled={isSubscribing}>
                 <Send className="h-4 w-4" />
               </Button>
             </form>
+            {subscribed && (
+              <div className="mt-3 flex items-center gap-2 text-sm text-green-400">
+                <CheckCircle className="h-4 w-4" />
+                Subscribed successfully!
+              </div>
+            )}
+            {subscribeError && (
+              <div className="mt-3 flex items-center gap-2 text-sm text-red-400">
+                <AlertCircle className="h-4 w-4" />
+                {subscribeError}
+              </div>
+            )}
           </div>
         </div>
 

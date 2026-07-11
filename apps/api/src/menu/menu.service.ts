@@ -38,8 +38,16 @@ export class MenuService {
     return prisma.category.delete({ where: { id } });
   }
 
-  async getMenuItems(params: { category?: string; search?: string; popular?: boolean; featured?: boolean; page?: number; limit?: number }) {
-    const where: any = { status: "active" };
+  async getMenuItems(params: { category?: string; search?: string; popular?: boolean; featured?: boolean; page?: number; limit?: number; status?: string }) {
+    const where: any = {};
+
+    if (params.status === "all") {
+      where.status = { not: "archived" };
+    } else if (params.status) {
+      where.status = params.status as any;
+    } else {
+      where.status = "active";
+    }
 
     if (params.category && params.category !== "all") {
       where.category = { slug: params.category };
@@ -123,7 +131,17 @@ export class MenuService {
   }
 
   async deleteMenuItem(id: string) {
-    return prisma.menuItem.delete({ where: { id } });
+    return prisma.menuItem.update({
+      where: { id },
+      data: { status: "archived" },
+    });
+  }
+
+  async restoreMenuItem(id: string) {
+    return prisma.menuItem.update({
+      where: { id },
+      data: { status: "active" },
+    });
   }
 
   async reorderItems(items: { id: string; order: number }[]) {

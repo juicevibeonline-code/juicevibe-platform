@@ -1,49 +1,23 @@
 "use client";
 
-import { useState } from "react";
-import { TrendingUp, DollarSign, ShoppingCart } from "lucide-react";
 import {
-  AreaChart,
-  Area,
+  BarChart,
+  Bar,
   XAxis,
   YAxis,
-  Tooltip,
   ResponsiveContainer,
-  PieChart,
-  Pie,
+  Tooltip,
   Cell,
-  Legend,
 } from "recharts";
 
-const weeklyData = [
-  { day: "Mon", revenue: 12000, orders: 15 },
-  { day: "Tue", revenue: 19500, orders: 25 },
-  { day: "Wed", revenue: 13500, orders: 18 },
-  { day: "Thu", revenue: 24000, orders: 32 },
-  { day: "Fri", revenue: 16500, orders: 22 },
-  { day: "Sat", revenue: 27000, orders: 36 },
-  { day: "Sun", revenue: 21000, orders: 28 },
-];
-
-const categoryData = [
-  { name: "Milkshakes", value: 45, color: "#22C55E" }, // primary
-  { name: "Smoothies", value: 30, color: "#FB923C" }, // orange
-  { name: "Fresh Juices", value: 15, color: "#FBBF24" }, // yellow
-  { name: "Mocktails/Lassi", value: 10, color: "#F43F5E" }, // pink
-];
-
-// Custom Tooltip for Area Chart
-function CustomTooltip({ active, payload, label }: any) {
+function ChartTooltip({ active, payload, label }: any) {
   if (active && payload && payload.length) {
-    const isRevenue = payload[0].name === "Revenue";
-    const value = payload[0].value;
     return (
-      <div className="glass-panel rounded-2xl p-4 border border-white/40 dark:border-white/10 shadow-xl bg-white/90 dark:bg-[#111813]/90 text-sm">
-        <p className="font-bold text-muted-foreground mb-1">{label}</p>
-        <p className="font-black text-foreground">
-          {isRevenue
-            ? `LKR ${value.toLocaleString("en-LK")}`
-            : `${value} Orders`}
+      <div className="bg-card/85 backdrop-blur-md border border-border/80 rounded-xl px-3.5 py-2.5 shadow-xl shadow-foreground/5 relative overflow-hidden">
+        <div className="absolute top-0 left-0 w-1.5 h-full bg-primary" />
+        <p className="text-[10px] font-data font-black text-muted uppercase tracking-widest pl-1">{label}</p>
+        <p className="text-xs font-data font-black text-foreground mt-1 pl-1">
+          LKR {payload[0].value.toLocaleString("en-LK")}
         </p>
       </div>
     );
@@ -51,167 +25,132 @@ function CustomTooltip({ active, payload, label }: any) {
   return null;
 }
 
-// Custom Tooltip for Pie Chart
-function PieTooltip({ active, payload }: any) {
-  if (active && payload && payload.length) {
-    const data = payload[0];
-    return (
-      <div className="glass-panel rounded-2xl p-3 border border-white/40 dark:border-white/10 shadow-xl bg-white/90 dark:bg-[#111813]/90 text-xs">
-        <p className="font-bold text-foreground">{data.name}</p>
-        <p className="font-semibold text-muted-foreground mt-0.5">{data.value}% of sales</p>
-      </div>
-    );
-  }
-  return null;
+interface RevenueChartProps {
+  data: { date: string; revenue: number; orders: number }[];
+  title?: string;
 }
 
-export function RevenueChart() {
-  const [metric, setMetric] = useState<"revenue" | "orders">("revenue");
-  const isRevenue = metric === "revenue";
+export function RevenueChart({ data, title = "Revenue Chart" }: RevenueChartProps) {
+  const chartData = (data || []).map((d) => {
+    // Format date string to a shorter presentation (e.g. Mon, or Jul 11)
+    const dateObj = new Date(d.date);
+    const label = isNaN(dateObj.getTime())
+      ? d.date
+      : dateObj.toLocaleDateString([], { month: "short", day: "numeric" });
+    return {
+      day: label,
+      revenue: d.revenue,
+    };
+  });
 
-  const totalRevenue = weeklyData.reduce((sum, item) => sum + item.revenue, 0);
-  const totalOrders = weeklyData.reduce((sum, item) => sum + item.orders, 0);
+  const totalRevenue = chartData.reduce((sum, d) => sum + d.revenue, 0);
+  const maxVal = Math.max(...chartData.map((d) => d.revenue), 1);
 
   return (
-    <div className="bg-transparent h-[380px] flex flex-col justify-between">
-      {/* Chart Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+    <div className="flex flex-col h-full">
+      <div className="flex items-baseline justify-between mb-1">
         <div>
-          <h3 className="text-xl font-bold tracking-tight text-foreground">Weekly Overview</h3>
-          <p className="text-sm font-medium text-muted mt-0.5">Track your café analytics</p>
+          <div className="font-display font-bold text-sm text-foreground">{title}</div>
+          <div className="text-xs text-muted mt-0.5 font-medium">Revenue details over the selected period</div>
         </div>
-        
-        {/* Toggle Controls */}
-        <div className="flex bg-gray-100 dark:bg-white/5 p-1 rounded-2xl border border-border/50 shrink-0">
-          <button
-            onClick={() => setMetric("revenue")}
-            className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all duration-300 ${
-              isRevenue
-                ? "bg-white dark:bg-white/10 text-primary shadow-sm"
-                : "text-muted hover:text-foreground"
-            }`}
-          >
-            <DollarSign className="w-3.5 h-3.5" />
-            Revenue
-          </button>
-          <button
-            onClick={() => setMetric("orders")}
-            className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all duration-300 ${
-              !isRevenue
-                ? "bg-white dark:bg-white/10 text-primary shadow-sm"
-                : "text-muted hover:text-foreground"
-            }`}
-          >
-            <ShoppingCart className="w-3.5 h-3.5" />
-            Orders
-          </button>
+        <div className="font-data text-base font-black text-foreground">
+          LKR {totalRevenue.toLocaleString("en-LK")}
         </div>
       </div>
-
-      {/* Summary Figure */}
-      <div className="flex items-end justify-between mb-4 px-1">
-        <div>
-          <p className="text-xs font-bold text-muted uppercase tracking-wider">
-            {isRevenue ? "Total Revenue" : "Total Orders"}
-          </p>
-          <p className="text-3xl font-black text-foreground mt-0.5">
-            {isRevenue
-              ? `LKR ${totalRevenue.toLocaleString("en-LK")}`
-              : `${totalOrders} Orders`}
-          </p>
-        </div>
-        <div className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-primary/15 text-xs font-bold text-primary-dark">
-          <TrendingUp className="w-3.5 h-3.5" />
-          +12.5%
-        </div>
-      </div>
-
-      {/* Chart Canvas */}
       <div className="flex-1 w-full min-h-[220px]">
-        <ResponsiveContainer width="100%" height="100%">
-          <AreaChart data={weeklyData} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
-            <defs>
-              <linearGradient id="colorMetric" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor={isRevenue ? "#22C55E" : "#FB923C"} stopOpacity={0.3} />
-                <stop offset="95%" stopColor={isRevenue ? "#22C55E" : "#FB923C"} stopOpacity={0.0} />
-              </linearGradient>
-            </defs>
-            <XAxis
-              dataKey="day"
-              tickLine={false}
-              axisLine={false}
-              tick={{ fill: "#64748B", fontSize: 11, fontWeight: 600 }}
-            />
-            <YAxis
-              tickLine={false}
-              axisLine={false}
-              tick={{ fill: "#64748B", fontSize: 11, fontWeight: 600 }}
-              tickFormatter={(v) => (isRevenue ? `${v / 1000}k` : v)}
-            />
-            <Tooltip content={<CustomTooltip />} cursor={{ stroke: "#22C55E", strokeWidth: 1, strokeDasharray: "4 4" }} />
-            <Area
-              type="monotone"
-              dataKey={isRevenue ? "revenue" : "orders"}
-              name={isRevenue ? "Revenue" : "Orders"}
-              stroke={isRevenue ? "#22C55E" : "#FB923C"}
-              strokeWidth={3}
-              fillOpacity={1}
-              fill="url(#colorMetric)"
-            />
-          </AreaChart>
-        </ResponsiveContainer>
+        {chartData.length === 0 ? (
+          <div className="flex items-center justify-center h-full text-xs text-muted font-bold uppercase tracking-wider">
+            No chart data available
+          </div>
+        ) : (
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={chartData} margin={{ top: 20, right: 0, left: 0, bottom: 0 }}>
+              <defs>
+                <linearGradient id="primaryGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="var(--primary)" stopOpacity={1} />
+                  <stop offset="100%" stopColor="var(--primary-dark)" stopOpacity={0.8} />
+                </linearGradient>
+                <linearGradient id="orangeGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="var(--orange)" stopOpacity={1} />
+                  <stop offset="100%" stopColor="#C47D34" stopOpacity={0.8} />
+                </linearGradient>
+              </defs>
+              <XAxis
+                dataKey="day"
+                axisLine={false}
+                tickLine={false}
+                tick={{ fontSize: 10, fill: "var(--muted)", fontFamily: "var(--font-data)", fontWeight: "bold" }}
+              />
+              <YAxis hide />
+              <Tooltip
+                cursor={{ fill: "var(--border)", opacity: 0.2 }}
+                content={<ChartTooltip />}
+              />
+              <Bar dataKey="revenue" radius={[6, 6, 0, 0]} maxBarSize={28}>
+                {chartData.map((d, i) => (
+                  <Cell key={i} fill={d.revenue === maxVal ? "url(#orangeGradient)" : "url(#primaryGradient)"} />
+                ))}
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+        )}
       </div>
     </div>
   );
 }
 
-export function CategorySalesChart() {
-  return (
-    <div className="bg-transparent h-[380px] flex flex-col justify-between">
-      <div>
-        <h3 className="text-xl font-bold tracking-tight text-foreground">Sales Distribution</h3>
-        <p className="text-sm font-medium text-muted mt-0.5">Top performing categories</p>
-      </div>
+interface CategorySalesProps {
+  data: { name: string; revenue: number }[];
+}
 
-      <div className="flex-1 w-full min-h-[240px] flex items-center justify-center relative">
-        <ResponsiveContainer width="100%" height="100%">
-          <PieChart>
-            <Pie
-              data={categoryData}
-              cx="50%"
-              cy="50%"
-              innerRadius={70}
-              outerRadius={90}
-              paddingAngle={4}
-              dataKey="value"
-            >
-              {categoryData.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={entry.color} />
-              ))}
-            </Pie>
-            <Tooltip content={<PieTooltip />} />
-            <Legend
-              verticalAlign="bottom"
-              height={36}
-              content={({ payload }) => (
-                <div className="flex flex-wrap justify-center gap-x-4 gap-y-1 mt-4">
-                  {payload?.map((entry: any, index) => (
-                    <div key={`legend-${index}`} className="flex items-center gap-1.5 text-xs font-bold text-muted-foreground">
-                      <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: entry.color }} />
-                      <span>{entry.value}</span>
-                    </div>
-                  ))}
-                </div>
-              )}
-            />
-          </PieChart>
-        </ResponsiveContainer>
-        {/* Total Label Center */}
-        <div className="absolute top-[47%] left-1/2 -translate-x-1/2 -translate-y-1/2 text-center pointer-events-none">
-          <p className="text-xs font-extrabold text-muted uppercase tracking-widest">Share</p>
-          <p className="text-2xl font-black text-foreground mt-0.5">100%</p>
+export function CategorySalesChart({ data }: CategorySalesProps) {
+  const total = (data || []).reduce((sum, d) => sum + d.revenue, 0);
+  const colors = ["var(--primary)", "var(--orange)", "var(--primary-light)", "var(--pink)", "var(--muted)"];
+
+  const categoryData = (data || [])
+    .map((d, i) => ({
+      name: d.name,
+      pct: total ? Math.round((d.revenue / total) * 100) : 0,
+      color: colors[i % colors.length] || "var(--muted)",
+    }))
+    .slice(0, 5); // display top 5
+
+  return (
+    <div className="flex flex-col h-full">
+      <div className="font-display font-bold text-sm text-foreground mb-0.5">Top Selling Share</div>
+      <div className="text-xs text-muted mb-4 font-medium">Revenue split of top items</div>
+
+      {categoryData.length === 0 ? (
+        <div className="flex-1 flex items-center justify-center text-xs text-muted font-bold uppercase tracking-wider py-16">
+          No sales data share
         </div>
-      </div>
+      ) : (
+        <>
+          {/* Horizontal stacked bar */}
+          <div className="flex h-3 rounded-full overflow-hidden mb-6 border border-border/20">
+            {categoryData.map((c) => (
+              <div
+                key={c.name}
+                className="border-r border-background last:border-r-0"
+                style={{ width: `${c.pct}%`, background: c.color }}
+              />
+            ))}
+          </div>
+
+          {/* Legend */}
+          <div className="flex flex-col gap-3">
+            {categoryData.map((c) => (
+              <div key={c.name} className="flex items-center justify-between text-xs group hover:bg-primary/[0.02] p-1 -mx-1 rounded transition-colors duration-150">
+                <div className="flex items-center gap-2">
+                  <span className="w-2.5 h-2.5 rounded-full shrink-0 border border-white/10" style={{ background: c.color }} />
+                  <span className="text-foreground font-medium group-hover:text-primary transition-colors truncate max-w-[130px]">{c.name}</span>
+                </div>
+                <span className="font-data font-bold text-foreground">{c.pct}%</span>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
     </div>
   );
 }
