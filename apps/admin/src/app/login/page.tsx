@@ -63,8 +63,12 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4">
-      <div className="w-full max-w-md space-y-6">
+    <div className="flex min-h-screen items-center justify-center bg-background px-4 relative overflow-hidden">
+      {/* Handcrafted Organic Accent Glows */}
+      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] rounded-full bg-orange/5 blur-[120px] pointer-events-none" />
+      <div className="absolute bottom-1/4 left-1/3 w-[300px] h-[300px] rounded-full bg-primary/5 blur-[100px] pointer-events-none" />
+      
+      <div className="w-full max-w-md space-y-6 relative z-10">
         <div className="text-center space-y-2">
           <div className="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 border border-primary/20 text-primary mb-2">
             <ShieldCheck className="h-6 w-6" />
@@ -77,8 +81,8 @@ export default function LoginPage() {
           </p>
         </div>
 
-        <div className="terminal-card p-8 border border-border shadow-2xl relative overflow-hidden bg-card">
-          <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-primary/50 to-transparent" />
+        <div className="terminal-card p-8 border border-border shadow-2xl relative overflow-hidden bg-card glow-border-yellow">
+          <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-yellow/50 to-transparent" />
           
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             {errorMsg && (

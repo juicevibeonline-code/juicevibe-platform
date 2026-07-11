@@ -5,6 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuthStore } from "@juice-vibe/services";
 import { cn } from "@juice-vibe/utils";
+import { motion } from "framer-motion";
 import {
   LayoutDashboard,
   ClipboardList,
@@ -120,13 +121,20 @@ export function Sidebar({ collapsed, setCollapsed }: SidebarProps) {
               key={item.href}
               href={item.href}
               className={cn(
-                "flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-medium transition-all group relative",
+                "flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-medium transition-all group relative border border-transparent",
                 isActive
-                  ? "bg-primary/10 text-primary border border-primary/20"
-                  : "text-muted-foreground hover:text-foreground hover:bg-ink-dark/50 border border-transparent"
+                  ? "text-primary font-bold text-glow"
+                  : "text-muted-foreground hover:text-foreground hover:bg-ink-dark/50"
               )}
             >
-              <Icon className={cn("h-4 w-4 shrink-0 transition-transform", isActive ? "text-primary" : "text-muted-foreground group-hover:text-foreground")} />
+              {isActive && (
+                <motion.div
+                  layoutId="activeNavIndicator"
+                  className="absolute inset-0 bg-primary/10 border border-primary/20 rounded-lg -z-10"
+                  transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                />
+              )}
+              <Icon className={cn("h-4 w-4 shrink-0 transition-transform", isActive ? "text-primary scale-110" : "text-muted-foreground group-hover:text-foreground group-hover:scale-105")} />
               {!collapsed && <span className="font-heading">{item.label}</span>}
               {collapsed && (
                 <div className="absolute left-14 bg-card border border-border text-foreground text-[10px] py-1 px-2 rounded opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity whitespace-nowrap z-30 shadow-xl font-mono">

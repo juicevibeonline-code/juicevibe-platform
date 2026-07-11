@@ -98,7 +98,7 @@ export default function MissionControlDashboard() {
             Mission Control
           </h1>
           <p className="text-xs text-muted-foreground font-mono mt-1">
-            实时运行监控 // OPERATIONAL LOGS AND DISPATCH PANEL
+            // OPERATIONAL LOGS AND DISPATCH PANEL
           </p>
         </div>
         <div className="flex items-center gap-3">
@@ -124,10 +124,10 @@ export default function MissionControlDashboard() {
       {/* KPI Cards Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* KPI: Revenue */}
-        <div className="terminal-card p-5 relative overflow-hidden bg-card">
+        <div className="terminal-card p-5 relative overflow-hidden bg-card border-primary/30 glow-border citrus-card-hover">
           <div className="flex items-center justify-between mb-3">
             <span className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest">Gross Revenue</span>
-            <TrendingUp className="h-4 w-4 text-primary" />
+            <TrendingUp className="h-4 w-4 text-primary text-glow" />
           </div>
           <div className="font-numeral text-2xl font-bold text-foreground">
             {formatPrice(currentStats.revenue)}
@@ -139,40 +139,40 @@ export default function MissionControlDashboard() {
         </div>
 
         {/* KPI: Orders */}
-        <div className="terminal-card p-5 relative overflow-hidden bg-card">
+        <div className="terminal-card p-5 relative overflow-hidden bg-card border-orange/30 glow-border-orange orange-card-hover">
           <div className="flex items-center justify-between mb-3">
             <span className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest">Orders Count</span>
-            <ShoppingBag className="h-4 w-4 text-primary" />
+            <ShoppingBag className="h-4 w-4 text-orange text-glow-orange" />
           </div>
           <div className="font-numeral text-2xl font-bold text-foreground">
             {currentStats.orders}
           </div>
-          <div className="mt-2 flex items-center gap-1.5 text-[10px] font-mono text-primary">
+          <div className="mt-2 flex items-center gap-1.5 text-[10px] font-mono text-orange">
             <span>+{currentStats.ordersChange}%</span>
             <span className="text-muted-foreground/60">completed dispatch</span>
           </div>
         </div>
 
         {/* KPI: Active Members */}
-        <div className="terminal-card p-5 relative overflow-hidden bg-card">
+        <div className="terminal-card p-5 relative overflow-hidden bg-card border-yellow/30 glow-border-yellow sunlight-card-hover">
           <div className="flex items-center justify-between mb-3">
             <span className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest">CRM Customers</span>
-            <UserCheck className="h-4 w-4 text-primary" />
+            <UserCheck className="h-4 w-4 text-yellow text-glow-yellow" />
           </div>
           <div className="font-numeral text-2xl font-bold text-foreground">
             {currentStats.customers}
           </div>
-          <div className="mt-2 flex items-center gap-1.5 text-[10px] font-mono text-primary">
+          <div className="mt-2 flex items-center gap-1.5 text-[10px] font-mono text-yellow">
             <span>+{currentStats.customersChange}%</span>
             <span className="text-muted-foreground/60">loyalty acquisitions</span>
           </div>
         </div>
 
         {/* KPI: AOV */}
-        <div className="terminal-card p-5 relative overflow-hidden bg-card">
+        <div className="terminal-card p-5 relative overflow-hidden bg-card border-primary/30 glow-border citrus-card-hover">
           <div className="flex items-center justify-between mb-3">
             <span className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest">Avg Order Value</span>
-            <Clock className="h-4 w-4 text-primary" />
+            <Clock className="h-4 w-4 text-primary text-glow" />
           </div>
           <div className="font-numeral text-2xl font-bold text-foreground">
             {formatPrice(currentStats.averageOrderValue)}
@@ -187,7 +187,7 @@ export default function MissionControlDashboard() {
       {/* Main Charts & Live Feed Section */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left Column: Recharts Trend */}
-        <div className="lg:col-span-2 terminal-card p-6 bg-card space-y-4">
+        <div className="lg:col-span-2 terminal-card p-6 bg-card space-y-4 border-primary/20">
           <div className="flex items-center justify-between">
             <div>
               <h3 className="text-sm font-bold text-foreground font-heading">
@@ -205,13 +205,18 @@ export default function MissionControlDashboard() {
               <AreaChart data={currentChart} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                 <defs>
                   <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#10B981" stopOpacity={0.2} />
+                    <stop offset="5%" stopColor="#10B981" stopOpacity={0.25} />
                     <stop offset="95%" stopColor="#10B981" stopOpacity={0} />
+                  </linearGradient>
+                  <linearGradient id="colorOrders" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#FB923C" stopOpacity={0.15} />
+                    <stop offset="95%" stopColor="#FB923C" stopOpacity={0} />
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="#163B29" opacity={0.3} />
                 <XAxis dataKey="date" stroke="#4B6B58" />
-                <YAxis stroke="#4B6B58" />
+                <YAxis yAxisId="left" stroke="#10B981" />
+                <YAxis yAxisId="right" orientation="right" stroke="#FB923C" />
                 <Tooltip
                   contentStyle={{
                     backgroundColor: "#1F2E24",
@@ -222,12 +227,23 @@ export default function MissionControlDashboard() {
                   }}
                 />
                 <Area
+                  yAxisId="left"
                   type="monotone"
                   dataKey="revenue"
                   stroke="#10B981"
                   strokeWidth={2}
                   fillOpacity={1}
                   fill="url(#colorRevenue)"
+                />
+                <Area
+                  yAxisId="right"
+                  type="monotone"
+                  dataKey="orders"
+                  stroke="#FB923C"
+                  strokeWidth={1.5}
+                  strokeDasharray="4 4"
+                  fillOpacity={1}
+                  fill="url(#colorOrders)"
                 />
               </AreaChart>
             </ResponsiveContainer>
@@ -237,7 +253,7 @@ export default function MissionControlDashboard() {
         {/* Right Column: Alerts & Status summary */}
         <div className="space-y-6">
           {/* Inventory warning panel */}
-          <div className="terminal-card p-5 bg-card border border-border space-y-3">
+          <div className="terminal-card p-5 bg-card border border-border space-y-3 border-pink/20">
             <h3 className="text-xs font-bold text-foreground uppercase tracking-widest font-mono flex items-center gap-2">
               <AlertTriangle className="h-4 w-4 text-pink" />
               <span>Inventory Threshold Alarms</span>
@@ -261,8 +277,50 @@ export default function MissionControlDashboard() {
             </div>
           </div>
 
+          {/* Refrigerator & Dispenser Telemetry Counter */}
+          <div className="terminal-card p-5 bg-card border border-yellow/30 glow-border-yellow sunlight-card-hover space-y-4">
+            <h3 className="text-xs font-bold text-foreground uppercase tracking-widest font-mono flex items-center gap-2">
+              <Activity className="h-4 w-4 text-yellow text-glow-yellow animate-pulse" />
+              <span>Juicebar Vibe Telemetry</span>
+            </h3>
+            
+            <div className="space-y-2.5 font-mono text-[9px]">
+              <div className="flex justify-between items-center bg-ink-dark/40 p-2 rounded-lg border border-border/40">
+                <span className="text-muted-foreground flex items-center gap-1.5">
+                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-ping" />
+                  Chiller #1 (Citrus Chest)
+                </span>
+                <span className="font-numeral text-primary font-bold">2.4 °C</span>
+              </div>
+              
+              <div className="flex justify-between items-center bg-ink-dark/40 p-2 rounded-lg border border-border/40">
+                <span className="text-muted-foreground flex items-center gap-1.5">
+                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-ping" />
+                  Chiller #2 (Pulp Vault)
+                </span>
+                <span className="font-numeral text-primary font-bold">1.8 °C</span>
+              </div>
+
+              <div className="flex justify-between items-center bg-ink-dark/40 p-2 rounded-lg border border-border/40">
+                <span className="text-muted-foreground flex items-center gap-1.5">
+                  <span className="h-1.5 w-1.5 rounded-full bg-orange-400" />
+                  CO2 Carbonator Tank
+                </span>
+                <span className="font-numeral text-orange font-bold">48 PSI</span>
+              </div>
+
+              <div className="flex justify-between items-center bg-ink-dark/40 p-2 rounded-lg border border-border/40">
+                <span className="text-muted-foreground flex items-center gap-1.5">
+                  <span className="h-1.5 w-1.5 rounded-full bg-yellow-400 animate-pulse" />
+                  Puree Dispenser Flow
+                </span>
+                <span className="font-numeral text-yellow font-bold">1.4 GPM</span>
+              </div>
+            </div>
+          </div>
+
           {/* Popular/Top products listing */}
-          <div className="terminal-card p-5 bg-card border border-border space-y-3">
+          <div className="terminal-card p-5 bg-card border border-border space-y-3 border-primary/20">
             <h3 className="text-xs font-bold text-foreground uppercase tracking-widest font-mono flex items-center gap-2">
               <UtensilsCrossed className="h-4 w-4 text-primary" />
               <span>Top Operational Items</span>
@@ -276,7 +334,7 @@ export default function MissionControlDashboard() {
                 <div key={idx} className="py-2.5 flex items-center justify-between first:pt-0 last:pb-0">
                   <div className="flex items-center gap-2">
                     <span className="text-muted-foreground">0{idx + 1}.</span>
-                    <span className="font-medium text-foreground">{item.name}</span>
+                    <span className="font-medium text-foreground font-sans">{item.name}</span>
                   </div>
                   <div className="flex items-center gap-4">
                     <span className="text-muted-foreground">{item.quantity} orders</span>

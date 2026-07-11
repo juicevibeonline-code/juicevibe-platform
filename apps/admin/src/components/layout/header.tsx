@@ -2,9 +2,10 @@
 
 import React from "react";
 import { usePathname } from "next/navigation";
-import { Sparkles, Bell, Search, Terminal, Menu, ShieldAlert } from "lucide-react";
+import { Sparkles, Bell, Search, Terminal, Menu, ShieldAlert, Sun, Moon } from "lucide-react";
 import { cn } from "@juice-vibe/utils";
 import { Badge } from "@juice-vibe/ui";
+import { useTheme } from "@/app/theme-provider";
 
 interface HeaderProps {
   sidebarCollapsed: boolean;
@@ -26,6 +27,7 @@ export function Header({
   onOpenNotifications,
 }: HeaderProps) {
   const pathname = usePathname();
+  const { theme, setTheme } = useTheme();
 
   // Simple breadcrumbs map
   const getBreadcrumbs = () => {
@@ -101,6 +103,15 @@ export function Header({
               <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
             </span>
           )}
+        </button>
+
+        {/* Theme Toggle */}
+        <button
+          onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+          className="p-2 text-muted-foreground hover:text-foreground hover:bg-ink-dark/60 rounded-lg transition-colors cursor-pointer"
+          title={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
+        >
+          {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
         </button>
 
         {/* Floating AI Panel button */}

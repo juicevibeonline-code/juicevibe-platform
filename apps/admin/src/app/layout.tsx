@@ -22,6 +22,7 @@ const bricolageGrotesque = Bricolage_Grotesque({
 });
 
 import { Providers } from "./providers";
+import { ThemeProvider } from "./theme-provider";
 
 export const metadata: Metadata = {
   title: "Juice Vibe OS — Mission Control",
@@ -42,8 +43,28 @@ export default function RootLayout({
       className={`${inter.variable} ${ibmPlexMono.variable} ${bricolageGrotesque.variable}`}
       suppressHydrationWarning
     >
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  var theme = localStorage.getItem('juice-theme') || 'dark';
+                  if (theme === 'system') {
+                    var darkQuery = window.matchMedia('(prefers-color-scheme: dark)');
+                    theme = darkQuery.matches ? 'dark' : 'light';
+                  }
+                  document.documentElement.classList.add(theme);
+                } catch (e) {}
+              })();
+            `,
+          }}
+        />
+      </head>
       <body className="min-h-screen font-body antialiased selection:bg-primary selection:text-ink-dark">
-        <Providers>{children}</Providers>
+        <ThemeProvider defaultTheme="dark" storageKey="juice-theme">
+          <Providers>{children}</Providers>
+        </ThemeProvider>
       </body>
     </html>
   );
