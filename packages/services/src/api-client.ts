@@ -3,7 +3,7 @@ import { apiConfig } from "@juice-vibe/config";
 
 export type ApiClient = AxiosInstance;
 
-let store: { getState: () => { tokens?: { accessToken: string } } } | undefined;
+let store: { getState: () => { tokens?: { accessToken: string; refreshToken?: string } }; setState?: (partial: any) => void } | undefined;
 
 export function injectAuthStore(s: typeof store) {
   store = s;
@@ -35,11 +35,15 @@ apiClient.interceptors.response.use(
           const refreshToken = store?.getState()?.tokens?.refreshToken;
           if (refreshToken) {
             const { data } = await axios.post(`${apiConfig.baseUrl}/auth/refresh`, { refreshToken });
-            // update store with new tokens
+            const newTokens = data?.data;
+            if (newTokens?.accessToken) {
+              store?.setState?.({ tokens: newTokens });
+            }
+            originalRequest.headers = { ...originalRequest.headers, Authorization: `Bearer ${newTokens?.accessToken}` };
             return apiClient(originalRequest);
           }
         } catch {
-          // refresh failed - redirect to login
+          store?.setState?.({ tokens: undefined, user: undefined, isAuthenticated: false });
         }
       }
     }

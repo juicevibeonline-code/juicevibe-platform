@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException, ConflictException } from "@nestjs/common";
 import { prisma } from "@juice-vibe/database";
 
+
 @Injectable()
 export class CouponService {
   async getCoupons() {
@@ -22,14 +23,14 @@ export class CouponService {
     return { valid: true, discount, coupon };
   }
 
-  async createCoupon(input: { code: string; type: string; value: number; minOrderAmount?: number; maxDiscount?: number; usageLimit?: number; expiresAt?: string }) {
+  async createCoupon(input: { code: string; type: "percentage" | "fixed"; value: number; minOrderAmount?: number; maxDiscount?: number; usageLimit?: number; expiresAt?: string }) {
     const existing = await prisma.coupon.findUnique({ where: { code: input.code } });
     if (existing) throw new ConflictException("Coupon code already exists");
 
     return prisma.coupon.create({
       data: {
         code: input.code.toUpperCase(),
-        type: input.type,
+        type: input.type as "percentage" | "fixed",
         value: input.value,
         minOrderAmount: input.minOrderAmount || 0,
         maxDiscount: input.maxDiscount,

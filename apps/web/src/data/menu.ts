@@ -74,14 +74,14 @@ export const menuItems: MenuItem[] = [
 
   // Mocktails
   { id: "virgin-mojito", name: "Classic Virgin Mojito", description: "Mint, lime, soda & sugar", price: 400, category: "mocktails", popular: true, image: "/images/MenuItems/Mocktails-Classic Virgin Mojito – LKR 400.00.png" },
-  { id: "flavoured-mojito", name: "Flavoured Mojito", description: "Choose from Mango, Mandarin, Passion Fruit, Blackcurrant", price: 400, category: "mocktails", image: "/images/MenuItems/Mocktails-Flavoured Mojito.png" },
+  { id: "flavoured-mojito", name: "Flavoured Mojito", description: "Choose your favourite flavour", price: 400, category: "mocktails", flavours: ["Mango", "Mandarin", "Passion Fruit", "Blackcurrant"], image: "/images/MenuItems/Mocktails-Flavoured Mojito.png" },
 
   // Fruits & Ice Cream
   { id: "jaggery-cashew", name: "Jaggery & Cashew Dream", description: "Traditional jaggery with cashew nuts", price: 500, category: "ice-cream", popular: true, image: "/images/MenuItems/Jaggery & Cashew Dream – LKR 500.00.jpg" },
   { id: "banana-boat", name: "Banana Boat", description: "Banana split with ice cream & toppings", price: 500, category: "ice-cream" },
   { id: "fruit-salad", name: "Fruit Salad", description: "Fresh seasonal fruit salad", price: 300, category: "ice-cream" },
   { id: "fruit-salad-icecream", name: "Fruit Salad with Ice Cream", description: "Fresh fruit salad topped with ice cream", price: 350, category: "ice-cream" },
-  { id: "ice-cream-scoops", name: "Choice of Ice Cream (3 Scoops)", description: "Vanilla, Chocolate, Strawberry, Fruit & Nut, Mango", price: 350, category: "ice-cream" },
+  { id: "ice-cream-scoops", name: "Choice of Ice Cream (3 Scoops)", description: "Mix and match your favourite scoops", price: 350, category: "ice-cream", flavours: ["Vanilla", "Chocolate", "Strawberry", "Fruit & Nut", "Mango"] },
 
   // Burgers
   { id: "chicken-burger", name: "Chicken Burger", description: "Grilled chicken patty with fresh toppings", price: 400, category: "burgers", popular: true },

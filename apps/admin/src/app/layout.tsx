@@ -1,31 +1,70 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Inter, IBM_Plex_Mono, Bricolage_Grotesque, Space_Grotesk } from "next/font/google";
 import "./globals.css";
-import { Sidebar } from "@/components/sidebar";
-import { Header } from "@/components/header";
-import { ToastProvider } from "@/hooks/useToast";
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-body",
+  display: "swap",
+});
+
+const ibmPlexMono = IBM_Plex_Mono({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-mono",
+  display: "swap",
+});
+
+const bricolageGrotesque = Bricolage_Grotesque({
+  subsets: ["latin"],
+  variable: "--font-heading",
+  display: "swap",
+});
+
+import { Providers } from "./providers";
+import { ThemeProvider } from "./theme-provider";
 
 export const metadata: Metadata = {
-  title: "Juice Vibe Admin",
-  description: "Juice Vibe Premium Café Admin Dashboard",
-  robots: { index: false, follow: false },
+  title: "Juice Vibe OS — Mission Control",
+  description: "Official administrative operational platform for Juice Vibe.",
+  icons: {
+    icon: "/favicon.ico",
+  },
 };
 
-export default function AdminLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
   return (
-    <html lang="en">
-      <body className={inter.className}>
-        <ToastProvider>
-          <div className="flex min-h-screen">
-            <Sidebar />
-            <div className="flex-1 ml-64">
-              <Header />
-              <main className="p-8">{children}</main>
-            </div>
-          </div>
-        </ToastProvider>
+    <html
+      lang="en"
+      className={`${inter.variable} ${ibmPlexMono.variable} ${bricolageGrotesque.variable}`}
+      suppressHydrationWarning
+    >
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  var theme = localStorage.getItem('juice-theme') || 'dark';
+                  if (theme === 'system') {
+                    var darkQuery = window.matchMedia('(prefers-color-scheme: dark)');
+                    theme = darkQuery.matches ? 'dark' : 'light';
+                  }
+                  document.documentElement.classList.add(theme);
+                } catch (e) {}
+              })();
+            `,
+          }}
+        />
+      </head>
+      <body className="min-h-screen font-body antialiased selection:bg-primary selection:text-ink-dark">
+        <ThemeProvider defaultTheme="dark" storageKey="juice-theme">
+          <Providers>{children}</Providers>
+        </ThemeProvider>
       </body>
     </html>
   );

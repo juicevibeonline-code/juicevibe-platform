@@ -50,7 +50,27 @@ export class BlogService {
     });
   }
 
+  async updatePost(id: string, input: { title?: string; excerpt?: string; content?: string; coverImage?: string; tags?: string[]; category?: string; isPublished?: boolean }) {
+    const data: any = { ...input };
+    if (input.title) {
+      data.slug = slugify(input.title);
+    }
+    if (input.isPublished !== undefined) {
+      if (input.isPublished) {
+        data.publishedAt = new Date();
+      } else {
+        data.publishedAt = null;
+      }
+    }
+    return prisma.blogPost.update({
+      where: { id },
+      data,
+      include: { author: { select: { name: true, avatar: true } } },
+    });
+  }
+
   async deletePost(id: string) {
     return prisma.blogPost.delete({ where: { id } });
   }
 }
+

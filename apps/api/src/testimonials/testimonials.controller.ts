@@ -3,6 +3,7 @@ import { ApiTags, ApiBearerAuth, ApiOperation } from "@nestjs/swagger";
 import { TestimonialsService } from "./testimonials.service";
 import { JwtAuthGuard, RolesGuard, Roles } from "../common/guards";
 import { ApiResponseDto } from "../common/dto";
+import { CreateTestimonialDto } from "../common/dto";
 
 @ApiTags("Testimonials")
 @Controller("testimonials")
@@ -28,7 +29,7 @@ export class TestimonialsController {
 
   @Post()
   @ApiOperation({ summary: "Submit a testimonial" })
-  async create(@Body() body: any) {
+  async create(@Body() body: CreateTestimonialDto) {
     const testimonial = await this.testimonialsService.create(body);
     return ApiResponseDto.ok(testimonial, "Testimonial submitted for review");
   }

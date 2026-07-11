@@ -1,5 +1,6 @@
-import { ApiProperty } from "@nestjs/swagger";
-import { IsString, IsOptional, IsBoolean, IsNumber, IsArray, Min } from "class-validator";
+import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
+import { IsString, IsOptional, IsBoolean, IsNumber, IsArray, IsEmail, Min, MinLength, MaxLength, IsInt, ValidateNested } from "class-validator";
+import { Type } from "class-transformer";
 
 export class PaginationDto {
   @ApiProperty({ required: false })
@@ -38,3 +39,326 @@ export class ApiResponseDto<T> {
     };
   }
 }
+
+export class RegisterDto {
+  @ApiProperty({ example: "John Doe" })
+  @IsString()
+  @MinLength(2)
+  @MaxLength(100)
+  name: string;
+
+  @ApiProperty({ example: "john@example.com" })
+  @IsEmail()
+  email: string;
+
+  @ApiProperty({ example: "password123" })
+  @IsString()
+  @MinLength(6)
+  password: string;
+
+  @ApiPropertyOptional({ example: "+94711234567" })
+  @IsOptional()
+  @IsString()
+  phone?: string;
+}
+
+export class LoginDto {
+  @ApiProperty({ example: "john@example.com" })
+  @IsEmail()
+  email: string;
+
+  @ApiProperty({ example: "password123" })
+  @IsString()
+  password: string;
+}
+
+export class RefreshDto {
+  @ApiProperty()
+  @IsString()
+  refreshToken: string;
+}
+
+export class OrderItemDto {
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  menuItemId?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  name?: string;
+
+  @ApiProperty()
+  @IsInt()
+  @Min(1, { message: "Quantity must be at least 1" })
+  quantity: number;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
+  price?: number;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  notes?: string;
+}
+
+export class CreateOrderDto {
+  @ApiProperty({ enum: ["delivery", "pickup", "dine_in"] })
+  @IsString()
+  type: string;
+
+  @ApiProperty()
+  @IsString()
+  customerName: string;
+
+  @ApiProperty()
+  @IsString()
+  customerPhone: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsEmail()
+  customerEmail?: string;
+
+  @ApiProperty({ type: [OrderItemDto] })
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => OrderItemDto)
+  items: OrderItemDto[];
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  deliveryAddress?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  notes?: string;
+
+  @ApiPropertyOptional({ enum: ["cash", "card", "online"] })
+  @IsOptional()
+  @IsString()
+  paymentMethod?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  couponCode?: string;
+}
+
+export class UpdateOrderStatusDto {
+  @ApiProperty({ enum: ["pending", "confirmed", "preparing", "ready", "completed", "cancelled"] })
+  @IsString()
+  status: string;
+}
+
+export class CreateMenuItemDto {
+  @ApiProperty()
+  @IsString()
+  name: string;
+
+  @ApiProperty()
+  @IsString()
+  description: string;
+
+  @ApiProperty()
+  price: number;
+
+  @ApiProperty()
+  @IsString()
+  categoryId: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  images?: string[];
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  calories?: number;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  ingredients?: string[];
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  tags?: string[];
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  isPopular?: boolean;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  isFeatured?: boolean;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  variants?: { name: string; priceAdjustment: number; isDefault: boolean }[];
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  addOns?: { name: string; price: number; category: string; isAvailable: boolean }[];
+}
+
+export class CreateCategoryDto {
+  @ApiProperty()
+  @IsString()
+  name: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  description?: string;
+
+  @ApiProperty()
+  @IsString()
+  icon: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  image?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  order?: number;
+}
+
+export class CreateTestimonialDto {
+  @ApiProperty()
+  @IsString()
+  name: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  role?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  avatar?: string;
+
+  @ApiProperty()
+  rating: number;
+
+  @ApiProperty()
+  @IsString()
+  text: string;
+}
+
+export class CreateContactMessageDto {
+  @ApiProperty()
+  @IsString()
+  name: string;
+
+  @ApiProperty()
+  @IsEmail()
+  email: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  phone?: string;
+
+  @ApiProperty()
+  @IsString()
+  subject: string;
+
+  @ApiProperty()
+  @IsString()
+  message: string;
+}
+
+export class SubscribeDto {
+  @ApiProperty()
+  @IsEmail()
+  email: string;
+}
+
+export class ReorderItemsDto {
+  @ApiProperty()
+  items: { id: string; order: number }[];
+}
+
+export class CreateBlogPostDto {
+  @ApiProperty({ example: "5 Morning Juices For Infinite Energy" })
+  @IsString()
+  @MinLength(3)
+  title: string;
+
+  @ApiProperty({ example: "Discover the best cold-pressed juices to kickstart your day." })
+  @IsString()
+  excerpt: string;
+
+  @ApiProperty({ example: "Full blog content here..." })
+  @IsString()
+  content: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  coverImage?: string;
+
+  @ApiPropertyOptional({ type: [String], example: ["health", "morning", "juices"] })
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  tags?: string[];
+
+  @ApiPropertyOptional({ example: "Health" })
+  @IsOptional()
+  @IsString()
+  category?: string;
+
+  @ApiPropertyOptional({ example: false })
+  @IsOptional()
+  @IsBoolean()
+  isPublished?: boolean;
+}
+
+export class UpdateBlogPostDto {
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  @MinLength(3)
+  title?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  excerpt?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  content?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  coverImage?: string;
+
+  @ApiPropertyOptional({ type: [String] })
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  tags?: string[];
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  category?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsBoolean()
+  isPublished?: boolean;
+}
+

@@ -1,88 +1,134 @@
 import { Injectable, NotFoundException, BadRequestException } from "@nestjs/common";
 import { prisma, Prisma } from "@juice-vibe/database";
-import { generateId } from "@juice-vibe/utils";
+import { randomBytes } from "crypto";
 
 @Injectable()
 export class OrdersService {
   async createOrder(input: {
-    items: { menuItemId: string; quantity: number; variant?: string; addOnIds?: string[]; notes?: string }[];
+    items: { menuItemId?: string; name?: string; price?: number; quantity: number; variant?: string; addOnIds?: string[]; notes?: string }[];
     customerName: string; customerPhone: string; customerEmail?: string;
     type: string; paymentMethod: string; notes?: string; couponCode?: string;
     deliveryAddress?: any; userId?: string;
   }) {
-    const orderNumber = "JV-" + Date.now().toString(36).toUpperCase() + generateId().slice(0, 4).toUpperCase();
+    const orderNumber = "JV-" + randomBytes(8).toString("hex").toUpperCase();
     let subtotal = 0;
-    let discount = 0;
 
-    const orderItems = await Promise.all(
-      input.items.map(async (item) => {
-        const menuItem = await prisma.menuItem.findUnique({ where: { id: item.menuItemId } });
-        if (!menuItem) throw new NotFoundException(`Menu item ${item.menuItemId} not found`);
-        if (menuItem.availability !== "in_stock") throw new BadRequestException(`${menuItem.name} is not available`);
+    const menuItemIds = input.items.map(i => i.menuItemId).filter(Boolean) as string[];
+    const menuItemNames = input.items.map(i => i.name).filter(Boolean) as string[];
 
-        let itemPrice = menuItem.price * item.quantity;
-        subtotal += itemPrice;
-
-        return {
-          menuItemId: item.menuItemId,
-          name: menuItem.name,
-          quantity: item.quantity,
-          price: menuItem.price,
-          variant: item.variant,
-          addOns: item.addOnIds ?? Prisma.DbNull,
-          notes: item.notes,
-        };
-      })
-    );
-
-    if (input.couponCode) {
-      const coupon = await prisma.coupon.findUnique({ where: { code: input.couponCode } });
-      if (coupon && coupon.isActive && coupon.usedCount < coupon.usageLimit) {
-        if (!coupon.expiresAt || new Date(coupon.expiresAt) > new Date()) {
-          if (subtotal >= coupon.minOrderAmount) {
-            discount = coupon.type === "percentage"
-              ? Math.min(subtotal * (coupon.value / 100), coupon.maxDiscount || subtotal)
-              : Math.min(coupon.value, coupon.maxDiscount || coupon.value);
-
-            await prisma.coupon.update({ where: { id: coupon.id }, data: { usedCount: { increment: 1 } } });
-          }
-        }
+    // Batch query database items to resolve the N+1 query problem
+    const dbMenuItems = await prisma.menuItem.findMany({
+      where: {
+        OR: [
+          { id: { in: menuItemIds } },
+          { name: { in: menuItemNames, mode: "insensitive" } }
+        ]
       }
-    }
-
-    const tax = subtotal * 0.05; // 5% tax
-    const total = subtotal + tax - discount;
-
-    const order = await prisma.order.create({
-      data: {
-        orderNumber,
-        customerId: input.userId,
-        customerName: input.customerName,
-        customerPhone: input.customerPhone,
-        customerEmail: input.customerEmail,
-        subtotal,
-        tax,
-        discount,
-        total,
-        type: input.type as any,
-        paymentMethod: input.paymentMethod as any,
-        notes: input.notes,
-        couponCode: input.couponCode,
-        deliveryAddress: input.deliveryAddress ?? Prisma.DbNull,
-        items: { create: orderItems },
-      },
-      include: { items: true },
     });
 
-    if (input.userId) {
-      const customer = await prisma.customer.findUnique({ where: { userId: input.userId } });
-      if (customer) {
-        await prisma.customer.update({
-          where: { userId: input.userId },
-          data: { totalOrders: { increment: 1 }, totalSpent: { increment: total } },
+    const orderItems = input.items.map((item) => {
+      let menuItem = dbMenuItems.find(m => m.id === item.menuItemId);
+      if (!menuItem && item.name) {
+        menuItem = dbMenuItems.find(m => m.name.toLowerCase() === item.name!.toLowerCase());
+      }
+
+      if (!menuItem) {
+        throw new BadRequestException(`Menu item not found: ${item.name || item.menuItemId}`);
+      }
+
+      if (menuItem.availability !== "in_stock") {
+        throw new BadRequestException(`${menuItem.name} is not available`);
+      }
+
+      const itemPrice = menuItem.price;
+      const itemName = menuItem.name;
+      subtotal += itemPrice * item.quantity;
+
+      return {
+        menuItemId: menuItem.id,
+        name: itemName,
+        quantity: item.quantity,
+        price: itemPrice,
+        variant: item.variant,
+        addOns: item.addOnIds ?? Prisma.DbNull,
+        notes: item.notes,
+      };
+    });
+
+    const order = await prisma.$transaction(async (tx) => {
+      let discount = 0;
+
+      if (input.couponCode) {
+        // Enforce concurrency protection using SELECT ... FOR UPDATE row-level lock
+        const coupons = await tx.$queryRaw<any[]>`
+          SELECT * FROM "Coupon" 
+          WHERE "code" = ${input.couponCode.toUpperCase()} 
+          FOR UPDATE
+        `;
+        const coupon = coupons[0];
+
+        if (!coupon) {
+          throw new BadRequestException("Coupon not found");
+        }
+        if (!coupon.isActive) {
+          throw new BadRequestException("Coupon is inactive");
+        }
+        if (coupon.usedCount >= coupon.usageLimit) {
+          throw new BadRequestException("Coupon usage limit reached");
+        }
+        if (coupon.expiresAt && new Date(coupon.expiresAt) < new Date()) {
+          throw new BadRequestException("Coupon has expired");
+        }
+        if (subtotal < coupon.minOrderAmount) {
+          throw new BadRequestException(`Minimum order amount is LKR ${coupon.minOrderAmount}`);
+        }
+
+        discount = coupon.type === "percentage"
+          ? Math.min(subtotal * (coupon.value / 100), coupon.maxDiscount || subtotal)
+          : Math.min(coupon.value, coupon.maxDiscount || coupon.value);
+
+        await tx.coupon.update({
+          where: { id: coupon.id },
+          data: { usedCount: { increment: 1 } },
         });
       }
-    }
+
+      const tax = subtotal * 0.05; // 5% tax
+      const total = subtotal + tax - discount;
+
+      const order = await tx.order.create({
+        data: {
+          orderNumber,
+          customerId: input.userId,
+          customerName: input.customerName,
+          customerPhone: input.customerPhone,
+          customerEmail: input.customerEmail,
+          subtotal,
+          tax,
+          discount,
+          total,
+          type: input.type as any,
+          paymentMethod: input.paymentMethod as any,
+          notes: input.notes,
+          couponCode: input.couponCode,
+          deliveryAddress: input.deliveryAddress ?? Prisma.DbNull,
+          items: { create: orderItems },
+        },
+        include: { items: true },
+      });
+
+      if (input.userId) {
+        const customer = await tx.customer.findUnique({ where: { userId: input.userId } });
+        if (customer) {
+          await tx.customer.update({
+            where: { userId: input.userId },
+            data: { totalOrders: { increment: 1 }, totalSpent: { increment: total } },
+          });
+        }
+      }
+
+      return order;
+    });
 
     return order;
   }

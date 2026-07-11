@@ -34,7 +34,7 @@ export interface OrderItem {
   notes?: string;
 }
 
-export type OrderType = "delivery" | "pickup" | "dine-in";
+export type OrderType = "delivery" | "pickup" | "dine_in";
 
 export interface CreateOrderInput {
   items: CreateOrderItemInput[];

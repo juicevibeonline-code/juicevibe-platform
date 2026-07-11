@@ -22,4 +22,5 @@ export interface CreateBlogInput {
   author: string;
   tags?: string[];
   category: string;
+  isPublished?: boolean;
 }

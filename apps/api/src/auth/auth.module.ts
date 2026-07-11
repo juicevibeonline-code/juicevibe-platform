@@ -9,7 +9,7 @@ import { JwtStrategy } from "./jwt.strategy";
   imports: [
     PassportModule.register({ defaultStrategy: "jwt" }),
     JwtModule.register({
-      secret: process.env.JWT_SECRET || "juice-vibe-jwt-secret-change-in-production",
+      secret: process.env.JWT_SECRET ?? (() => { throw new Error("JWT_SECRET environment variable is required"); })(),
       signOptions: { expiresIn: "7d" },
     }),
   ],

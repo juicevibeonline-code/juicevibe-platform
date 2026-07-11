@@ -249,10 +249,15 @@ model Review {
   @@index([userId])
 }
 
+enum CouponType {
+  percentage
+  fixed
+}
+
 model Coupon {
-  id            String   @id @default(cuid())
-  code          String   @unique
-  type          String
+  id            String      @id @default(cuid())
+  code          String      @unique
+  type          CouponType
   value         Float
   minOrderAmount Float   @default(0)
   maxDiscount   Float?

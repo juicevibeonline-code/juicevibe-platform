@@ -3,7 +3,7 @@ import { ApiTags, ApiBearerAuth, ApiOperation } from "@nestjs/swagger";
 import { BlogService } from "./blog.service";
 import { CurrentUser } from "../common/decorators";
 import { JwtAuthGuard, RolesGuard, Roles } from "../common/guards";
-import { ApiResponseDto } from "../common/dto";
+import { ApiResponseDto, UpdateBlogPostDto } from "../common/dto";
 
 @ApiTags("Blog")
 @Controller("blog")
@@ -54,6 +54,16 @@ export class BlogController {
     return ApiResponseDto.ok(post, "Post published");
   }
 
+  @Patch(":id")
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles("admin", "editor")
+  @ApiBearerAuth()
+  @ApiOperation({ summary: "Update a blog post" })
+  async updatePost(@Param("id") id: string, @Body() body: UpdateBlogPostDto) {
+    const post = await this.blogService.updatePost(id, body);
+    return ApiResponseDto.ok(post, "Post updated successfully");
+  }
+
   @Delete(":id")
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles("admin")
@@ -64,3 +74,4 @@ export class BlogController {
     return ApiResponseDto.ok(null, "Post deleted");
   }
 }
+

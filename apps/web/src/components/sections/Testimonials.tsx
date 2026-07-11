@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Star, Quote } from "lucide-react";
+import { Star, Quote, Users, Utensils } from "lucide-react";
 import { testimonials } from "@/data/testimonials";
 
 const containerVariants = {
@@ -16,6 +16,12 @@ const itemVariants = {
   hidden: { opacity: 0, y: 30 },
   visible: { opacity: 1, y: 0 },
 };
+
+const stats = [
+  { value: "4.9", label: "Rating", icon: Star, color: "text-yellow-500", bg: "bg-yellow-500/10" },
+  { value: "200+", label: "Happy Customers", icon: Users, color: "text-pink-500", bg: "bg-pink-500/10" },
+  { value: "40+", label: "Menu Items", icon: Utensils, color: "text-orange-500", bg: "bg-orange-500/10" },
+];
 
 export function Testimonials() {
   return (
@@ -38,6 +44,30 @@ export function Testimonials() {
             What Our{" "}
             <span className="text-gradient-warm">Community</span> Says
           </h2>
+          <p className="mt-4 text-lg text-gray-600">
+            Loved by hundreds of happy customers across Sri Lanka
+          </p>
+        </motion.div>
+
+        {/* Stats Row */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+          className="mt-10 flex flex-wrap justify-center gap-8 md:gap-12"
+        >
+          {stats.map((stat) => (
+            <div key={stat.label} className="flex items-center gap-3">
+              <div className={`flex h-12 w-12 items-center justify-center rounded-xl ${stat.bg}`}>
+                <stat.icon className={`h-6 w-6 ${stat.color}`} />
+              </div>
+              <div>
+                <div className="font-heading text-2xl font-extrabold text-dark-green">{stat.value}</div>
+                <div className="text-xs font-semibold text-gray-500">{stat.label}</div>
+              </div>
+            </div>
+          ))}
         </motion.div>
 
         <motion.div

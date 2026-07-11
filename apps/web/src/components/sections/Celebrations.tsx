@@ -122,14 +122,20 @@ export function Celebrations() {
               </div>
             </div>
             <div className="hidden md:block">
-              <div className="relative aspect-square rounded-3xl bg-gradient-to-br from-pink/20 via-orange/10 to-primary/10">
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="text-center">
-                    <div className="text-8xl">🎂</div>
-                    <div className="mt-4 font-heading text-3xl font-extrabold text-dark-green">
-                      Celebrate at Juice Vibe
-                    </div>
+              <div className="relative aspect-square rounded-3xl overflow-hidden bg-gradient-to-br from-pink/20 via-orange/10 to-primary/10">
+                <img
+                  src="/images/Celibrations/C1.png"
+                  alt="Celebration at Juice Vibe"
+                  className="absolute inset-0 w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
+                <div className="absolute bottom-0 left-0 right-0 p-8">
+                  <div className="font-heading text-2xl font-extrabold text-white drop-shadow-lg">
+                    Celebrate at Juice Vibe
                   </div>
+                  <p className="mt-2 text-sm text-white/80 font-medium">
+                    Making your special moments unforgettable
+                  </p>
                 </div>
               </div>
             </div>

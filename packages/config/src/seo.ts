@@ -69,7 +69,6 @@ export function restaurantJsonLd() {
       { "@type": "OpeningHoursSpecification", dayOfWeek: "Saturday", opens: "09:00", closes: "23:00" },
       { "@type": "OpeningHoursSpecification", dayOfWeek: "Sunday", opens: "10:00", closes: "21:00" },
     ],
-    servesCuisine: "Juice",
     priceRange: "$$",
   };
 }

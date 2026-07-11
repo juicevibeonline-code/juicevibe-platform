@@ -38,10 +38,10 @@ const values = [
 ];
 
 const team = [
-  { name: "Arjun Mehta", role: "Founder & Head Mixologist", initial: "AM" },
-  { name: "Sofia D'Souza", role: "Head Chef", initial: "SD" },
-  { name: "Vikram Raj", role: "Operations Manager", initial: "VR" },
-  { name: "Maya Krishnan", role: "Creative Director", initial: "MK" },
+  { name: "Kavinda Perera", role: "Founder & Head Mixologist", initial: "KP" },
+  { name: "Tharushi Fernando", role: "Head Chef", initial: "TF" },
+  { name: "Nipun Wickramasinghe", role: "Operations Manager", initial: "NW" },
+  { name: "Amasha de Silva", role: "Creative Director", initial: "AD" },
 ];
 
 export default function AboutPage() {
@@ -78,8 +78,8 @@ export default function AboutPage() {
               >
                 <div className="relative">
                   <Image
-                    src="/images/sampleui.jpeg"
-                    alt="Juice Vibe Store"
+                    src="/images/Opening/Opening.png"
+                    alt="Juice Vibe Grand Opening"
                     width={600}
                     height={450}
                     className="aspect-[4/3] rounded-3xl object-cover"
@@ -106,7 +106,7 @@ export default function AboutPage() {
                 <div className="space-y-4 text-gray-600 leading-relaxed">
                   <p>
                     Juice Vibe was born from a simple belief: that what you drink should
-                    make you feel amazing. Our founder, Arjun Mehta, traveled across
+                    make you feel amazing. Our founder, Kavinda Perera, traveled across
                     tropical regions discovering flavor combinations that would
                     redefine the juice bar experience.
                   </p>
@@ -124,6 +124,29 @@ export default function AboutPage() {
                 </div>
               </motion.div>
             </div>
+          </div>
+        </section>
+
+        <section className="relative overflow-hidden bg-gradient-to-br from-primary via-primary-dark to-dark-green py-20">
+          <div className="absolute inset-0 bg-[url('/images/Opening/Opening.png')] bg-cover bg-center opacity-15" />
+          <div className="container relative text-center">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+            >
+              <span className="inline-block rounded-full bg-white/20 px-5 py-2 text-sm font-bold text-white backdrop-blur-sm">
+                Grand Opening
+              </span>
+              <h2 className="mt-6 font-heading text-3xl font-extrabold text-white md:text-5xl">
+                We&apos;re Officially Open!
+              </h2>
+              <p className="mx-auto mt-5 max-w-2xl text-lg text-white/85 leading-relaxed">
+                From a dream to reality, our doors are officially open and the journey has begun.
+                Thank you for celebrating this special moment with us and being part of our grand opening.
+              </p>
+            </motion.div>
           </div>
         </section>
 

@@ -22,6 +22,11 @@ export const authService = {
     return data.data;
   },
 
+  async getCustomers(): Promise<any[]> {
+    const { data } = await apiClient.get("/auth/customers");
+    return data.data;
+  },
+
   async logout(): Promise<void> {
     await apiClient.post("/auth/logout");
   },

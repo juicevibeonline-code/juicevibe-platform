@@ -37,10 +37,10 @@ const features = [
 ];
 
 const stats = [
-  { end: 50, suffix: "+", label: "Menu Items" },
-  { end: 1000, suffix: "+", label: "Happy Customers" },
+  { end: 40, suffix: "+", label: "Menu Items" },
+  { end: 200, suffix: "+", label: "Happy Customers" },
   { end: 4, suffix: ".9★", label: "Rating" },
-  { end: 3, suffix: "+", label: "Locations" },
+  { end: 1, suffix: "", label: "Location" },
 ];
 
 export function FeaturedSection() {

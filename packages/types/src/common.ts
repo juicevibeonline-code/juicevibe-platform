@@ -1,5 +1,5 @@
 export type Status = "active" | "inactive" | "archived";
-export type Availability = "in-stock" | "out-of-stock" | "coming-soon";
+export type Availability = "in_stock" | "out_of_stock" | "coming_soon";
 export type Currency = "LKR" | "USD";
 export type OrderStatus = "pending" | "confirmed" | "preparing" | "ready" | "completed" | "cancelled";
 export type PaymentStatus = "pending" | "paid" | "refunded" | "failed";

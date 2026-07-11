@@ -10,6 +10,7 @@ import { TestimonialsModule } from "./testimonials/testimonials.module";
 import { BlogModule } from "./blog/blog.module";
 import { CouponModule } from "./coupon/coupon.module";
 import { AnalyticsModule } from "./analytics/analytics.module";
+import { SettingsModule } from "./settings/settings.module";
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { AnalyticsModule } from "./analytics/analytics.module";
     BlogModule,
     CouponModule,
     AnalyticsModule,
+    SettingsModule,
   ],
   providers: [
     { provide: APP_GUARD, useClass: ThrottlerGuard },
