@@ -1,0 +1,265 @@
+"use client";
+
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { settingsService } from "@juice-vibe/services";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { 
+  Settings, 
+  Save, 
+  RotateCw, 
+  Sliders, 
+  MapPin, 
+  Clock, 
+  CreditCard,
+  ShieldCheck
+} from "lucide-react";
+import React, { useEffect, useState } from "react";
+import { Badge } from "@juice-vibe/ui";
+
+const settingsFormSchema = z.object({
+  business_name: z.string().min(2, "Business name required"),
+  business_tagline: z.string().optional(),
+  business_phone: z.string().min(6, "Phone format invalid"),
+  business_email: z.string().email("Email format invalid"),
+  business_address: z.string().min(5, "Address description too short"),
+  opening_hours_weekdays: z.string().optional(),
+  tax_rate: z.number().min(0, "Tax rate cannot be negative"),
+  delivery_fee: z.number().min(0, "Delivery fee cannot be negative"),
+  free_delivery_min: z.number().min(0, "Free delivery target cannot be negative"),
+});
+
+type SettingsFormSchema = z.infer<typeof settingsFormSchema>;
+
+export default function SystemSettings() {
+  const [successMsg, setSuccessMsg] = useState<string | null>(null);
+
+  // Fetch Settings
+  const { data: settings = {}, isLoading, refetch } = useQuery<Record<string, string>>({
+    queryKey: ["systemSettings"],
+    queryFn: () => settingsService.getSettings(),
+    retry: 1,
+  });
+
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<SettingsFormSchema>({
+    resolver: zodResolver(settingsFormSchema),
+    defaultValues: {
+      business_name: "Juice Vibe",
+      business_tagline: "Sip the Good Vibes",
+      business_phone: "+94718435876",
+      business_email: "hello@juicevibe.com",
+      business_address: "Galle Road, Bentota, Sri Lanka",
+      opening_hours_weekdays: "8:00 AM - 10:00 PM",
+      tax_rate: 5,
+      delivery_fee: 150,
+      free_delivery_min: 1000,
+    },
+  });
+
+  // Load backend values into form once fetched
+  useEffect(() => {
+    if (Object.keys(settings).length > 0) {
+      reset({
+        business_name: settings.business_name || "Juice Vibe",
+        business_tagline: settings.business_tagline || "Sip the Good Vibes",
+        business_phone: settings.business_phone || "+94718435876",
+        business_email: settings.business_email || "hello@juicevibe.com",
+        business_address: settings.business_address || "Galle Road, Bentota, Sri Lanka",
+        opening_hours_weekdays: settings.opening_hours_weekdays || "8:00 AM - 10:00 PM",
+        tax_rate: Number(settings.tax_rate || 5),
+        delivery_fee: Number(settings.delivery_fee || 150),
+        free_delivery_min: Number(settings.free_delivery_min || 1000),
+      });
+    }
+  }, [settings, reset]);
+
+  // Update Settings mutation
+  const updateSettingsMutation = useMutation({
+    mutationFn: (input: Record<string, string>) => settingsService.updateSettings(input),
+    onSuccess: () => {
+      setSuccessMsg("Settings updated successfully in global DB parameters.");
+      refetch();
+      setTimeout(() => setSuccessMsg(null), 3000);
+    },
+  });
+
+  const onSubmit = (data: SettingsFormSchema) => {
+    // Convert to Record<string, string> expected by service layer
+    const values: Record<string, string> = {
+      business_name: data.business_name,
+      business_tagline: data.business_tagline || "",
+      business_phone: data.business_phone,
+      business_email: data.business_email,
+      business_address: data.business_address,
+      opening_hours_weekdays: data.opening_hours_weekdays || "",
+      tax_rate: String(data.tax_rate),
+      delivery_fee: String(data.delivery_fee),
+      free_delivery_min: String(data.free_delivery_min),
+    };
+    updateSettingsMutation.mutate(values);
+  };
+
+  return (
+    <div className="space-y-6">
+      {/* Header controls */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-border pb-4">
+        <div>
+          <h1 className="text-xl font-bold tracking-tight text-foreground font-heading">
+            System Settings
+          </h1>
+          <p className="text-xs text-muted-foreground font-mono mt-1">
+            GLOBAL DB VARIABLES OVERRIDES & API CONSTANTS CONFIG
+          </p>
+        </div>
+      </div>
+
+      {isLoading ? (
+        <div className="text-center py-20 font-mono text-xs text-muted-foreground uppercase">
+          Fetching system config indices parameters...
+        </div>
+      ) : (
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 max-w-4xl">
+          {successMsg && (
+            <div className="flex items-center gap-2 rounded-lg border border-primary/30 bg-primary/10 p-3 text-xs text-primary font-mono">
+              <ShieldCheck className="h-4 w-4 shrink-0" />
+              <span>{successMsg}</span>
+            </div>
+          )}
+
+          {/* Section 1: Business Profile details */}
+          <div className="terminal-card bg-card border border-border p-6 space-y-4">
+            <h2 className="text-xs font-bold text-foreground uppercase tracking-widest font-mono flex items-center gap-2">
+              <Sliders className="h-4 w-4 text-primary" />
+              <span>Business Profile Parameters</span>
+            </h2>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-1">
+                <label className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">Store Name</label>
+                <input
+                  type="text"
+                  className="w-full bg-ink-dark border border-border text-foreground font-mono text-xs px-3 py-2 rounded-lg focus:outline-none focus:border-primary/50"
+                  {...register("business_name")}
+                />
+                {errors.business_name && <p className="text-[10px] font-mono text-pink">{errors.business_name.message}</p>}
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">Tagline Accent</label>
+                <input
+                  type="text"
+                  className="w-full bg-ink-dark border border-border text-foreground font-mono text-xs px-3 py-2 rounded-lg focus:outline-none focus:border-primary/50"
+                  {...register("business_tagline")}
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">Public Phone ID</label>
+                <input
+                  type="text"
+                  className="w-full bg-ink-dark border border-border text-foreground font-mono text-xs px-3 py-2 rounded-lg focus:outline-none focus:border-primary/50 font-numeral"
+                  {...register("business_phone")}
+                />
+                {errors.business_phone && <p className="text-[10px] font-mono text-pink">{errors.business_phone.message}</p>}
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">Operations Contact Email</label>
+                <input
+                  type="email"
+                  className="w-full bg-ink-dark border border-border text-foreground font-mono text-xs px-3 py-2 rounded-lg focus:outline-none focus:border-primary/50"
+                  {...register("business_email")}
+                />
+                {errors.business_email && <p className="text-[10px] font-mono text-pink">{errors.business_email.message}</p>}
+              </div>
+            </div>
+
+            <div className="space-y-1">
+              <label className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">Physical Address Location</label>
+              <input
+                type="text"
+                className="w-full bg-ink-dark border border-border text-foreground font-mono text-xs px-3 py-2 rounded-lg focus:outline-none focus:border-primary/50"
+                {...register("business_address")}
+              />
+              {errors.business_address && <p className="text-[10px] font-mono text-pink">{errors.business_address.message}</p>}
+            </div>
+          </div>
+
+          {/* Section 2: Fiscal parameters */}
+          <div className="terminal-card bg-card border border-border p-6 space-y-4">
+            <h2 className="text-xs font-bold text-foreground uppercase tracking-widest font-mono flex items-center gap-2">
+              <CreditCard className="h-4 w-4 text-primary" />
+              <span>Fiscal & Delivery parameters</span>
+            </h2>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 font-mono text-xs">
+              <div className="space-y-1">
+                <label className="text-[10px] uppercase tracking-wider text-muted-foreground">General Tax Rate (%)</label>
+                <input
+                  type="number"
+                  className="w-full bg-ink-dark border border-border text-foreground px-3 py-2 rounded-lg focus:outline-none focus:border-primary/50 font-numeral"
+                  {...register("tax_rate", { valueAsNumber: true })}
+                />
+                {errors.tax_rate && <p className="text-[10px] text-pink">{errors.tax_rate.message}</p>}
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-[10px] uppercase tracking-wider text-muted-foreground">Flat Delivery Fee (LKR)</label>
+                <input
+                  type="number"
+                  className="w-full bg-ink-dark border border-border text-foreground px-3 py-2 rounded-lg focus:outline-none focus:border-primary/50 font-numeral"
+                  {...register("delivery_fee", { valueAsNumber: true })}
+                />
+                {errors.delivery_fee && <p className="text-[10px] text-pink">{errors.delivery_fee.message}</p>}
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-[10px] uppercase tracking-wider text-muted-foreground">Free Delivery Minimum (LKR)</label>
+                <input
+                  type="number"
+                  className="w-full bg-ink-dark border border-border text-foreground px-3 py-2 rounded-lg focus:outline-none focus:border-primary/50 font-numeral"
+                  {...register("free_delivery_min", { valueAsNumber: true })}
+                />
+                {errors.free_delivery_min && <p className="text-[10px] text-pink">{errors.free_delivery_min.message}</p>}
+              </div>
+            </div>
+          </div>
+
+          {/* Section 3: Operational bounds */}
+          <div className="terminal-card bg-card border border-border p-6 space-y-4">
+            <h2 className="text-xs font-bold text-foreground uppercase tracking-widest font-mono flex items-center gap-2">
+              <Clock className="h-4 w-4 text-primary" />
+              <span>Operational Hours Shift bounds</span>
+            </h2>
+
+            <div className="space-y-1">
+              <label className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">Standard Weekdays Hours</label>
+              <input
+                type="text"
+                className="w-full bg-ink-dark border border-border text-foreground font-mono text-xs px-3 py-2 rounded-lg focus:outline-none focus:border-primary/50"
+                {...register("opening_hours_weekdays")}
+              />
+            </div>
+          </div>
+
+          <div className="flex items-center justify-end">
+            <button
+              type="submit"
+              disabled={updateSettingsMutation.isPending}
+              className="inline-flex items-center gap-2 px-4 py-2 bg-primary hover:bg-primary-dark text-ink-dark text-xs font-mono font-bold rounded-lg uppercase tracking-wider cursor-pointer"
+            >
+              <Save className="h-4 w-4" />
+              <span>{updateSettingsMutation.isPending ? "Updating DB..." : "Commit Variables"}</span>
+            </button>
+          </div>
+        </form>
+      )}
+    </div>
+  );
+}
