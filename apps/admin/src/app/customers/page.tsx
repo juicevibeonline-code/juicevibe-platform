@@ -93,14 +93,27 @@ export default function CustomersPage() {
       key: "name",
       label: "Customer",
       sortable: true,
-      render: (item: Customer) => (
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-            <span className="text-sm font-bold text-primary">{item.name[0]}</span>
+      render: (item: Customer) => {
+        const colors = [
+          { bg: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400" },
+          { bg: "bg-blue-500/10 text-blue-600 dark:text-blue-400" },
+          { bg: "bg-pink-500/10 text-pink-600 dark:text-pink-400" },
+          { bg: "bg-amber-500/10 text-amber-600 dark:text-amber-400" },
+          { bg: "bg-rose-500/10 text-rose-600 dark:text-rose-400" },
+          { bg: "bg-indigo-500/10 text-indigo-600 dark:text-indigo-400" },
+        ];
+        const firstLetter = (item.name[0] || "A").toUpperCase();
+        const code = firstLetter.charCodeAt(0);
+        const style = colors[code % colors.length] || colors[0];
+        return (
+          <div className="flex items-center gap-3">
+            <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 font-bold text-xs ${style.bg}`}>
+              {firstLetter}
+            </div>
+            <span className="font-bold text-foreground text-xs">{item.name}</span>
           </div>
-          <span className="font-medium text-foreground text-sm">{item.name}</span>
-        </div>
-      ),
+        );
+      },
     },
     {
       key: "email",
@@ -108,12 +121,12 @@ export default function CustomersPage() {
       sortable: true,
       render: (item: Customer) => (
         <div className="space-y-0.5">
-          <div className="flex items-center gap-1.5 text-xs text-foreground">
+          <div className="flex items-center gap-1.5 text-xs text-foreground font-semibold">
             <Mail className="w-3 h-3 text-muted shrink-0" />
             {item.email}
           </div>
           {item.phone && (
-            <div className="flex items-center gap-1.5 text-xs text-muted">
+            <div className="flex items-center gap-1.5 text-[11px] text-muted">
               <Phone className="w-3 h-3 shrink-0" />
               {item.phone}
             </div>
@@ -126,7 +139,7 @@ export default function CustomersPage() {
       label: "Orders",
       sortable: true,
       render: (item: Customer) => (
-        <div className="flex items-center gap-1.5 text-sm font-medium">
+        <div className="flex items-center gap-1.5 text-xs font-semibold">
           <ShoppingBag className="w-3.5 h-3.5 text-muted" />
           {item.orderCount ?? 0}
         </div>
@@ -137,7 +150,7 @@ export default function CustomersPage() {
       label: "Total Spent",
       sortable: true,
       render: (item: Customer) => (
-        <span className="text-sm font-semibold text-foreground">
+        <span className="text-xs font-bold text-primary">
           LKR {(item.totalSpent ?? 0).toLocaleString()}
         </span>
       ),

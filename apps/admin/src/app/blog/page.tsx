@@ -7,6 +7,7 @@ import { PageHeader } from "@/components/PageHeader";
 import { Modal } from "@/components/ui/Modal";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
+import { ActionMenu } from "@/components/ui";
 import { blogService } from "@juice-vibe/services";
 import { useToast } from "@/hooks/useToast";
 import type { BlogPost } from "@juice-vibe/types";
@@ -158,22 +159,31 @@ export default function BlogPage() {
     },
     {
       key: "actions",
-      label: "Actions",
-      render: (item: BlogPost) => (
-        <div className="flex items-center gap-1">
-          {!item.isPublished && (
-            <button 
-              onClick={() => handlePublish(item.id)}
-              className="p-1 rounded hover:bg-emerald-50 dark:hover:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 cursor-pointer"
-              title="Publish Post"
-            >
-              <CheckCircle className="w-4 h-4" />
-            </button>
-          )}
-          <button onClick={() => handleEditPostClick(item)} className="p-1 rounded hover:bg-blue-50 dark:hover:bg-blue-500/10 text-blue-600 dark:text-blue-400 cursor-pointer" title="Edit"><Edit className="w-4 h-4" /></button>
-          <button onClick={() => handleDelete(item.id)} className="p-1 rounded hover:bg-rose-50 dark:hover:bg-rose-500/10 text-rose-600 dark:text-rose-400 cursor-pointer" title="Delete"><Trash2 className="w-4 h-4" /></button>
-        </div>
-      ),
+      label: "",
+      render: (item: BlogPost) => {
+        const actions = [];
+        if (!item.isPublished) {
+          actions.push({
+            label: "Publish Post",
+            onClick: () => handlePublish(item.id),
+            icon: <CheckCircle className="w-3.5 h-3.5 text-emerald-600" />,
+          });
+        }
+        actions.push(
+          {
+            label: "Edit Post",
+            onClick: () => handleEditPostClick(item),
+            icon: <Edit className="w-3.5 h-3.5 text-blue-600" />,
+          },
+          {
+            label: "Delete Post",
+            onClick: () => handleDelete(item.id),
+            icon: <Trash2 className="w-3.5 h-3.5 text-rose-600" />,
+            destructive: true,
+          }
+        );
+        return <ActionMenu items={actions} />;
+      },
     },
   ];
 
@@ -205,24 +215,31 @@ export default function BlogPage() {
     <div className="space-y-6 max-w-7xl mx-auto px-4 pb-12">
       <PageHeader title="Blog Management" subtitle="Manage blog posts and articles" accentColor="yellow" action={newPostBtn} />
 
-      {/* Filter tabs with count badges */}
-      <div className="flex gap-1.5 flex-wrap">
-        {filterOptions.map((f) => (
-          <button
-            key={f}
-            onClick={() => setFilter(f)}
-            className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-bold capitalize border transition-colors cursor-pointer ${
-              filter === f
-                ? "bg-background border-border text-primary"
-                : "bg-card hover:bg-background text-muted hover:text-foreground border-border"
-            }`}
-          >
-            {f}
-            <span className={`text-[10px] px-1.5 py-0.5 rounded font-bold ${filter === f ? "bg-primary/10 text-primary-dark" : "bg-background text-muted"}`}>
-              {countFor(f)}
-            </span>
-          </button>
-        ))}
+      {/* Filter tabs with count badges Control Bar */}
+      <div className="bg-card border border-border/80 p-1.5 rounded-xl flex items-center gap-1 overflow-x-auto custom-scrollbar max-w-full shrink-0 shadow-sm">
+        {filterOptions.map((f) => {
+          const isActive = filter === f;
+          return (
+            <button
+              key={f}
+              onClick={() => setFilter(f)}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold capitalize transition-all cursor-pointer whitespace-nowrap ${
+                isActive
+                  ? "bg-primary text-white shadow-sm"
+                  : "text-muted hover:text-foreground hover:bg-background/50"
+              }`}
+            >
+              {f}
+              <span className={`text-[9px] px-1.5 py-0.5 rounded-md font-extrabold ${
+                isActive 
+                  ? "bg-white/20 text-white" 
+                  : "bg-muted/15 text-muted-foreground"
+              }`}>
+                {countFor(f)}
+              </span>
+            </button>
+          );
+        })}
       </div>
 
       {error && (

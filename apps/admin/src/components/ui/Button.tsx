@@ -13,22 +13,22 @@ export interface ButtonProps extends Omit<HTMLMotionProps<"button">, "ref" | "ch
 
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant = "primary", size = "md", isLoading, children, disabled, ...props }, ref) => {
-    const baseStyles = "relative inline-flex items-center justify-center font-bold transition-colors focus:outline-none disabled:opacity-50 disabled:pointer-events-none overflow-hidden";
+    const baseStyles = "relative inline-flex items-center justify-center font-bold tracking-wide transition-colors focus:outline-none disabled:opacity-50 disabled:pointer-events-none overflow-hidden cursor-pointer";
     
     const variants = {
-      primary: "bg-primary text-primary-foreground hover:bg-primary-dark shadow-[0_4px_15px_rgba(34,197,94,0.3)]",
-      secondary: "bg-gray-100 text-gray-900 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-100 dark:hover:bg-gray-700",
-      outline: "border-2 border-border bg-transparent text-foreground hover:bg-muted",
-      ghost: "bg-transparent text-foreground hover:bg-muted",
-      danger: "bg-pink text-white hover:bg-[#BE123C] shadow-[0_4px_15px_rgba(244,63,94,0.3)]",
+      primary: "bg-primary text-primary-foreground hover:bg-primary-dark shadow-sm shadow-primary/10",
+      secondary: "bg-slate-100 text-slate-900 hover:bg-slate-200 dark:bg-zinc-800 dark:text-zinc-100 dark:hover:bg-zinc-700 border border-border/40",
+      outline: "border border-border/80 bg-transparent text-foreground hover:bg-slate-50 dark:hover:bg-zinc-900",
+      ghost: "bg-transparent text-foreground hover:bg-slate-100 dark:hover:bg-zinc-800",
+      danger: "bg-rose-600 text-white hover:bg-rose-700 shadow-sm shadow-rose-500/10",
       glass: "glass-panel text-foreground hover:bg-white/80 dark:hover:bg-white/10",
     };
 
     const sizes = {
-      sm: "h-9 px-4 text-xs rounded-lg",
-      md: "h-11 px-6 text-sm rounded-xl",
-      lg: "h-14 px-8 text-base rounded-2xl",
-      icon: "h-11 w-11 rounded-xl",
+      sm: "h-8 px-3.5 text-[10px] rounded-lg",
+      md: "h-10 px-4 text-xs rounded-lg",
+      lg: "h-12 px-6 text-sm rounded-xl",
+      icon: "h-10 w-10 rounded-lg",
     };
 
     return (

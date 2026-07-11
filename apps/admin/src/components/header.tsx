@@ -63,7 +63,7 @@ export function Header({ onMobileMenuClick }: HeaderProps) {
   return (
     <header className="sticky top-0 z-40 bg-background/80 backdrop-blur-xl border-b border-border w-full transition-colors mb-6">
       <div className="flex items-center justify-between h-16 px-4 md:px-8">
-        <div className="flex items-center gap-3 w-full max-w-md">
+        <div className="flex items-center gap-3">
           {/* Mobile Menu Toggle */}
           <button
             onClick={onMobileMenuClick}
@@ -74,19 +74,20 @@ export function Header({ onMobileMenuClick }: HeaderProps) {
           </button>
 
           {/* Page Breadcrumb */}
-          <span className="hidden md:flex items-center gap-2 font-data text-xs tracking-wider uppercase text-muted shrink-0">
+          <span className="hidden md:flex items-center gap-2 font-data text-xs font-black tracking-widest uppercase text-muted shrink-0">
             {currentPage}
-            <span className="text-border">/</span>
           </span>
-
-          {/* Search / Command Palette */}
-          <div className="relative w-full group">
-            <CommandPalette />
-          </div>
         </div>
 
         {/* Actions */}
-        <div className="flex items-center gap-3 ml-3">
+        <div className="flex items-center gap-3.5 ml-3">
+          {/* Search / Command Palette */}
+          <div className="relative w-48 sm:w-56 group shrink-0">
+            <CommandPalette />
+          </div>
+
+          <span className="h-4 w-[1px] bg-border hidden sm:block" />
+
           {/* Theme Toggle */}
           <button
             onClick={() => setTheme(theme === "dark" ? "light" : "dark")}

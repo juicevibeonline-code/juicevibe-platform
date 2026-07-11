@@ -5,6 +5,7 @@ import { Mail, MailOpen, Trash2, MessageSquare, Reply, AlertCircle } from "lucid
 import { Table } from "@/components/table";
 import { PageHeader } from "@/components/PageHeader";
 import { Drawer } from "@/components/ui/drawer";
+import { ActionMenu } from "@/components/ui";
 import { contactService, type ContactMessage } from "@juice-vibe/services";
 import { useToast } from "@/hooks/useToast";
 
@@ -97,19 +98,22 @@ export default function MessagesPage() {
 
   // 2. Sort
   const sorted = [...filtered].sort((a, b) => {
-    let fieldA = a[sortField as keyof ContactMessage];
-    let fieldB = b[sortField as keyof ContactMessage];
+    const valA = a[sortField as keyof ContactMessage];
+    const valB = b[sortField as keyof ContactMessage];
 
-    if (fieldA === undefined) fieldA = "";
-    if (fieldB === undefined) fieldB = "";
+    if (valA === undefined || valB === undefined) return 0;
 
-    if (typeof fieldA === "boolean") {
-      fieldA = fieldA ? 1 : 0;
-      fieldB = fieldB ? 1 : 0;
+    if (typeof valA === "boolean" && typeof valB === "boolean") {
+      const numA = valA ? 1 : 0;
+      const numB = valB ? 1 : 0;
+      return sortDirection === "asc" ? numA - numB : numB - numA;
     }
 
-    if (fieldA < fieldB) return sortDirection === "asc" ? -1 : 1;
-    if (fieldA > fieldB) return sortDirection === "asc" ? 1 : -1;
+    if (typeof valA === "string" && typeof valB === "string") {
+      const comp = valA.localeCompare(valB);
+      return sortDirection === "asc" ? comp : -comp;
+    }
+
     return 0;
   });
 
@@ -145,13 +149,8 @@ export default function MessagesPage() {
       label: "Status",
       sortable: true,
       render: (item: ContactMessage) => (
-        <span className={`inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded border ${
-          !item.isRead
-            ? "bg-primary/10 text-primary border-primary/20"
-            : "bg-background text-muted border-border"
-        }`}>
-          {!item.isRead ? <Mail className="w-3 h-3" /> : <MailOpen className="w-3 h-3" />}
-          {!item.isRead ? "Unread" : "Read"}
+        <span className="font-bold text-xs uppercase tracking-wider whitespace-nowrap">
+          {!item.isRead ? "🟡 Unread" : "🟢 Read"}
         </span>
       ),
     },
@@ -166,24 +165,22 @@ export default function MessagesPage() {
     {
       key: "actions",
       label: "",
-      render: (item: ContactMessage) => (
-        <div className="flex items-center gap-1">
-          <button
-            onClick={() => handleMarkRead(item)}
-            className="p-1.5 rounded hover:bg-primary/10 text-primary transition-colors cursor-pointer"
-            title="View Message"
-          >
-            <MessageSquare className="w-4 h-4" />
-          </button>
-          <button
-            onClick={() => handleDelete(item.id)}
-            className="p-1.5 rounded hover:bg-rose-50 dark:hover:bg-rose-500/10 text-rose-600 transition-colors cursor-pointer"
-            title="Delete"
-          >
-            <Trash2 className="w-4 h-4" />
-          </button>
-        </div>
-      ),
+      render: (item: ContactMessage) => {
+        const actions = [
+          {
+            label: "View Message",
+            onClick: () => handleMarkRead(item),
+            icon: <MessageSquare className="w-3.5 h-3.5 text-primary" />,
+          },
+          {
+            label: "Delete Message",
+            onClick: () => handleDelete(item.id),
+            icon: <Trash2 className="w-3.5 h-3.5 text-rose-600" />,
+            destructive: true,
+          },
+        ];
+        return <ActionMenu items={actions} />;
+      },
     },
   ];
 

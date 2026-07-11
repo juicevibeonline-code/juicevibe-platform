@@ -7,6 +7,7 @@ import { Table } from "@/components/table";
 import { KanbanBoard } from "@/components/kanban-board";
 import { Drawer } from "@/components/ui/drawer";
 import { PageHeader } from "@/components/PageHeader";
+import { ActionMenu } from "@/components/ui";
 import { orderService } from "@juice-vibe/services";
 import type { Order, OrderItem, OrderStatus } from "@juice-vibe/types";
 
@@ -115,14 +116,21 @@ export default function OrdersPage() {
     {
       key: "status",
       label: "Status",
-      render: (item: Order) => (
-        <span className={`inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded capitalize ${statusColors[item.status]}`}>
-          {item.status === "pending" && <Clock className="w-3 h-3" />}
-          {item.status === "completed" && <CheckCircle className="w-3 h-3" />}
-          {item.status === "cancelled" && <XCircle className="w-3 h-3" />}
-          {item.status}
-        </span>
-      ),
+      render: (item: Order) => {
+        const statusLabels: Record<string, string> = {
+          completed: "🟢 Completed",
+          pending: "🟡 Pending",
+          preparing: "🟠 Preparing",
+          confirmed: "🔵 Confirmed",
+          ready: "🟣 Ready",
+          cancelled: "🔴 Cancelled",
+        };
+        return (
+          <span className="font-bold text-xs uppercase tracking-wider whitespace-nowrap">
+            {statusLabels[item.status] || item.status}
+          </span>
+        );
+      },
     },
     { 
       key: "paymentStatus", 
@@ -143,15 +151,17 @@ export default function OrdersPage() {
     },
     {
       key: "actions",
-      label: "Actions",
-      render: (item: Order) => (
-        <button
-          onClick={() => setSelectedOrder(item)}
-          className="p-1 rounded hover:bg-background transition-colors text-muted hover:text-primary cursor-pointer"
-        >
-          <Eye className="w-4 h-4" />
-        </button>
-      ),
+      label: "",
+      render: (item: Order) => {
+        const actions = [
+          {
+            label: "View Details",
+            onClick: () => setSelectedOrder(item),
+            icon: <Eye className="w-3.5 h-3.5 text-primary" />,
+          },
+        ];
+        return <ActionMenu items={actions} />;
+      },
     },
   ];
 
@@ -294,8 +304,18 @@ export default function OrdersPage() {
               <h3 className="text-[10px] font-bold text-muted mb-3 uppercase tracking-wider">Order Info</h3>
               <div className="flex items-center justify-between mb-2">
                 <span className="text-muted">Status</span>
-                <span className={`inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded capitalize ${statusColors[selectedOrder.status]}`}>
-                  {selectedOrder.status}
+                <span className="font-bold text-xs uppercase tracking-wider">
+                  {(() => {
+                    const statusLabels: Record<string, string> = {
+                      completed: "🟢 Completed",
+                      pending: "🟡 Pending",
+                      preparing: "🟠 Preparing",
+                      confirmed: "🔵 Confirmed",
+                      ready: "🟣 Ready",
+                      cancelled: "🔴 Cancelled",
+                    };
+                    return statusLabels[selectedOrder.status] || selectedOrder.status;
+                  })()}
                 </span>
               </div>
               <div className="flex items-center justify-between mb-2">

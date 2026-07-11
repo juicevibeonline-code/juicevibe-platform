@@ -18,11 +18,11 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
     const hasValue = props.value !== undefined && props.value !== "";
 
     return (
-      <div className="relative w-full flex flex-col gap-1">
+      <div className="relative w-full flex flex-col gap-1.5">
         {label && (
           <label 
             htmlFor={inputId}
-            className="text-sm font-bold text-gray-700 dark:text-gray-300 ml-1"
+            className="text-[10px] font-extrabold uppercase tracking-wider text-muted ml-0.5"
           >
             {label}
           </label>
@@ -33,11 +33,11 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
             type={type}
             ref={ref}
             className={cn(
-              "flex h-12 w-full rounded-xl border border-transparent bg-white/60 dark:bg-white/5 px-4 py-2 text-sm text-foreground shadow-sm transition-all duration-300",
-              "focus:outline-none focus:bg-white dark:focus:bg-black/40 focus:border-primary/50 focus:shadow-[0_0_15px_rgba(34,197,94,0.15)]",
+              "flex h-10 w-full rounded-lg border border-border/80 bg-slate-50/50 dark:bg-zinc-900/30 px-3.5 py-2 text-xs text-foreground shadow-sm transition-all duration-200",
+              "focus:outline-none focus:bg-background focus:border-primary focus:ring-1 focus:ring-primary/20",
               "placeholder:text-muted disabled:cursor-not-allowed disabled:opacity-50",
-              error && "border-pink/50 focus:border-pink focus:shadow-[0_0_15px_rgba(244,63,94,0.15)] bg-pink/5",
-              success && "border-primary/50 bg-primary/5",
+              error && "border-rose-500 focus:border-rose-500 focus:ring-rose-500/20 bg-rose-500/5",
+              success && "border-emerald-500 focus:border-emerald-500 bg-emerald-500/5",
               className
             )}
             {...props}

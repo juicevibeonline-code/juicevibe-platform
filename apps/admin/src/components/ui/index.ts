@@ -5,3 +5,4 @@ export { Badge } from "./Badge";
 export { Avatar } from "./Avatar";
 export { Modal } from "./Modal";
 export { ConfirmDialog } from "./ConfirmDialog";
+export { ActionMenu } from "./action-menu";

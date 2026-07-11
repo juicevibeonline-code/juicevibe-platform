@@ -7,6 +7,7 @@ import { Modal } from "@/components/ui/Modal";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 import { PageHeader } from "@/components/PageHeader";
+import { ActionMenu } from "@/components/ui";
 import { menuService } from "@juice-vibe/services";
 import { useToast } from "@/hooks/useToast";
 import type { MenuItem, MenuCategory } from "@juice-vibe/types";
@@ -198,24 +199,35 @@ export default function MenuPage() {
     },
     {
       key: "actions",
-      label: "Actions",
-      render: (item: MenuItem) => (
-        <div className="flex items-center gap-1">
-          {item.status === "archived" ? (
+      label: "",
+      render: (item: MenuItem) => {
+        if (item.status === "archived") {
+          return (
             <button
               onClick={() => handleRestore(item.id)}
               className="px-2.5 py-1 text-[10px] bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg cursor-pointer transition-colors shadow-sm"
             >
               Restore
             </button>
-          ) : (
-            <>
-              <button onClick={() => handleEditItemClick(item)} className="p-1 rounded hover:bg-blue-50 dark:hover:bg-blue-500/10 text-blue-600 dark:text-blue-400 cursor-pointer" title="Edit"><Edit className="w-4 h-4" /></button>
-              <button onClick={() => handleDeleteClick(item.id)} className="p-1 rounded hover:bg-rose-50 dark:hover:bg-rose-500/10 text-rose-600 dark:text-rose-400 cursor-pointer" title="Archive"><Trash2 className="w-4 h-4" /></button>
-            </>
-          )}
-        </div>
-      ),
+          );
+        }
+
+        const actions = [
+          {
+            label: "Edit Item",
+            onClick: () => handleEditItemClick(item),
+            icon: <Edit className="w-3.5 h-3.5 text-blue-600" />,
+          },
+          {
+            label: "Archive",
+            onClick: () => handleDeleteClick(item.id),
+            icon: <Trash2 className="w-3.5 h-3.5 text-rose-600" />,
+            destructive: true,
+          },
+        ];
+
+        return <ActionMenu items={actions} />;
+      },
     },
   ];
 

@@ -7,6 +7,7 @@ import { PageHeader } from "@/components/PageHeader";
 import { Modal } from "@/components/ui/Modal";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
+import { ActionMenu } from "@/components/ui";
 import { couponService } from "@juice-vibe/services";
 import { useToast } from "@/hooks/useToast";
 import type { Coupon } from "@juice-vibe/types";
@@ -110,10 +111,8 @@ export default function CouponsPage() {
         const isExpired = item.expiresAt && new Date(item.expiresAt) < new Date();
         const active = item.isActive && !isExpired;
         return (
-          <span className={`inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded capitalize ${
-            active ? "bg-emerald-50 text-emerald-700 border border-emerald-100 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20" : "bg-background text-muted border border-border dark:text-muted"
-          }`}>
-            {active ? "Active" : isExpired ? "Expired" : "Inactive"}
+          <span className="font-bold text-xs uppercase tracking-wider whitespace-nowrap">
+            {active ? "🟢 Active" : isExpired ? "🔴 Expired" : "⚪ Inactive"}
           </span>
         );
       },
@@ -127,16 +126,18 @@ export default function CouponsPage() {
     },
     {
       key: "actions",
-      label: "Actions",
-      render: (item: Coupon) => (
-        <button 
-          onClick={() => handleDelete(item.id)}
-          className="p-1 rounded hover:bg-rose-50 dark:hover:bg-rose-500/10 text-rose-600 dark:text-rose-400 transition-colors cursor-pointer"
-          title="Delete Coupon"
-        >
-          <Trash2 className="w-4 h-4" />
-        </button>
-      ),
+      label: "",
+      render: (item: Coupon) => {
+        const actions = [
+          {
+            label: "Delete Coupon",
+            onClick: () => handleDelete(item.id),
+            icon: <Trash2 className="w-3.5 h-3.5 text-rose-600" />,
+            destructive: true,
+          },
+        ];
+        return <ActionMenu items={actions} />;
+      },
     },
   ];
 

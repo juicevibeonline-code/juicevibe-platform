@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Star, Check, X } from "lucide-react";
 import { Table } from "@/components/table";
 import { PageHeader } from "@/components/PageHeader";
+import { ActionMenu } from "@/components/ui";
 import { testimonialService } from "@juice-vibe/services";
 import type { Testimonial } from "@juice-vibe/types";
 
@@ -88,38 +89,24 @@ export default function TestimonialsPage() {
     },
     {
       key: "actions",
-      label: "Actions",
-      render: (item: Testimonial) => (
-        <div className="flex items-center gap-1">
-          {!item.isApproved && (
-            <>
-              <button 
-                onClick={() => handleApprove(item.id)}
-                className="p-1 rounded hover:bg-emerald-50 dark:hover:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 cursor-pointer"
-                title="Approve"
-              >
-                <Check className="w-4 h-4" />
-              </button>
-              <button 
-                onClick={() => handleReject(item.id)}
-                className="p-1 rounded hover:bg-rose-50 dark:hover:bg-rose-500/10 text-rose-600 dark:text-rose-400 cursor-pointer"
-                title="Reject"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </>
-          )}
-          {item.isApproved && (
-            <button 
-              onClick={() => handleReject(item.id)}
-              className="p-1 rounded hover:bg-rose-50 dark:hover:bg-rose-500/10 text-rose-600 dark:text-rose-400 cursor-pointer"
-              title="Delete"
-            >
-              <X className="w-4 h-4" />
-            </button>
-          )}
-        </div>
-      ),
+      label: "",
+      render: (item: Testimonial) => {
+        const actions = [];
+        if (!item.isApproved) {
+          actions.push({
+            label: "Approve",
+            onClick: () => handleApprove(item.id),
+            icon: <Check className="w-3.5 h-3.5 text-emerald-600" />,
+          });
+        }
+        actions.push({
+          label: item.isApproved ? "Delete" : "Reject",
+          onClick: () => handleReject(item.id),
+          icon: <X className="w-3.5 h-3.5 text-rose-600" />,
+          destructive: true,
+        });
+        return <ActionMenu items={actions} />;
+      },
     },
   ];
 
@@ -146,26 +133,31 @@ export default function TestimonialsPage() {
         accentColor="orange"
       />
 
-      {/* Tabs list with count badges */}
-      <div className="flex gap-1.5 flex-wrap">
-        {tabs.map((tab) => (
-          <button
-            key={tab.id}
-            onClick={() => setActiveTab(tab.id)}
-            className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-bold transition-colors border cursor-pointer ${
-              activeTab === tab.id
-                ? "bg-background border-border text-primary"
-                : "bg-card hover:bg-background text-muted hover:text-foreground border-border"
-            }`}
-          >
-            {tab.label}
-            <span className={`text-[10px] px-1.5 py-0.5 rounded font-bold ${
-              activeTab === tab.id ? "bg-primary/10 text-primary-dark" : "bg-background text-muted"
-            }`}>
-              {tab.count}
-            </span>
-          </button>
-        ))}
+      {/* Tabs list with count badges Control Bar */}
+      <div className="bg-card border border-border/80 p-1.5 rounded-xl flex items-center gap-1 overflow-x-auto custom-scrollbar max-w-full shrink-0 shadow-sm">
+        {tabs.map((tab) => {
+          const isActive = activeTab === tab.id;
+          return (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
+                isActive
+                  ? "bg-primary text-white shadow-sm"
+                  : "text-muted hover:text-foreground hover:bg-background/50"
+              }`}
+            >
+              {tab.label}
+              <span className={`text-[9px] px-1.5 py-0.5 rounded-md font-extrabold ${
+                isActive 
+                  ? "bg-white/20 text-white" 
+                  : "bg-muted/15 text-muted-foreground"
+              }`}>
+                {tab.count}
+              </span>
+            </button>
+          );
+        })}
       </div>
 
 

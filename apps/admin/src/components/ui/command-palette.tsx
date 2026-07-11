@@ -60,14 +60,14 @@ export function CommandPalette() {
     <>
       <button
         onClick={() => setIsOpen(true)}
-        className="w-full flex items-center justify-between pl-4 pr-3 py-2 rounded-xl bg-gray-50/50 dark:bg-white/5 border border-transparent hover:border-gray-200 dark:hover:border-white/10 hover:bg-white dark:hover:bg-white/10 text-sm transition-all duration-300"
+        className="w-full flex items-center justify-between pl-3.5 pr-2.5 py-1.5 rounded-lg bg-slate-50 dark:bg-zinc-900/30 border border-border/80 hover:border-primary/50 text-xs transition-all duration-200 select-none shadow-sm cursor-pointer"
       >
         <div className="flex items-center gap-2 text-muted">
-          <Search className="w-4 h-4" />
+          <Search className="w-3.5 h-3.5 text-muted" />
           <span>Search or command...</span>
         </div>
-        <kbd className="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-gray-200/50 dark:bg-white/10 text-xs font-medium text-gray-500 dark:text-gray-400">
-          <Command className="w-3 h-3" /> K
+        <kbd className="hidden sm:inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded border border-border/80 bg-background text-[9px] font-bold text-muted shadow-sm font-mono">
+          <Command className="w-2.5 h-2.5" /> K
         </kbd>
       </button>
 

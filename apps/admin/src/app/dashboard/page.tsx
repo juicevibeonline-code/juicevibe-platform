@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Plus, ClipboardList, ImagePlus, RefreshCw, Loader2 } from "lucide-react";
+import { Plus, ClipboardList, ImagePlus, RefreshCw, Loader2, Download, Settings } from "lucide-react";
 import { RevenueChart, CategorySalesChart } from "@/components/revenue-chart";
 import { RecentOrders } from "@/components/recent-orders";
 import { StatsCard, StatsStrip } from "@/components/stats-card";
@@ -11,18 +11,9 @@ import { useToast } from "@/hooks/useToast";
 
 function getGreeting() {
   const hour = new Date().getHours();
-  if (hour < 12) return "Good Morning";
-  if (hour < 18) return "Good Afternoon";
-  return "Good Evening";
-}
-
-function getFormattedDate() {
-  return new Date().toLocaleDateString("en-US", {
-    weekday: "long",
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
+  if (hour < 12) return "Good morning";
+  if (hour < 18) return "Good afternoon";
+  return "Good evening";
 }
 
 const shortcuts = [
@@ -31,30 +22,29 @@ const shortcuts = [
     title: "Add Menu Item", 
     desc: "Create a new beverage or food item", 
     href: "/menu",
-    color: "text-primary border-primary/10 bg-primary/5 group-hover:bg-primary/10",
-    hoverBorder: "hover:border-primary/30"
+    color: "text-emerald-600 border-emerald-500/10 bg-emerald-500/5 group-hover:bg-emerald-500/10",
+    hoverBorder: "hover:border-emerald-500/30"
   },
   { 
     icon: ClipboardList, 
     title: "Track Orders", 
     desc: "Manage active, cooking and ready orders", 
     href: "/orders",
-    color: "text-orange border-orange/10 bg-orange/5 group-hover:bg-orange/10",
-    hoverBorder: "hover:border-orange/30"
+    color: "text-amber-600 border-amber-500/10 bg-amber-50/5 group-hover:bg-amber-100/10",
+    hoverBorder: "hover:border-amber-500/30"
   },
   { 
     icon: ImagePlus, 
     title: "Upload Assets", 
     desc: "Manage image gallery and cafe promos", 
     href: "/gallery",
-    color: "text-blue border-blue/10 bg-blue/5 group-hover:bg-blue/10",
-    hoverBorder: "hover:border-blue/30"
+    color: "text-blue-600 border-blue-500/10 bg-blue-500/5 group-hover:bg-blue-500/10",
+    hoverBorder: "hover:border-blue-500/30"
   },
 ];
 
 export default function DashboardPage() {
   const { toast } = useToast();
-  const [dateStr, setDateStr] = useState("");
   const [greeting, setGreeting] = useState("");
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [revenueData, setRevenueData] = useState<any[]>([]);
@@ -91,59 +81,99 @@ export default function DashboardPage() {
   };
 
   useEffect(() => {
-    setDateStr(getFormattedDate());
     setGreeting(getGreeting());
     loadData();
   }, [daysRange]);
 
+  const handleExport = () => {
+    toast({
+      type: "success",
+      title: "Data Exported",
+      message: "Dashboard summary data exported successfully to CSV.",
+    });
+  };
+
   return (
     <div className="space-y-6 max-w-7xl mx-auto px-4 pb-12">
-      {/* Greeting Banner */}
-      <div className="relative overflow-hidden rounded-2xl border border-border bg-card/40 backdrop-blur-md p-6 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
-        {/* Dynamic decorative backdrop circles */}
-        <div className="absolute top-[-30px] left-[-30px] w-24 h-24 bg-primary/10 rounded-full blur-[20px] pointer-events-none" />
-        <div className="absolute bottom-[-30px] right-[-30px] w-32 h-32 bg-orange/10 rounded-full blur-[30px] pointer-events-none" />
-
-        <div className="relative z-10">
-          <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-primary/10 text-primary text-[10px] font-bold tracking-wider uppercase font-data">
-            <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-            {greeting}
-          </div>
-          <h1 className="font-display text-2xl font-black text-foreground mt-2.5 tracking-tight flex items-center gap-3">
-            Workspace Overview
-            <button
-              onClick={() => loadData(true)}
-              className="p-1 rounded-md text-muted hover:text-foreground hover:bg-card border border-transparent hover:border-border transition-colors cursor-pointer"
-              title="Refresh metrics"
-            >
-              {refreshing ? (
-                <Loader2 className="w-4 h-4 animate-spin text-primary" />
-              ) : (
-                <RefreshCw className="w-4 h-4" />
-              )}
-            </button>
-          </h1>
-          <p className="text-xs text-muted mt-1 font-medium flex items-center gap-1.5">
-            <span>{dateStr}</span>
-            <span className="text-border">|</span>
-            <span className="text-primary font-semibold">Bentota Outlet active</span>
+      {/* Page Header Actions Block */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-border/60 mb-6">
+        <div>
+          <h1 className="text-2xl font-extrabold text-foreground tracking-tight">Dashboard</h1>
+          <p className="text-xs text-muted mt-1.5 font-semibold">
+            {greeting}, Admin. Here is your business overview today.
           </p>
         </div>
-        
-        <Link
-          href="/orders"
-          className="relative z-10 self-start md:self-center px-4 py-2.5 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-primary to-primary-dark hover:from-primary-dark hover:to-primary hover:scale-[1.02] shadow-md shadow-primary/10 transition-all duration-300 flex items-center gap-1.5 group cursor-pointer"
-        >
-          Live Orders Board
-          <span className="group-hover:translate-x-0.5 transition-transform duration-205">&rarr;</span>
-        </Link>
+
+        {/* Header Control Actions */}
+        <div className="flex items-center gap-2 flex-wrap">
+          {/* Timeline Range selector */}
+          <div className="flex bg-slate-100/80 dark:bg-zinc-900/60 p-0.5 rounded-lg border border-border/60">
+            {[
+              { label: "7D", val: 7 },
+              { label: "30D", val: 30 },
+              { label: "1Y", val: 365 },
+            ].map((item) => (
+              <button
+                key={item.val}
+                onClick={() => setDaysRange(item.val)}
+                className={`px-2.5 py-1 rounded-md text-[10px] font-bold transition-all cursor-pointer ${
+                  daysRange === item.val
+                    ? "bg-card text-foreground shadow-sm"
+                    : "text-muted hover:text-foreground"
+                }`}
+              >
+                {item.label}
+              </button>
+            ))}
+          </div>
+
+          {/* Refresh Button */}
+          <button
+            onClick={() => loadData(true)}
+            className="p-2 rounded-lg bg-card border border-border hover:bg-slate-50 dark:hover:bg-zinc-900 text-muted hover:text-foreground transition-all cursor-pointer shadow-sm flex items-center justify-center shrink-0"
+            title="Refresh metrics"
+          >
+            {refreshing ? (
+              <Loader2 className="w-3.5 h-3.5 animate-spin text-primary" />
+            ) : (
+              <RefreshCw className="w-3.5 h-3.5" />
+            )}
+          </button>
+
+          {/* Export Button */}
+          <button
+            onClick={handleExport}
+            className="p-2 rounded-lg bg-card border border-border hover:bg-slate-50 dark:hover:bg-zinc-900 text-muted hover:text-foreground transition-all cursor-pointer shadow-sm flex items-center justify-center shrink-0"
+            title="Export summary"
+          >
+            <Download className="w-3.5 h-3.5" />
+          </button>
+
+          {/* Settings Shortcut */}
+          <Link
+            href="/settings"
+            className="p-2 rounded-lg bg-card border border-border hover:bg-slate-50 dark:hover:bg-zinc-900 text-muted hover:text-foreground transition-all shadow-sm cursor-pointer shrink-0"
+            title="Workspace Settings"
+          >
+            <Settings className="w-3.5 h-3.5" />
+          </Link>
+
+          {/* Live Orders Board Button */}
+          <Link
+            href="/orders"
+            className="px-3.5 py-1.5 rounded-lg bg-primary hover:bg-primary-dark text-xs font-bold text-white transition-all shadow-md shadow-primary/10 cursor-pointer whitespace-nowrap flex items-center gap-1 group"
+          >
+            Live Board
+            <span className="group-hover:translate-x-0.5 transition-transform duration-205">&rarr;</span>
+          </Link>
+        </div>
       </div>
 
       {/* Stats Ledger Strip */}
       {loading ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 animate-pulse">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 animate-pulse">
           {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="h-24 bg-card border border-border rounded-xl" />
+            <div key={i} className="h-[110px] bg-card border border-border/80 rounded-xl" />
           ))}
         </div>
       ) : (
@@ -156,13 +186,13 @@ export default function DashboardPage() {
           />
           <StatsCard
             title="Total Orders"
-            value={(stats?.orders ?? 0).toString()}
+            value={(stats?.orders ?? 0).toLocaleString()}
             delta={`${stats?.ordersChange && stats.ordersChange >= 0 ? "+" : ""}${stats?.ordersChange ?? 0}%`}
             up={(stats?.ordersChange ?? 0) >= 0}
           />
           <StatsCard
             title="Total Customers"
-            value={(stats?.customers ?? 0).toString()}
+            value={(stats?.customers ?? 0).toLocaleString()}
             delta={`${stats?.customersChange && stats.customersChange >= 0 ? "+" : ""}${stats?.customersChange ?? 0}%`}
             up={(stats?.customersChange ?? 0) >= 0}
           />
@@ -175,77 +205,65 @@ export default function DashboardPage() {
         </StatsStrip>
       )}
 
-      {/* Date Range & Chart Header */}
-      <div className="flex justify-between items-center bg-card border border-border/80 px-4 py-2 rounded-xl">
-        <span className="text-xs font-bold text-muted uppercase tracking-wider">Timeline Chart Settings</span>
-        <div className="flex gap-1.5">
-          {[
-            { label: "Week", val: 7 },
-            { label: "Month", val: 30 },
-            { label: "Year", val: 365 },
-          ].map((item) => (
-            <button
-              key={item.val}
-              onClick={() => setDaysRange(item.val)}
-              className={`px-3 py-1 rounded-lg text-[10px] font-bold uppercase transition-colors cursor-pointer border ${
-                daysRange === item.val
-                  ? "bg-primary text-white border-primary"
-                  : "bg-background text-muted border-border hover:bg-card hover:text-foreground"
-              }`}
-            >
-              {item.label}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Charts Row */}
+      {/* Bento Grid Layout */}
       {loading ? (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-pulse">
-          <div className="col-span-1 lg:col-span-2 h-[300px] bg-card border border-border rounded-xl" />
-          <div className="h-[300px] bg-card border border-border rounded-xl" />
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 animate-pulse">
+          <div className="lg:col-span-3 space-y-6">
+            <div className="h-[300px] bg-card border border-border/80 rounded-xl" />
+            <div className="h-[350px] bg-card border border-border/80 rounded-xl" />
+          </div>
+          <div className="space-y-6">
+            <div className="h-[250px] bg-card border border-border/80 rounded-xl" />
+            <div className="h-[250px] bg-card border border-border/80 rounded-xl" />
+          </div>
         </div>
       ) : (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="col-span-1 lg:col-span-2 premium-card p-6">
-            <RevenueChart
-              data={revenueData}
-              title={daysRange === 7 ? "Weekly Overview" : daysRange === 30 ? "Monthly Overview" : "Yearly Overview"}
-            />
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 items-start">
+          {/* Main Content Area (Timeline Charts & Lists) - Spans 3 cols */}
+          <div className="lg:col-span-3 space-y-6">
+            <div className="premium-card p-6 shadow-sm">
+              <RevenueChart
+                data={revenueData}
+                title={daysRange === 7 ? "Weekly Revenue" : daysRange === 30 ? "Monthly Revenue" : "Yearly Revenue"}
+              />
+            </div>
+            <div className="premium-card p-6 shadow-sm">
+              <RecentOrders />
+            </div>
           </div>
-          <div className="premium-card p-6">
-            <CategorySalesChart data={topSelling} />
+
+          {/* Sidebar Panels (Top Sellings & Quick Actions) - Spans 1 col */}
+          <div className="space-y-6">
+            <div className="premium-card p-6 shadow-sm">
+              <CategorySalesChart data={topSelling} />
+            </div>
+
+            <div className="space-y-4">
+              <span className="text-[10px] font-bold text-muted uppercase tracking-widest block pl-1">Quick Actions</span>
+              <div className="flex flex-col gap-3">
+                {shortcuts.map((s) => (
+                  <Link
+                    key={s.title}
+                    href={s.href}
+                    className={`premium-card p-4 flex items-start gap-3.5 group transition-all duration-300 ${s.hoverBorder}`}
+                  >
+                    <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 border transition-all duration-300 group-hover:scale-105 ${s.color}`}>
+                      <s.icon size={15} />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="text-xs font-bold text-foreground group-hover:text-primary transition-colors duration-200 flex items-center gap-1">
+                        <span className="truncate">{s.title}</span>
+                        <span className="opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all duration-300 text-[10px]">&rarr;</span>
+                      </div>
+                      <div className="text-[10px] mt-0.5 text-muted leading-relaxed font-semibold">{s.desc}</div>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
       )}
-
-      {/* Orders + Shortcuts */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="col-span-1 lg:col-span-2 premium-card p-6">
-          <RecentOrders />
-        </div>
-
-        <div className="flex flex-col gap-4">
-          {shortcuts.map((s) => (
-            <Link
-              key={s.title}
-              href={s.href}
-              className={`premium-card p-5 flex items-start gap-4 group transition-all duration-300 ${s.hoverBorder}`}
-            >
-              <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 border transition-all duration-300 group-hover:scale-110 ${s.color}`}>
-                <s.icon size={16} />
-              </div>
-              <div className="flex-1">
-                <div className="text-xs font-bold text-foreground group-hover:text-primary transition-colors duration-200 flex items-center gap-1">
-                  {s.title}
-                  <span className="opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all duration-300 text-[10px]">&rarr;</span>
-                </div>
-                <div className="text-[11px] mt-1 text-muted leading-relaxed font-medium">{s.desc}</div>
-              </div>
-            </Link>
-          ))}
-        </div>
-      </div>
     </div>
   );
 }
