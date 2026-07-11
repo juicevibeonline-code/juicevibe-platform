@@ -47,10 +47,10 @@ export default function MenuPage() {
         >
           <div className="absolute inset-0">
             <Image
-              src="/images/Menu.jpeg"
-              alt="Menu"
+              src="/images/MenuItems/hero.png"
+              alt="Fresh juices and flavors"
               fill
-              className="object-cover opacity-5"
+              className="object-cover opacity-8"
               priority
             />
           </div>
