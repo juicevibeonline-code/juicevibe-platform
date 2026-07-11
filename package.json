@@ -15,6 +15,7 @@
     "db:studio": "pnpm --filter @juice-vibe/database db:studio"
   },
   "devDependencies": {
+    "@types/node": "^22.0.0",
     "prettier": "^3.4.0",
     "turbo": "^2.4.0",
     "typescript": "^5.7.0"

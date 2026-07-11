@@ -39,7 +39,6 @@ export class AuthService {
   }
 
   async login(input: { email: string; password: string }) {
-    console.log("PRISMA OBJECT:", prisma);
     const user = await prisma.user.findUnique({ where: { email: input.email } });
     if (!user) throw new UnauthorizedException("Invalid credentials");
 
