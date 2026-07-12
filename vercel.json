@@ -1,4 +1,4 @@
 {
-  "installCommand": "npm install -g pnpm@10.34.5 && pnpm install --no-frozen-lockfile",
+  "installCommand": "corepack enable && pnpm install --no-frozen-lockfile",
   "buildCommand": "turbo build"
 }
