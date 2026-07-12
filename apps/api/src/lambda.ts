@@ -16,7 +16,19 @@ export async function bootstrapLambda() {
   });
 
   app.setGlobalPrefix("api");
-  app.use(helmet());
+  app.use(
+    helmet({
+      contentSecurityPolicy: {
+        directives: {
+          ...helmet.contentSecurityPolicy.getDefaultDirectives(),
+          "script-src": ["'self'", "'unsafe-inline'", "cdnjs.cloudflare.com"],
+          "style-src": ["'self'", "'unsafe-inline'", "cdnjs.cloudflare.com", "fonts.googleapis.com"],
+          "font-src": ["'self'", "fonts.gstatic.com"],
+          "img-src": ["'self'", "data:", "cdn.jsdelivr.net"],
+        },
+      },
+    })
+  );
 
   const allowedOrigins = [
     process.env.FRONTEND_URL || "http://localhost:3000",
