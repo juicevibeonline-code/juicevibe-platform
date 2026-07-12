@@ -139,6 +139,9 @@ Also update `apps/api/package.json` to add a `vercel-build` script:
 
 4. **Add Environment Variables** (click "Add" for each):
 
+   > [!IMPORTANT]
+   > You **must** add the `ENABLE_EXPERIMENTAL_COREPACK` variable. This ensures Vercel uses the correct `pnpm` version (`9.15.9`) specified in your `package.json` to prevent package installation errors.
+
    | Variable | Value |
    |---|---|
    | `DATABASE_URL` | `postgresql://...` (your Neon/Supabase URL) |
@@ -153,6 +156,7 @@ Also update `apps/api/package.json` to add a `vercel-build` script:
    | `CLOUDINARY_CLOUD_NAME` | (your Cloudinary name) |
    | `CLOUDINARY_API_KEY` | (your Cloudinary key) |
    | `CLOUDINARY_API_SECRET` | (your Cloudinary secret) |
+   | `ENABLE_EXPERIMENTAL_COREPACK` | `1` *(Critical: forces Vercel to use pnpm@9.15.9)* |
 
 5. Click **Deploy** and wait for the build to complete
 6. Note your API URL: `https://juice-vibe-api.vercel.app`
@@ -191,10 +195,14 @@ pnpm db:seed
 
 4. **Add Environment Variables:**
 
+   > [!IMPORTANT]
+   > You **must** add the `ENABLE_EXPERIMENTAL_COREPACK` variable. This ensures Vercel uses the correct `pnpm` version (`9.15.9`) specified in your `package.json` to prevent package installation errors.
+
    | Variable | Value |
    |---|---|
    | `NEXT_PUBLIC_API_URL` | `https://juice-vibe-api.vercel.app` |
    | `NODE_ENV` | `production` |
+   | `ENABLE_EXPERIMENTAL_COREPACK` | `1` *(Critical: forces Vercel to use pnpm@9.15.9)* |
 
 5. Click **Deploy**
 6. Your storefront URL: `https://juice-vibe-web.vercel.app`
@@ -214,10 +222,14 @@ pnpm db:seed
 
 4. **Add Environment Variables:**
 
+   > [!IMPORTANT]
+   > You **must** add the `ENABLE_EXPERIMENTAL_COREPACK` variable. This ensures Vercel uses the correct `pnpm` version (`9.15.9`) specified in your `package.json` to prevent package installation errors.
+
    | Variable | Value |
    |---|---|
    | `NEXT_PUBLIC_API_URL` | `https://juice-vibe-api.vercel.app` |
    | `NODE_ENV` | `production` |
+   | `ENABLE_EXPERIMENTAL_COREPACK` | `1` *(Critical: forces Vercel to use pnpm@9.15.9)* |
 
 5. Click **Deploy**
 6. Your admin URL: `https://juice-vibe-admin.vercel.app`
