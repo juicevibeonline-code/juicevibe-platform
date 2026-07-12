@@ -18,7 +18,7 @@ We are pleased to deliver the **Juice Vibe Digital Platform** — a complete, fu
 
 | Platform | URL | Purpose |
 |---|---|---|
-| **Customer Website** | `https://juice-vibe-web.vercel.app` *(update after deploy)* | Public-facing storefront for your customers |
+| **Customer Website** | `https://juice-vibe-waskaduwa-web.vercel.app/` *(update after deploy)* | Public-facing storefront for your customers |
 | **Admin Dashboard** | `https://juice-vibe-admin.vercel.app` *(update after deploy)* | Internal management portal for staff |
 | **API & Docs** | `https://juice-vibe-api.vercel.app/api/docs` *(update after deploy)* | Backend API documentation (technical) |
 
