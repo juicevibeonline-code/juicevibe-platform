@@ -1,4 +1,5 @@
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000/api";
+const rawUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000/api";
+const API_URL = rawUrl.endsWith("/api") ? rawUrl : `${rawUrl}/api`;
 
 export interface CreateOrderPayload {
   customerName: string;
