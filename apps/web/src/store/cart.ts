@@ -9,6 +9,8 @@ export interface CartItem extends MenuItem {
 
 interface CartState {
   items: CartItem[];
+  tableId: string | null;
+  setTableId: (tableId: string | null) => void;
   addItem: (item: MenuItem, quantity?: number) => void;
   removeItem: (cartItemId: string) => void;
   updateQuantity: (cartItemId: string, quantity: number) => void;
@@ -22,6 +24,8 @@ export const useCartStore = create<CartState>()(
   persist(
     (set, get) => ({
       items: [],
+      tableId: null,
+      setTableId: (tableId) => set({ tableId }),
       isOpen: false,
       setIsOpen: (isOpen) => set({ isOpen }),
       
@@ -54,7 +58,7 @@ export const useCartStore = create<CartState>()(
         )
       })),
 
-      clearCart: () => set({ items: [] }),
+      clearCart: () => set({ items: [], tableId: null }),
 
       getTotals: () => {
         const { items } = get();
@@ -70,7 +74,7 @@ export const useCartStore = create<CartState>()(
     {
       name: "juice-vibe-cart",
       // Exclude UI state from persistence
-      partialize: (state) => ({ items: state.items }),
+      partialize: (state) => ({ items: state.items, tableId: state.tableId }),
     }
   )
 );

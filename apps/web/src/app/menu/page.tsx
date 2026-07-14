@@ -1,6 +1,8 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { Suspense, useState, useMemo, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
+import { useCartStore } from "@/store/cart";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
@@ -15,12 +17,23 @@ import { MenuItemCard } from "@/components/menu/MenuItemCard";
 import type { MenuItem, MenuCategory } from "@juice-vibe/types";
 import { menuService } from "@juice-vibe/services";
 
-export default function MenuPage() {
+function MenuContent() {
+  const searchParams = useSearchParams();
+  const setTableId = useCartStore((state) => state.setTableId);
+  const tableIdFromStore = useCartStore((state) => state.tableId);
+
   const [search, setSearch] = useState("");
   const [activeCategory, setActiveCategory] = useState("all");
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
   const [categories, setCategories] = useState<MenuCategory[]>([]);
   const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const tableId = searchParams.get("tableId");
+    if (tableId) {
+      setTableId(tableId);
+    }
+  }, [searchParams, setTableId]);
 
   useEffect(() => {
     async function loadData() {
@@ -241,5 +254,13 @@ export default function MenuPage() {
       <BackToTop />
       <WhatsAppButton />
     </>
+  );
+}
+
+export default function MenuPage() {
+  return (
+    <Suspense>
+      <MenuContent />
+    </Suspense>
   );
 }

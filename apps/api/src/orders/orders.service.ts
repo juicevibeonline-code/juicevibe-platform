@@ -1,14 +1,17 @@
 import { Injectable, NotFoundException, BadRequestException } from "@nestjs/common";
 import { prisma, Prisma } from "@juice-vibe/database";
 import { randomBytes } from "crypto";
+import { OrdersGateway } from "./orders.gateway";
 
 @Injectable()
 export class OrdersService {
+  constructor(private ordersGateway: OrdersGateway) {}
+
   async createOrder(input: {
     items: { menuItemId?: string; name?: string; price?: number; quantity: number; variant?: string; addOnIds?: string[]; notes?: string }[];
     customerName: string; customerPhone: string; customerEmail?: string;
     type: string; paymentMethod: string; notes?: string; couponCode?: string;
-    deliveryAddress?: any; userId?: string;
+    deliveryAddress?: any; userId?: string; tableId?: string;
   }) {
     const orderNumber = "JV-" + randomBytes(8).toString("hex").toUpperCase();
     let subtotal = 0;
@@ -112,9 +115,10 @@ export class OrdersService {
           notes: input.notes,
           couponCode: input.couponCode,
           deliveryAddress: input.deliveryAddress ?? Prisma.DbNull,
+          tableId: input.tableId,
           items: { create: orderItems },
         },
-        include: { items: true },
+        include: { items: true, table: true },
       });
 
       if (input.userId) {
@@ -129,6 +133,9 @@ export class OrdersService {
 
       return order;
     });
+
+    // Emit live event to dashboard
+    this.ordersGateway.emitNewOrder(order);
 
     return order;
   }

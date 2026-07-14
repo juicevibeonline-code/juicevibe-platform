@@ -46,6 +46,7 @@ export interface CreateOrderInput {
   paymentMethod: import("./common").PaymentMethod;
   notes?: string;
   couponCode?: string;
+  tableId?: string;
 }
 
 export interface CreateOrderItemInput {

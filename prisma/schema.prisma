@@ -208,11 +208,14 @@ model Order {
 
   customer          User?         @relation(fields: [customerId], references: [id])
   items             OrderItem[]
+  tableId           String?
+  table             Table?        @relation(fields: [tableId], references: [id])
 
   @@index([orderNumber])
   @@index([customerId])
   @@index([status])
   @@index([createdAt])
+  @@index([tableId])
 }
 
 model OrderItem {
@@ -408,4 +411,13 @@ model Setting {
   id    String @id @default(cuid())
   key   String @unique
   value String
+}
+
+model Table {
+  id        String   @id @default(cuid())
+  number    Int      @unique
+  qrCodeUrl String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  orders    Order[]
 }

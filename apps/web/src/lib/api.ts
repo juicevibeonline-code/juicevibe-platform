@@ -8,6 +8,7 @@ export interface CreateOrderPayload {
   type: "pickup" | "dine_in" | "delivery";
   paymentMethod: "cash" | "card" | "online";
   notes?: string;
+  tableId?: string;
   items: {
     name: string;
     price: number;

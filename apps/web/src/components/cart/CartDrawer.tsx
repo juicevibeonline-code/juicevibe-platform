@@ -24,7 +24,7 @@ interface CheckoutForm {
 }
 
 export function CartDrawer() {
-  const { items, isOpen, setIsOpen, updateQuantity, removeItem, getTotals, clearCart } = useCartStore();
+  const { items, isOpen, setIsOpen, updateQuantity, removeItem, getTotals, clearCart, tableId } = useCartStore();
   const [mounted, setMounted] = useState(false);
   const [step, setStep] = useState<Step>("cart");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -74,9 +74,10 @@ export function CartDrawer() {
         customerName: form.customerName,
         customerPhone: form.customerPhone,
         customerEmail: form.customerEmail || undefined,
-        type: form.type,
+        type: tableId ? "dine_in" : form.type,
         paymentMethod: form.paymentMethod,
         notes: form.notes || undefined,
+        tableId: tableId || undefined,
         items: items.map((item) => ({
           name: item.name,
           price: item.price,

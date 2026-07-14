@@ -31,14 +31,17 @@ export async function bootstrapLambda() {
   );
 
   const allowedOrigins = [
-    process.env.FRONTEND_URL || "http://localhost:3000",
+    process.env.FRONTEND_URL,
     process.env.ADMIN_URL || "http://localhost:3001",
   ].filter(Boolean);
 
   app.enableCors({
     origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
       if (!origin) return callback(null, true);
-      if (origin.endsWith(".vercel.app") || allowedOrigins.includes(origin)) {
+      
+      const isLocalhost = origin ? /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin) : false;
+      
+      if (origin.endsWith(".vercel.app") || allowedOrigins.includes(origin) || isLocalhost) {
         return callback(null, true);
       }
       callback(new Error(`CORS: ${origin} not allowed`));
