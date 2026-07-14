@@ -65,7 +65,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4 relative overflow-hidden bg-[radial-gradient(#163b29_1px,transparent_1px)] [background-size:20px_20px]">
+    <div className="dark flex min-h-screen items-center justify-center bg-background px-4 relative overflow-hidden bg-[radial-gradient(#163b29_1px,transparent_1px)] [background-size:20px_20px]">
       {/* Handcrafted Organic Accent Glows */}
       <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full bg-primary/5 blur-[120px] pointer-events-none animate-pulse" />
       <div className="absolute bottom-1/4 left-1/3 w-[300px] h-[300px] rounded-full bg-emerald-950/20 blur-[100px] pointer-events-none" />

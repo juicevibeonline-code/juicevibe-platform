@@ -28,18 +28,23 @@ export default function GalleryPage() {
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const [galleryImages, setGalleryImages] = useState<GalleryImage[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  async function loadData() {
+    try {
+      setLoading(true);
+      setError(null);
+      const images = await galleryService.getImages();
+      setGalleryImages(images);
+    } catch (err) {
+      console.error("Failed to load gallery images:", err);
+      setError("Unable to connect to the server. Please check if the API is running or try again.");
+    } finally {
+      setLoading(false);
+    }
+  }
 
   useEffect(() => {
-    async function loadData() {
-      try {
-        const images = await galleryService.getImages();
-        setGalleryImages(images);
-      } catch (error) {
-        console.error("Failed to load gallery images:", error);
-      } finally {
-        setLoading(false);
-      }
-    }
     loadData();
   }, []);
 
@@ -104,6 +109,18 @@ export default function GalleryPage() {
               <div className="mt-16 text-center">
                 <div className="text-4xl animate-bounce">📸</div>
                 <p className="mt-4 font-mono text-sm text-dark-green uppercase tracking-wider animate-pulse">Compiling Tropical Moments...</p>
+              </div>
+            ) : error ? (
+              <div className="mt-16 text-center">
+                <div className="text-4xl">⚠️</div>
+                <h3 className="mt-4 font-heading text-xl font-bold text-red-500">Failed to Load Gallery</h3>
+                <p className="mt-2 text-gray-500 max-w-md mx-auto font-medium">{error}</p>
+                <button
+                  onClick={loadData}
+                  className="mt-6 inline-flex items-center justify-center rounded-full bg-primary px-6 py-2.5 text-sm font-semibold text-white shadow-lg shadow-primary/25 hover:bg-primary-dark hover:scale-105 active:scale-95 transition-all duration-300 cursor-pointer"
+                >
+                  Retry Connection
+                </button>
               </div>
             ) : (
               <>

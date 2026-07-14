@@ -28,18 +28,23 @@ const stats = [
 export function Testimonials() {
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  async function loadData() {
+    try {
+      setLoading(true);
+      setError(null);
+      const data = await testimonialService.getApprovedTestimonials({ featured: true });
+      setTestimonials(data);
+    } catch (err) {
+      console.error("Failed to load testimonials:", err);
+      setError("Unable to connect to the server. Please check if the API is running or try again.");
+    } finally {
+      setLoading(false);
+    }
+  }
 
   useEffect(() => {
-    async function loadData() {
-      try {
-        const data = await testimonialService.getApprovedTestimonials({ featured: true });
-        setTestimonials(data);
-      } catch (error) {
-        console.error("Failed to load testimonials:", error);
-      } finally {
-        setLoading(false);
-      }
-    }
     loadData();
   }, []);
   return (
@@ -98,6 +103,16 @@ export function Testimonials() {
           {loading ? (
             <div className="mt-16 text-center font-mono text-sm text-gray-500 animate-pulse col-span-full">
               LOADING COMMUNITY FEEDBACK...
+            </div>
+          ) : error ? (
+            <div className="mt-16 text-center col-span-full">
+              <p className="text-red-500 font-semibold">{error}</p>
+              <button
+                onClick={loadData}
+                className="mt-4 inline-flex items-center justify-center rounded-full bg-primary px-6 py-2.5 text-sm font-semibold text-white shadow-lg shadow-primary/25 hover:bg-primary-dark hover:scale-105 active:scale-95 transition-all duration-300 cursor-pointer"
+              >
+                Retry Connection
+              </button>
             </div>
           ) : testimonials.length === 0 ? (
             <div className="mt-16 text-center text-gray-500 col-span-full">

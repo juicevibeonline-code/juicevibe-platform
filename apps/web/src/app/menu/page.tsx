@@ -27,6 +27,7 @@ function MenuContent() {
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
   const [categories, setCategories] = useState<MenuCategory[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const tableId = searchParams.get("tableId");
@@ -35,21 +36,25 @@ function MenuContent() {
     }
   }, [searchParams, setTableId]);
 
-  useEffect(() => {
-    async function loadData() {
-      try {
-        const [itemsData, catsData] = await Promise.all([
-          menuService.getMenuItems(),
-          menuService.getCategories(),
-        ]);
-        setMenuItems(itemsData);
-        setCategories(catsData);
-      } catch (error) {
-        console.error("Failed to load menu data:", error);
-      } finally {
-        setLoading(false);
-      }
+  async function loadData() {
+    try {
+      setLoading(true);
+      setError(null);
+      const [itemsData, catsData] = await Promise.all([
+        menuService.getMenuItems(),
+        menuService.getCategories(),
+      ]);
+      setMenuItems(itemsData);
+      setCategories(catsData);
+    } catch (err) {
+      console.error("Failed to load menu data:", err);
+      setError("Unable to connect to the server. Please check if the API is running or try again.");
+    } finally {
+      setLoading(false);
     }
+  }
+
+  useEffect(() => {
     loadData();
   }, []);
 
@@ -218,6 +223,26 @@ function MenuContent() {
                     Compiling Fresh Juices Menu...
                   </h3>
                 </motion.div>
+              ) : error ? (
+                <motion.div
+                  key="error"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="mt-16 text-center animate-fade-in"
+                >
+                  <div className="text-4xl">⚠️</div>
+                  <h3 className="mt-4 font-heading text-xl font-bold text-red-500">
+                    Failed to Load Menu
+                  </h3>
+                  <p className="mt-2 text-gray-500 max-w-md mx-auto font-medium">{error}</p>
+                  <button
+                    onClick={loadData}
+                    className="mt-6 inline-flex items-center justify-center rounded-full bg-primary px-6 py-2.5 text-sm font-semibold text-white shadow-lg shadow-primary/25 hover:bg-primary-dark hover:scale-105 active:scale-95 transition-all duration-300 cursor-pointer"
+                  >
+                    Retry Connection
+                  </button>
+                </motion.div>
               ) : filteredItems.length > 0 ? (
                 <motion.div
                   key={`${activeCategory}-${search}`}
@@ -225,7 +250,7 @@ function MenuContent() {
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.3 }}
-                  className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:gap-8"
+                  className="mt-6 grid gap-4 sm:gap-5 lg:gap-6 grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
                 >
                   {filteredItems.map((item, i) => (
                     <MenuItemCard key={item.id} item={item} index={i} />

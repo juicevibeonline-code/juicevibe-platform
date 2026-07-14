@@ -1,5 +1,10 @@
 @import "tailwindcss";
 
+@source "../../packages/ui/src/**/*.tsx";
+@source "../../packages/ui/src/**/*.ts";
+@source "../../../../packages/ui/src/**/*.tsx";
+@source "../../../../packages/ui/src/**/*.ts";
+
 @theme inline {
   --color-primary: #22C55E;
   --color-primary-dark: #16A34A;
