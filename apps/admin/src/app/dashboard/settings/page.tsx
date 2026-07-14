@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { settingsService } from "@juice-vibe/services";
+import { settingsService, authService } from "@juice-vibe/services";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -34,6 +34,42 @@ type SettingsFormSchema = z.infer<typeof settingsFormSchema>;
 
 export default function SystemSettings() {
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
+
+  const [oldPassword, setOldPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [passwordSuccess, setPasswordSuccess] = useState<string | null>(null);
+  const [passwordError, setPasswordError] = useState<string | null>(null);
+  const [passwordUpdating, setPasswordUpdating] = useState(false);
+
+  const handlePasswordChange = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setPasswordError(null);
+    setPasswordSuccess(null);
+
+    if (newPassword !== confirmPassword) {
+      setPasswordError("New passwords do not match");
+      return;
+    }
+    if (newPassword.length < 6) {
+      setPasswordError("Password must be at least 6 characters long");
+      return;
+    }
+
+    setPasswordUpdating(true);
+    try {
+      await authService.changePassword(oldPassword, newPassword);
+      setPasswordSuccess("Password updated successfully");
+      setOldPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
+    } catch (err: any) {
+      setPasswordError(err.response?.data?.message || err.message || "Failed to update password");
+    } finally {
+      setPasswordUpdating(false);
+    }
+  };
+
 
   // Fetch Settings
   const { data: settings = {}, isLoading, refetch } = useQuery<Record<string, string>>({
@@ -260,6 +296,74 @@ export default function SystemSettings() {
           </div>
         </form>
       )}
+
+      {/* Password Update Card */}
+      {!isLoading && (
+        <form onSubmit={handlePasswordChange} className="terminal-card bg-card border border-border p-6 space-y-4 max-w-4xl mt-6">
+          <h2 className="text-xs font-bold text-foreground uppercase tracking-widest font-mono flex items-center gap-2">
+            <ShieldCheck className="h-4 w-4 text-pink" />
+            <span>Security Credentials / Update Password</span>
+          </h2>
+
+          {passwordSuccess && (
+            <div className="rounded-lg border border-primary/30 bg-primary/10 p-3 text-xs text-primary font-mono">
+              {passwordSuccess}
+            </div>
+          )}
+
+          {passwordError && (
+            <div className="rounded-lg border border-pink/30 bg-pink/10 p-3 text-xs text-pink font-mono">
+              {passwordError}
+            </div>
+          )}
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="space-y-1">
+              <label className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">Current Password</label>
+              <input
+                type="password"
+                value={oldPassword}
+                onChange={(e) => setOldPassword(e.target.value)}
+                className="w-full bg-ink-dark border border-border text-foreground font-mono text-xs px-3 py-2 rounded-lg focus:outline-none focus:border-primary/50"
+                required
+              />
+            </div>
+
+            <div className="space-y-1">
+              <label className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">New Password</label>
+              <input
+                type="password"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                className="w-full bg-ink-dark border border-border text-foreground font-mono text-xs px-3 py-2 rounded-lg focus:outline-none focus:border-primary/50"
+                required
+              />
+            </div>
+
+            <div className="space-y-1">
+              <label className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">Confirm New Password</label>
+              <input
+                type="password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                className="w-full bg-ink-dark border border-border text-foreground font-mono text-xs px-3 py-2 rounded-lg focus:outline-none focus:border-primary/50"
+                required
+              />
+            </div>
+          </div>
+
+          <div className="flex items-center justify-end">
+            <button
+              type="submit"
+              disabled={passwordUpdating}
+              className="inline-flex items-center gap-2 px-4 py-2 bg-pink hover:bg-pink/90 text-white text-xs font-mono font-bold rounded-lg uppercase tracking-wider cursor-pointer"
+            >
+              <span>{passwordUpdating ? "Updating..." : "Update Password"}</span>
+            </button>
+          </div>
+        </form>
+      )}
     </div>
   );
 }
+

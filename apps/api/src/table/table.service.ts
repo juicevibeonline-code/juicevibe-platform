@@ -54,4 +54,10 @@ export class TableService {
     if (!table) throw new NotFoundException(`Table with ID ${id} not found`);
     return table;
   }
+
+  async deleteTable(id: string) {
+    await this.getTable(id);
+    return prisma.table.delete({ where: { id } });
+  }
 }
+

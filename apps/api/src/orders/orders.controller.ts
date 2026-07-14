@@ -56,6 +56,13 @@ export class OrdersController {
     return ApiResponseDto.ok(orders);
   }
 
+  @Get("track/:orderNumber")
+  @ApiOperation({ summary: "Track order by order number (Public)" })
+  async trackOrder(@Param("orderNumber") orderNumber: string): Promise<ApiResponseDto<OrderWithItems>> {
+    const order = await this.ordersService.getOrderByNumber(orderNumber);
+    return ApiResponseDto.ok(order);
+  }
+
   @Get(":id")
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
@@ -64,6 +71,7 @@ export class OrdersController {
     const order = await this.ordersService.getOrder(id);
     return ApiResponseDto.ok(order);
   }
+
 
   @Patch(":id/status")
   @UseGuards(JwtAuthGuard, RolesGuard)

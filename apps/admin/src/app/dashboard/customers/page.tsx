@@ -25,14 +25,8 @@ export default function CRMDirectory() {
     retry: 1,
   });
 
-  const fallbackCustomers = [
-    { id: "cust-1", user: { name: "Priya Sharma", email: "priya@gmail.com", phone: "+94771234567" }, loyaltyPoints: 450, totalSpent: 12500, totalOrders: 14, createdAt: "2026-06-10T00:00:00Z" },
-    { id: "cust-2", user: { name: "Arjun Nair", email: "arjun@yahoo.com", phone: "+94779876543" }, loyaltyPoints: 210, totalSpent: 7200, totalOrders: 8, createdAt: "2026-06-15T00:00:00Z" },
-    { id: "cust-3", user: { name: "Neha Gupta", email: "neha@outlook.com", phone: "+94715556666" }, loyaltyPoints: 780, totalSpent: 24500, totalOrders: 21, createdAt: "2026-05-20T00:00:00Z" },
-    { id: "cust-4", user: { name: "Rahul Verma", email: "rahul@blogger.com", phone: "+94723334444" }, loyaltyPoints: 120, totalSpent: 4300, totalOrders: 5, createdAt: "2026-07-01T00:00:00Z" }
-  ];
+  const currentCustomers: any[] = customers;
 
-  const currentCustomers: any[] = customers.length > 0 ? customers : fallbackCustomers;
 
   const filtered = currentCustomers.filter((c: any) => {
     const name = c.user?.name || "";
@@ -105,21 +99,32 @@ export default function CRMDirectory() {
               </thead>
               <tbody className="divide-y divide-border/30">
                 {filtered.map((c: any) => {
-                  const tier = getTier(c.loyaltyPoints);
+                  const isGuest = c.isGuest;
+                  const tier = isGuest
+                    ? { label: "Guest Client", color: "text-muted-foreground/60 bg-ink-dark/40 border-border/40" }
+                    : getTier(c.loyaltyPoints);
+
                   return (
                     <tr key={c.id} className="hover:bg-ink-dark/20 transition-colors">
                       <td className="py-3.5 px-4">
                         <div className="flex items-center gap-3">
-                          <div className="h-8 w-8 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center font-bold text-primary text-xs shrink-0 uppercase">
-                            {c.user?.name?.slice(0, 2) || "CL"}
+                          <div className={cn(
+                            "h-8 w-8 rounded-full flex items-center justify-center font-bold text-xs shrink-0 uppercase border",
+                            isGuest 
+                              ? "bg-ink-dark/40 text-muted-foreground border-border/40" 
+                              : "bg-primary/10 text-primary border-primary/20"
+                          )}>
+                            {c.user?.name?.slice(0, 2) || (isGuest ? "GT" : "CL")}
                           </div>
-                          <span className="font-semibold text-foreground font-sans">{c.user?.name}</span>
+                          <span className="font-semibold text-foreground font-sans">
+                            {c.user?.name || "Anonymous Guest"}
+                          </span>
                         </div>
                       </td>
                       <td className="py-3.5 px-4 text-muted-foreground">
                         <div className="flex flex-col">
                           <span>{c.user?.email}</span>
-                          <span className="text-[10px] mt-0.5">{c.user?.phone || "No phone ID"}</span>
+                          <span className="text-[10px] mt-0.5 font-numeral">{c.user?.phone || "No phone ID"}</span>
                         </div>
                       </td>
                       <td className="py-3.5 px-4">
@@ -127,7 +132,9 @@ export default function CRMDirectory() {
                           <span className={cn("text-[9px] uppercase tracking-widest px-2 py-0.5 rounded font-bold border", tier.color)}>
                             {tier.label}
                           </span>
-                          <span className="font-numeral text-xs text-primary">{c.loyaltyPoints}pts</span>
+                          {!isGuest && (
+                            <span className="font-numeral text-xs text-primary">{c.loyaltyPoints}pts</span>
+                          )}
                         </div>
                       </td>
                       <td className="py-3.5 px-4 font-numeral">{c.totalOrders || 0} checks</td>

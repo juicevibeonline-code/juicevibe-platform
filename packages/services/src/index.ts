@@ -13,5 +13,10 @@ export { contactService, type ContactMessage } from "./contact-service";
 export { settingsService } from "./settings-service";
 export { galleryService, type GalleryImage } from "./gallery-service";
 export { analyticsService, type DashboardStats, type RevenueChartData, type TopSellingItem, type OrderStatusDistribution } from "./analytics-service";
+export { tableService } from "./table-service";
+export { inventoryService } from "./inventory-service";
+export { employeeService } from "./employee-service";
+
+
 
 

@@ -44,6 +44,19 @@ export class TestimonialsController {
     return ApiResponseDto.ok(null, "Testimonial approved");
   }
 
+  @Patch(":id")
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles("admin", "manager")
+  @ApiBearerAuth()
+  @ApiOperation({ summary: "Update testimonial details (Admin/Manager)" })
+  async update(
+    @Param("id") id: string,
+    @Body() body: { isApproved?: boolean; isFeatured?: boolean; name?: string; role?: string; avatar?: string; rating?: number; text?: string }
+  ) {
+    const testimonial = await this.testimonialsService.update(id, body);
+    return ApiResponseDto.ok(testimonial, "Testimonial updated");
+  }
+
   @Delete(":id")
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles("admin")

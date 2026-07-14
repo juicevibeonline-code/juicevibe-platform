@@ -21,6 +21,11 @@ export const testimonialService = {
     await apiClient.patch(`/testimonials/${id}/approve`);
   },
 
+  async updateTestimonial(id: string, input: { isApproved?: boolean; isFeatured?: boolean }): Promise<Testimonial> {
+    const { data } = await apiClient.patch(`/testimonials/${id}`, input);
+    return data.data;
+  },
+
   async deleteTestimonial(id: string): Promise<void> {
     await apiClient.delete(`/testimonials/${id}`);
   },

@@ -2,7 +2,7 @@
 
 import React, { useState, useCallback } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { orderService } from "@juice-vibe/services";
+import { orderService, tableService } from "@juice-vibe/services";
 import type { Order } from "@juice-vibe/types";
 import { LoadingSpinner } from "@juice-vibe/ui";
 import { formatPrice, formatDate } from "@juice-vibe/utils";
@@ -27,7 +27,7 @@ import {
 import { cn } from "@juice-vibe/utils";
 import { useOrdersSocket } from "@/hooks/use-orders-socket";
 
-type ViewMode = "kanban" | "list";
+type ViewMode = "kanban" | "list" | "table_map";
 
 export default function OrderDesk() {
   const queryClient = useQueryClient();
@@ -35,6 +35,13 @@ export default function OrderDesk() {
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [typeFilter, setTypeFilter] = useState<string>("all");
   const [liveAlert, setLiveAlert] = useState<{ orderNumber: string; table?: number; total: number } | null>(null);
+
+  const { data: tables = [] } = useQuery<any[]>({
+    queryKey: ["tables"],
+    queryFn: () => tableService.getTables(),
+    enabled: viewMode === "table_map",
+  });
+
 
   // ─── Real-time WebSocket ─────────────────────────────────────────────────
   const handleNewOrder = useCallback((order: any) => {
@@ -94,6 +101,59 @@ export default function OrderDesk() {
       updateStatusMutation.mutate({ id: orderId, status: "cancelled" });
     }
   };
+
+  const handleExportCSV = () => {
+    if (filteredOrders.length === 0) {
+      alert("No orders to export");
+      return;
+    }
+
+    const headers = [
+      "Order Number",
+      "Customer Name",
+      "Phone",
+      "Email",
+      "Type",
+      "Status",
+      "Payment Method",
+      "Subtotal",
+      "Tax",
+      "Discount",
+      "Total",
+      "Created At"
+    ];
+
+    const rows = filteredOrders.map(order => [
+      order.orderNumber,
+      order.customerName,
+      order.customerPhone,
+      order.customerEmail || "",
+      order.type,
+      order.status,
+      order.paymentMethod,
+      order.subtotal,
+      order.tax,
+      order.discount,
+      order.total,
+      order.createdAt
+    ]);
+
+    const csvContent = [
+      headers.join(","),
+      ...rows.map(row => row.map(val => `"${String(val).replace(/"/g, '""')}"`).join(","))
+    ].join("\n");
+
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", `orders_export_${new Date().toISOString().split("T")[0]}.csv`);
+    link.style.visibility = "hidden";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
 
   // Filter type client-side to enforce same state source
   const filteredOrders = orders.filter((order: Order) => {
@@ -175,6 +235,16 @@ export default function OrderDesk() {
               <ListIcon className="h-3.5 w-3.5" />
               <span>GRID LIST</span>
             </button>
+            <button
+              onClick={() => setViewMode("table_map")}
+              className={cn(
+                "p-1.5 rounded-md text-xs font-mono flex items-center gap-1.5 cursor-pointer transition-all",
+                viewMode === "table_map" ? "bg-primary/20 text-primary border border-primary/10" : "text-muted-foreground hover:text-foreground"
+              )}
+            >
+              <QrCode className="h-3.5 w-3.5" />
+              <span>TABLE MAP</span>
+            </button>
           </div>
 
           {/* Type Filter */}
@@ -205,6 +275,13 @@ export default function OrderDesk() {
               <option value="cancelled">Cancelled</option>
             </select>
           )}
+
+          <button
+            onClick={handleExportCSV}
+            className="px-3 py-1.5 rounded-lg bg-ink-dark border border-border hover:border-primary/40 hover:text-foreground transition-colors text-muted-foreground cursor-pointer text-xs font-mono font-bold uppercase tracking-wider"
+          >
+            Export CSV
+          </button>
 
           <button
             onClick={() => refetch()}
@@ -309,7 +386,7 @@ export default function OrderDesk() {
             );
           })}
         </div>
-      ) : (
+      ) : viewMode === "list" ? (
         /* GRID LIST VIEW */
         <div className="terminal-card bg-card border border-border overflow-hidden">
           <div className="overflow-x-auto">
@@ -384,6 +461,69 @@ export default function OrderDesk() {
               </tbody>
             </table>
           </div>
+        </div>
+      ) : (
+        /* TABLE MAP VIEW */
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          {tables.map((table: any) => {
+            const activeStatuses = ["pending", "confirmed", "preparing", "ready"];
+            const tableOrders = filteredOrders.filter(
+              (o: any) => o.tableId === table.id && activeStatuses.includes(o.status)
+            );
+            const hasActiveOrders = tableOrders.length > 0;
+
+            return (
+              <div 
+                key={table.id} 
+                className={cn(
+                  "terminal-card bg-card border p-5 flex flex-col justify-between space-y-4 hover:shadow-lg transition-all",
+                  hasActiveOrders ? "border-primary/50 shadow-md" : "border-border/60"
+                )}
+              >
+                <div>
+                  <div className="flex items-center justify-between border-b border-border/40 pb-2">
+                    <span className="text-[10px] font-mono font-bold text-muted-foreground uppercase">
+                      Table Record
+                    </span>
+                    <span className={cn(
+                      "h-2.5 w-2.5 rounded-full",
+                      hasActiveOrders ? "bg-primary animate-pulse" : "bg-muted-foreground/30"
+                    )} />
+                  </div>
+
+                  <div className="py-4 text-center">
+                    <h2 className="text-4xl font-bold font-mono text-primary tracking-tight">
+                      {table.number}
+                    </h2>
+                    <span className="text-[9px] font-mono text-muted-foreground uppercase tracking-widest block mt-1">
+                      {hasActiveOrders ? `${tableOrders.length} active orders` : "table empty"}
+                    </span>
+                  </div>
+
+                  {hasActiveOrders && (
+                    <div className="space-y-2 border-t border-border/40 pt-3">
+                      {tableOrders.map((order: any) => (
+                        <div key={order.id} className="p-2 bg-ink-dark/30 rounded border border-border/40 flex items-center justify-between text-[10px] font-mono">
+                          <div>
+                            <span className="text-foreground font-semibold">#{order.orderNumber}</span>
+                            <span className="text-[8px] text-muted-foreground block uppercase mt-0.5">
+                              {order.status}
+                            </span>
+                          </div>
+                          <button
+                            onClick={() => handleStatusTransition(order.id, order.status)}
+                            className="bg-primary/10 text-primary border border-primary/20 hover:bg-primary/20 px-2 py-0.5 rounded text-[8px] font-bold uppercase transition-all"
+                          >
+                            Next
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            );
+          })}
         </div>
       )}
     </div>

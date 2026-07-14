@@ -30,4 +30,9 @@ export const orderService = {
     const { data } = await apiClient.get("/orders/my");
     return data.data;
   },
+
+  async trackOrder(orderNumber: string): Promise<Order> {
+    const { data } = await apiClient.get(`/orders/track/${orderNumber}`);
+    return data.data;
+  },
 };

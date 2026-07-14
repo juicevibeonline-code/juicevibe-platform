@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Get, UseGuards, HttpCode, HttpStatus } from "@nestjs/common";
+import { Controller, Post, Body, Get, UseGuards, HttpCode, HttpStatus, Patch } from "@nestjs/common";
 import { ApiTags, ApiBearerAuth, ApiOperation } from "@nestjs/swagger";
 import { AuthService } from "./auth.service";
 import { CurrentUser } from "../common/decorators";
@@ -73,4 +73,15 @@ export class AuthController {
     await this.authService.logout(userId);
     return ApiResponseDto.ok(null, "Logged out successfully");
   }
+
+  @Patch("change-password")
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(HttpStatus.OK)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: "Change user password" })
+  async changePassword(@CurrentUser("sub") userId: string, @Body() body: any) {
+    await this.authService.changePassword(userId, body.oldPassword, body.newPassword);
+    return ApiResponseDto.ok(null, "Password changed successfully");
+  }
 }
+

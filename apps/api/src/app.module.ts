@@ -12,6 +12,8 @@ import { CouponModule } from "./coupon/coupon.module";
 import { AnalyticsModule } from "./analytics/analytics.module";
 import { SettingsModule } from "./settings/settings.module";
 import { TableModule } from "./table/table.module";
+import { InventoryModule } from "./inventory/inventory.module";
+import { EmployeesModule } from "./employees/employees.module";
 
 @Module({
   imports: [
@@ -27,9 +29,13 @@ import { TableModule } from "./table/table.module";
     AnalyticsModule,
     SettingsModule,
     TableModule,
+    InventoryModule,
+    EmployeesModule,
   ],
+
   providers: [
     { provide: APP_GUARD, useClass: ThrottlerGuard },
   ],
 })
 export class AppModule {}
+

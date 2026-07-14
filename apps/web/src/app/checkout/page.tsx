@@ -15,7 +15,7 @@ import {
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { useCartStore } from "@/store/cart";
-import { orderService } from "@juice-vibe/services";
+import { orderService, couponService } from "@juice-vibe/services";
 
 // ─── Schema ────────────────────────────────────────────────────────────────────
 const schema = z.object({
@@ -46,9 +46,14 @@ export default function CheckoutPage() {
   const [loading, setLoading] = useState(false);
   const [apiError, setApiError] = useState<string | null>(null);
 
+  const [appliedCoupon, setAppliedCoupon] = useState<any | null>(null);
+  const [couponError, setCouponError] = useState<string | null>(null);
+  const [validatingCoupon, setValidatingCoupon] = useState(false);
+  const [discountVal, setDiscountVal] = useState(0);
+
   const { subtotal, count } = getTotals();
   const tax = subtotal * 0.05;
-  const total = subtotal + tax;
+  const total = Math.max(0, subtotal + tax - discountVal);
 
   const isDineIn = Boolean(tableId);
 
@@ -65,6 +70,30 @@ export default function CheckoutPage() {
   });
 
   const selectedPayment = watch("paymentMethod");
+  const couponCodeValue = watch("couponCode");
+
+  const handleApplyCoupon = async () => {
+    if (!couponCodeValue) return;
+    setValidatingCoupon(true);
+    setCouponError(null);
+    try {
+      const result = await couponService.validateCoupon(couponCodeValue.toUpperCase(), subtotal);
+      if (result.valid) {
+        setAppliedCoupon(result.coupon);
+        setDiscountVal(result.discount);
+      } else {
+        setCouponError("Invalid coupon");
+        setAppliedCoupon(null);
+        setDiscountVal(0);
+      }
+    } catch (err: any) {
+      setCouponError(err.response?.data?.message || err.message || "Invalid coupon");
+      setAppliedCoupon(null);
+      setDiscountVal(0);
+    } finally {
+      setValidatingCoupon(false);
+    }
+  };
 
   // ─── Submit ─────────────────────────────────────────────────────────────────
   const onSubmit = async (data: FormData) => {
@@ -319,11 +348,29 @@ export default function CheckoutPage() {
                     <label className="text-xs font-semibold text-gray-600 uppercase tracking-wide flex items-center gap-1.5">
                       <Tag className="h-3.5 w-3.5" /> Coupon Code
                     </label>
-                    <input
-                      {...register("couponCode")}
-                      placeholder="Enter code (if any)"
-                      className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
-                    />
+                    <div className="flex gap-2">
+                      <input
+                        {...register("couponCode")}
+                        placeholder="Enter code (if any)"
+                        className="flex-1 rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all uppercase"
+                      />
+                      <button
+                        type="button"
+                        onClick={handleApplyCoupon}
+                        disabled={validatingCoupon || !couponCodeValue}
+                        className="px-4 py-2.5 bg-primary text-white rounded-xl text-xs font-mono font-bold hover:bg-primary-dark transition-all disabled:opacity-50"
+                      >
+                        {validatingCoupon ? "Applying..." : "Apply"}
+                      </button>
+                    </div>
+                    {couponError && (
+                      <p className="text-xs text-pink font-mono">{couponError}</p>
+                    )}
+                    {appliedCoupon && (
+                      <p className="text-xs text-primary font-mono">
+                        Coupon Applied! Discount: LKR {discountVal.toLocaleString()} ({appliedCoupon.code})
+                      </p>
+                    )}
                   </div>
                   <div className="space-y-1.5">
                     <label className="text-xs font-semibold text-gray-600 uppercase tracking-wide">
@@ -403,6 +450,12 @@ export default function CheckoutPage() {
                       <span>Tax (5%)</span>
                       <span>LKR {tax.toFixed(0)}</span>
                     </div>
+                    {discountVal > 0 && (
+                      <div className="flex justify-between text-emerald-600 font-semibold font-mono text-xs">
+                        <span>Discount ({appliedCoupon?.code})</span>
+                        <span>- LKR {discountVal.toLocaleString()}</span>
+                      </div>
+                    )}
                     <div className="flex justify-between font-bold text-dark-green text-base pt-2 border-t border-gray-100">
                       <span>Total</span>
                       <span className="text-primary">LKR {total.toLocaleString()}</span>

@@ -19,7 +19,13 @@ import {
   ChevronRight,
   TrendingUp,
   Server,
-  Leaf
+  Leaf,
+  QrCode,
+  Tag,
+  MessageSquare,
+  Mail,
+  Heart,
+  BookOpen
 } from "lucide-react";
 import { Button } from "@juice-vibe/ui";
 
@@ -70,11 +76,41 @@ export function Sidebar({ collapsed, setCollapsed }: SidebarProps) {
       icon: ChefHat,
     },
     {
+      label: "Tables & QR",
+      href: "/dashboard/tables",
+      icon: QrCode,
+    },
+    {
+      label: "Coupons",
+      href: "/dashboard/coupons",
+      icon: Tag,
+    },
+    {
+      label: "Testimonials",
+      href: "/dashboard/testimonials",
+      icon: Heart,
+    },
+    {
+      label: "Subscribers",
+      href: "/dashboard/subscribers",
+      icon: Mail,
+    },
+    {
+      label: "Blog Posts",
+      href: "/dashboard/blog",
+      icon: BookOpen,
+    },
+    {
       label: "System Settings",
       href: "/dashboard/settings",
       icon: Settings,
     },
   ];
+
+
+
+
+
 
   return (
     <aside

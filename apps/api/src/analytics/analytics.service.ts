@@ -51,8 +51,8 @@ export class AnalyticsService {
 
   async getRevenueChart(days = 30) {
     const startDate = new Date();
-    startDate.setDate(startDate.getDate() - days + 1);
-    startDate.setHours(0, 0, 0, 0);
+    startDate.setUTCDate(startDate.getUTCDate() - days + 1);
+    startDate.setUTCHours(0, 0, 0, 0);
 
     const orders = await prisma.order.findMany({
       where: { createdAt: { gte: startDate } },
@@ -63,7 +63,7 @@ export class AnalyticsService {
 
     for (let i = 0; i < days; i++) {
       const date = new Date(startDate);
-      date.setDate(date.getDate() + i);
+      date.setUTCDate(date.getUTCDate() + i);
       const key = date.toISOString().split("T")[0] ?? "";
       dayMap.set(key, { revenue: 0, orders: 0 });
     }

@@ -77,7 +77,15 @@ export default function DashboardLayout({
     { name: "CRM Directory", desc: "View customer details & LTV", action: () => router.push("/dashboard/customers") },
     { name: "Inventory Log", desc: "Check raw materials inventory", action: () => router.push("/dashboard/inventory") },
     { name: "Staff Shifts", desc: "Track employee position profiles", action: () => router.push("/dashboard/employees") },
+    { name: "Tables & QR Codes", desc: "Manage dine-in tables and QR codes", action: () => router.push("/dashboard/tables") },
+    { name: "Coupons & Promotions", desc: "Manage discount codes and limits", action: () => router.push("/dashboard/coupons") },
+    { name: "Moderate Testimonials", desc: "Approve or feature customer testimonials", action: () => router.push("/dashboard/testimonials") },
+    { name: "Newsletter Subscribers", desc: "Manage newsletter subscription list", action: () => router.push("/dashboard/subscribers") },
+    { name: "Manage Blog Posts", desc: "Write or publish cafe articles", action: () => router.push("/dashboard/blog") },
     { name: "Workspace Settings", desc: "Adjust system variables", action: () => router.push("/dashboard/settings") },
+
+
+
   ];
 
   const filteredCommands = commands.filter(

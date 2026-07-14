@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { formatPrice } from "@juice-vibe/utils";
+import { inventoryService } from "@juice-vibe/services";
 import { 
   Warehouse, 
   Search, 
@@ -10,13 +10,10 @@ import {
   Edit3, 
   Trash2, 
   AlertTriangle,
-  RotateCw,
-  Image as ImageIcon
+  Loader2
 } from "lucide-react";
 import { cn } from "@juice-vibe/utils";
-import { Badge } from "@juice-vibe/ui";
 
-// Mock local inventory client mutations since backend inventory REST endpoint is not predefined in services package
 export default function InventoryLog() {
   const queryClient = useQueryClient();
   const [search, setSearch] = useState("");
@@ -30,17 +27,51 @@ export default function InventoryLog() {
   const [minStockLevel, setMinStockLevel] = useState(0);
   const [supplier, setSupplier] = useState("");
 
-  const [items, setItems] = useState<any[]>([
-    { id: "inv-1", name: "Mango Pulp", quantity: 4.2, unit: "kg", minStockLevel: 5.0, supplier: "Ceylon Fruits Ltd", expiryDate: "2026-08-10" },
-    { id: "inv-2", name: "Avocado Pulp", quantity: 6.5, unit: "kg", minStockLevel: 3.0, supplier: "Galle Organic Farms", expiryDate: "2026-08-15" },
-    { id: "inv-3", name: "Fresh Strawberries", quantity: 12.0, unit: "kg", minStockLevel: 4.0, supplier: "Ceylon Fruits Ltd", expiryDate: "2026-07-20" },
-    { id: "inv-4", name: "Full Cream Milk", quantity: 18.0, unit: "L", minStockLevel: 10.0, supplier: "Richlife Dairies", expiryDate: "2026-07-25" },
-    { id: "inv-5", name: "Passion Fruit Extract", quantity: 1.8, unit: "L", minStockLevel: 2.0, supplier: "Galle Organic Farms", expiryDate: "2026-09-01" },
-  ]);
+  // Fetch Items
+  const { data: items = [], isLoading } = useQuery<any[]>({
+    queryKey: ["inventory"],
+    queryFn: () => inventoryService.getItems(),
+    retry: 1,
+  });
+
+  // Create Mutation
+  const createMutation = useMutation({
+    mutationFn: (input: any) => inventoryService.createItem(input),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["inventory"] });
+      setIsModalOpen(false);
+    },
+    onError: (err: any) => {
+      alert(err.response?.data?.message || err.message || "Failed to create item");
+    },
+  });
+
+  // Update Mutation
+  const updateMutation = useMutation({
+    mutationFn: ({ id, input }: { id: string; input: any }) => inventoryService.updateItem(id, input),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["inventory"] });
+      setIsModalOpen(false);
+    },
+    onError: (err: any) => {
+      alert(err.response?.data?.message || err.message || "Failed to update item");
+    },
+  });
+
+  // Delete Mutation
+  const deleteMutation = useMutation({
+    mutationFn: (id: string) => inventoryService.deleteItem(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["inventory"] });
+    },
+    onError: (err: any) => {
+      alert(err.response?.data?.message || err.message || "Failed to delete item");
+    },
+  });
 
   const filtered = items.filter((i: any) => 
     i.name.toLowerCase().includes(search.toLowerCase()) || 
-    i.supplier.toLowerCase().includes(search.toLowerCase())
+    (i.supplier && i.supplier.toLowerCase().includes(search.toLowerCase()))
   );
 
   const handleOpenCreate = () => {
@@ -59,7 +90,7 @@ export default function InventoryLog() {
     setQuantity(item.quantity);
     setUnit(item.unit);
     setMinStockLevel(item.minStockLevel);
-    setSupplier(item.supplier);
+    setSupplier(item.supplier || "");
     setIsModalOpen(true);
   };
 
@@ -67,28 +98,24 @@ export default function InventoryLog() {
     e.preventDefault();
     if (!name.trim()) return;
 
-    if (editingItem) {
-      setItems((prev: any[]) => prev.map((i: any) => i.id === editingItem.id ? {
-        ...i, name, quantity: Number(quantity), unit, minStockLevel: Number(minStockLevel), supplier
-      } : i));
-    } else {
-      setItems((prev: any[]) => [...prev, {
-        id: `inv-${Date.now()}`,
-        name,
-        quantity: Number(quantity),
-        unit,
-        minStockLevel: Number(minStockLevel),
-        supplier,
-        expiryDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split("T")[0]
-      }]);
-    }
+    const payload = {
+      name,
+      quantity: Number(quantity),
+      unit,
+      minStockLevel: Number(minStockLevel),
+      supplier: supplier.trim() || undefined,
+    };
 
-    setIsModalOpen(false);
+    if (editingItem) {
+      updateMutation.mutate({ id: editingItem.id, input: payload });
+    } else {
+      createMutation.mutate(payload);
+    }
   };
 
   const handleDelete = (id: string) => {
     if (confirm("Are you sure you want to flag and delete this inventory item?")) {
-      setItems((prev: any[]) => prev.filter((i: any) => i.id !== id));
+      deleteMutation.mutate(id);
     }
   };
 
@@ -130,59 +157,73 @@ export default function InventoryLog() {
       {/* Grid stock list */}
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
         <div className="xl:col-span-2 terminal-card bg-card border border-border overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left font-mono text-xs">
-              <thead>
-                <tr className="border-b border-border/80 text-[10px] text-muted-foreground uppercase tracking-wider bg-ink-dark/30">
-                  <th className="py-3 px-4 font-semibold">Stock Name</th>
-                  <th className="py-3 px-4 font-semibold">Volume Count</th>
-                  <th className="py-3 px-4 font-semibold">Safety Level</th>
-                  <th className="py-3 px-4 font-semibold">Partner supplier</th>
-                  <th className="py-3 px-4 font-semibold text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border/30">
-                {filtered.map((item: any) => {
-                  const isLow = item.quantity <= item.minStockLevel;
-                  return (
-                    <tr key={item.id} className="hover:bg-ink-dark/20 transition-colors">
-                      <td className="py-3.5 px-4 font-bold text-foreground flex items-center gap-2">
-                        {item.name}
-                        {isLow && (
-                          <span className="h-2 w-2 rounded-full bg-pink animate-pulse" />
-                        )}
-                      </td>
-                      <td className="py-3.5 px-4 font-numeral">
-                        <span className={cn("font-bold", isLow ? "text-pink" : "text-primary")}>
-                          {item.quantity} {item.unit}
-                        </span>
-                      </td>
-                      <td className="py-3.5 px-4 font-numeral text-muted-foreground">
-                        Min {item.minStockLevel} {item.unit}
-                      </td>
-                      <td className="py-3.5 px-4 text-muted-foreground">{item.supplier}</td>
-                      <td className="py-3.5 px-4 text-right">
-                        <div className="flex items-center justify-end gap-2">
-                          <button
-                            onClick={() => handleOpenEdit(item)}
-                            className="p-1.5 border border-border hover:border-primary/40 text-muted-foreground hover:text-foreground rounded cursor-pointer"
-                          >
-                            <Edit3 className="h-3 w-3" />
-                          </button>
-                          <button
-                            onClick={() => handleDelete(item.id)}
-                            className="p-1.5 border border-border hover:border-pink/40 text-muted-foreground hover:text-pink rounded cursor-pointer"
-                          >
-                            <Trash2 className="h-3 w-3" />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
+          {isLoading ? (
+            <div className="text-center py-20 font-mono text-xs text-muted-foreground uppercase">
+              Fetching inventory catalog indices...
+            </div>
+          ) : filtered.length === 0 ? (
+            <div className="p-12 text-center">
+              <Warehouse className="h-8 w-8 text-muted-foreground mx-auto mb-3" />
+              <h3 className="text-sm font-bold text-foreground font-heading">No Inventory Records</h3>
+              <p className="text-xs text-muted-foreground font-mono mt-1">
+                Begin by adding raw ingredients and supplies.
+              </p>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-left font-mono text-xs">
+                <thead>
+                  <tr className="border-b border-border/80 text-[10px] text-muted-foreground uppercase tracking-wider bg-ink-dark/30">
+                    <th className="py-3 px-4 font-semibold">Stock Name</th>
+                    <th className="py-3 px-4 font-semibold">Volume Count</th>
+                    <th className="py-3 px-4 font-semibold">Safety Level</th>
+                    <th className="py-3 px-4 font-semibold">Partner supplier</th>
+                    <th className="py-3 px-4 font-semibold text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border/30">
+                  {filtered.map((item: any) => {
+                    const isLow = item.quantity <= item.minStockLevel;
+                    return (
+                      <tr key={item.id} className="hover:bg-ink-dark/20 transition-colors">
+                        <td className="py-3.5 px-4 font-bold text-foreground flex items-center gap-2">
+                          {item.name}
+                          {isLow && (
+                            <span className="h-2 w-2 rounded-full bg-pink animate-pulse" />
+                          )}
+                        </td>
+                        <td className="py-3.5 px-4 font-numeral">
+                          <span className={cn("font-bold", isLow ? "text-pink" : "text-primary")}>
+                            {item.quantity} {item.unit}
+                          </span>
+                        </td>
+                        <td className="py-3.5 px-4 font-numeral text-muted-foreground">
+                          Min {item.minStockLevel} {item.unit}
+                        </td>
+                        <td className="py-3.5 px-4 text-muted-foreground">{item.supplier || "—"}</td>
+                        <td className="py-3.5 px-4 text-right">
+                          <div className="flex items-center justify-end gap-2">
+                            <button
+                              onClick={() => handleOpenEdit(item)}
+                              className="p-1.5 border border-border hover:border-primary/40 text-muted-foreground hover:text-foreground rounded cursor-pointer"
+                            >
+                              <Edit3 className="h-3 w-3" />
+                            </button>
+                            <button
+                              onClick={() => handleDelete(item.id)}
+                              className="p-1.5 border border-border hover:border-pink/40 text-muted-foreground hover:text-pink rounded cursor-pointer"
+                            >
+                              <Trash2 className="h-3 w-3" />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          )}
         </div>
 
         {/* Alarm Side Panel */}
@@ -196,18 +237,24 @@ export default function InventoryLog() {
             </div>
             
             <div className="space-y-3 font-mono text-[10px]">
-              {items.filter((i: any) => i.quantity <= i.minStockLevel).map((item: any) => (
-                <div key={item.id} className="p-3 bg-pink/5 border border-pink/20 rounded-lg flex items-center justify-between">
-                  <div>
-                    <span className="font-semibold text-pink">{item.name}</span>
-                    <span className="text-[9px] text-muted-foreground block mt-0.5">Supplier: {item.supplier}</span>
-                  </div>
-                  <div className="text-right">
-                    <span className="font-numeral text-pink font-semibold bg-pink/10 px-2 py-0.5 rounded">{item.quantity} {item.unit}</span>
-                    <span className="text-[8px] text-muted-foreground block mt-1">Min threshold {item.minStockLevel}</span>
-                  </div>
+              {items.filter((i: any) => i.quantity <= i.minStockLevel).length === 0 ? (
+                <div className="text-center py-6 text-muted-foreground/60 uppercase">
+                  All inventory volumes nominal.
                 </div>
-              ))}
+              ) : (
+                items.filter((i: any) => i.quantity <= i.minStockLevel).map((item: any) => (
+                  <div key={item.id} className="p-3 bg-pink/5 border border-pink/20 rounded-lg flex items-center justify-between">
+                    <div>
+                      <span className="font-semibold text-pink">{item.name}</span>
+                      <span className="text-[9px] text-muted-foreground block mt-0.5">Supplier: {item.supplier || "—"}</span>
+                    </div>
+                    <div className="text-right">
+                      <span className="font-numeral text-pink font-semibold bg-pink/10 px-2 py-0.5 rounded">{item.quantity} {item.unit}</span>
+                      <span className="text-[8px] text-muted-foreground block mt-1">Min threshold {item.minStockLevel}</span>
+                    </div>
+                  </div>
+                ))
+              )}
             </div>
           </div>
         </div>
@@ -304,9 +351,14 @@ export default function InventoryLog() {
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-primary hover:bg-primary-dark text-ink-dark text-xs font-mono font-bold rounded-lg uppercase tracking-wider cursor-pointer"
+                  disabled={createMutation.isPending || updateMutation.isPending}
+                  className="px-4 py-2 bg-primary hover:bg-primary-dark text-ink-dark text-xs font-mono font-bold rounded-lg uppercase tracking-wider cursor-pointer flex items-center justify-center min-w-[100px]"
                 >
-                  Save Stock
+                  {createMutation.isPending || updateMutation.isPending ? (
+                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                  ) : (
+                    "Save Stock"
+                  )}
                 </button>
               </div>
             </form>
