@@ -1,3 +1,7 @@
+import * as dotenv from "dotenv";
+import { join } from "path";
+dotenv.config({ path: join(__dirname, "..", "..", "..", ".env") });
+
 import { NestFactory } from "@nestjs/core";
 import { ValidationPipe, Logger } from "@nestjs/common";
 import { SwaggerModule, DocumentBuilder } from "@nestjs/swagger";
@@ -5,7 +9,6 @@ import helmet from "helmet";
 import { AppModule } from "./app.module";
 
 import { NestExpressApplication } from "@nestjs/platform-express";
-import { join } from "path";
 
 async function bootstrap() {
   const logger = new Logger("Bootstrap");
@@ -35,7 +38,7 @@ async function bootstrap() {
   );
 
   const allowedOrigins = [
-    process.env.FRONTEND_URL || "http://localhost:3000",
+    process.env.FRONTEND_URL,
     process.env.ADMIN_URL || "http://localhost:3001",
   ].filter(Boolean);
 
@@ -43,8 +46,12 @@ async function bootstrap() {
     origin: (origin, callback) => {
       // Allow requests with no origin (mobile apps, Postman, server-to-server)
       if (!origin) return callback(null, true);
+      
+      // Allow local development origins (localhost or 127.0.0.1 on any port) dynamically
+      const isLocalhost = /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin);
+      
       // Allow any vercel.app preview URL automatically
-      if (origin.endsWith(".vercel.app") || allowedOrigins.includes(origin)) {
+      if (origin.endsWith(".vercel.app") || allowedOrigins.includes(origin) || isLocalhost) {
         return callback(null, true);
       }
       callback(new Error(`CORS: ${origin} not allowed`));

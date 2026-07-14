@@ -1,6 +1,6 @@
 # Juice Vibe Waskaduwa — Project Delivery Document
 **Client:** Juice Vibe Waskaduwa, Bentota, Sri Lanka
-**Prepared by:** [Your Company / Name]
+**Prepared by:** Dulanjaya Lakruwan 
 **Date:** July 12, 2026
 **Version:** 1.0 — Initial Delivery
 
@@ -18,13 +18,11 @@ We are pleased to deliver the **Juice Vibe Digital Platform** — a complete, fu
 
 | Platform | URL | Purpose |
 |---|---|---|
+| **Customer Website** | https://juice-vibe-waskaduwa-web.vercel.app/ | Public-facing storefront for your customers |
+| **Admin Dashboard** | https://juice-vibe-waskaduwa-admin.vercel.app/ | Internal management portal for staff |
+| **API & Docs** | https://juice-vibe-waskaduwa-api.vercel.app/api/docs | Backend API documentation (Swagger) |
 
-| **Customer Website** | `https://juice-vibe-waskaduwa-web.vercel.app/` *(update after deploy)* | Public-facing storefront for your customers |
-| **Admin Dashboard** | `https://juice-vibe-waskaduwa-admin.vercel.app` *(update after deploy)* | Internal management portal for staff |
-| **API & Docs** | `https://juice-vibe-api.vercel.app/api/docs` *(update after deploy)* | Backend API documentation (technical) |
-
-> [!NOTE]
-> These URLs will be updated with the final live links immediately upon deployment completion. Custom domains (e.g., `juicevibe.lk`) can be connected at any time.
+> Custom domains (e.g., `juicevibe.lk`) can be connected at any time via the Vercel dashboard.
 
 ---
 
@@ -83,9 +81,12 @@ A powerful, secure REST API built with NestJS 11:
 ### Admin Panel Login
 | Field | Value |
 |---|---|
-| URL | `https://juice-vibe-waskaduwa-admin.vercel.app` |
-| Admin Email | `admin@juicevibe.lk` *(to be set during setup)* |
-| Admin Password | *(to be provided securely)* |
+| URL | https://juice-vibe-waskaduwa-admin.vercel.app/ |
+| Admin Email | `admin@juicevibe.com` |
+| Admin Password | `Admin@123` |
+
+> [!TIP]
+> Change the admin password immediately after first login via the Settings page.
 
 ### Database (For Developer Reference)
 | Field | Value |
@@ -104,24 +105,21 @@ A powerful, secure REST API built with NestJS 11:
 | ✅ Admin dashboard built | Complete |
 | ✅ Backend API built | Complete |
 | ✅ Database schema designed | Complete |
-| ⏳ Cloud database provisioned | Pending |
-| ⏳ Vercel deployment — API | Pending |
-| ⏳ Vercel deployment — Web | Pending |
-| ⏳ Vercel deployment — Admin | Pending |
-| ⏳ Database seeded with initial data | Pending |
+| ✅ Cloud database provisioned | Complete (Neon PostgreSQL) |
+| ✅ Vercel deployment — API | Complete |
+| ✅ Vercel deployment — Web | Complete |
+| ✅ Vercel deployment — Admin | Complete |
+| ✅ Database seeded with initial data | Complete |
 | ⏳ Custom domain connected | Optional |
-| ⏳ Cloudinary image upload configured | Pending |
+| ✅ Cloudinary image upload configured | Complete |
 
 ---
 
-## 🚀 Next Steps (Action Required from You)
+## 🚀 Next Steps (Recommended)
 
-To go fully live, we need the following from you:
-
-1. **Domain name** — Do you have a domain (e.g., `juicevibe.lk`)? If yes, share the registrar login.
-2. **Cloudinary account** — For uploading menu and gallery images. We can create one on your behalf.
-3. **Initial admin password** — Decide a strong password for the admin account.
-4. **Review demo content** — Let us know if any colors, text, or layout needs adjustment.
+1. **Change admin password** — Update from the default `Admin@123` via the admin Settings page.
+2. **Custom domain** (optional) — Connect your domain (e.g., `juicevibe.lk`) through the Vercel dashboard.
+3. **Review content** — Let us know if any colors, text, or layout needs adjustment.
 
 ---
 
@@ -131,9 +129,9 @@ To go fully live, we need the following from you:
 |---|---|
 | **Bug Fixes** | Included for 30 days after launch |
 | **Content Updates** | Via the admin panel (self-service) |
-| **Technical Support** | Contact [Your Email / WhatsApp] |
-| **Hosting Cost** | Vercel Free Tier (₀/month for this traffic level) |
-| **Database Cost** | Neon Free Tier (0/month up to 0.5 GB) |
+| **Technical Support** | Contact [devlakruwan@gmail.com / WhatsApp-0714089493] |
+| **Hosting Cost** | Vercel Free Tier ($0/month for this traffic level) |
+| **Database Cost** | Neon Free Tier ($0/month up to 0.5 GB) |
 
 ---
 
@@ -153,4 +151,4 @@ By proceeding to use the delivered platform, the client acknowledges receipt of 
 
 ---
 *Document prepared for: Juice Vibe Waskaduwa, Bentota, Sri Lanka*
-*Contact: [Your contact info here]*
+*Contact: [devlakruwan@gmail.com / WhatsApp-0714089493]*

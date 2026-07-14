@@ -11,6 +11,7 @@ import { BlogModule } from "./blog/blog.module";
 import { CouponModule } from "./coupon/coupon.module";
 import { AnalyticsModule } from "./analytics/analytics.module";
 import { SettingsModule } from "./settings/settings.module";
+import { TableModule } from "./table/table.module";
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { SettingsModule } from "./settings/settings.module";
     CouponModule,
     AnalyticsModule,
     SettingsModule,
+    TableModule,
   ],
   providers: [
     { provide: APP_GUARD, useClass: ThrottlerGuard },

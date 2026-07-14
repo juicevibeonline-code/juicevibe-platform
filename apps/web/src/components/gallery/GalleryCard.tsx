@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import { Expand } from "lucide-react";
-import type { GalleryImage } from "@/data/gallery";
+import type { GalleryImage } from "@juice-vibe/services";
 
 import Image from "next/image";
 

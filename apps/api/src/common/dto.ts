@@ -149,6 +149,11 @@ export class CreateOrderDto {
   @IsOptional()
   @IsString()
   couponCode?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  tableId?: string;
 }
 
 export class UpdateOrderStatusDto {

@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { X, ChevronLeft, ChevronRight } from "lucide-react";
 import { useEffect } from "react";
 import Image from "next/image";
-import type { GalleryImage } from "@/data/gallery";
+import type { GalleryImage } from "@juice-vibe/services";
 
 interface LightboxProps {
   images: GalleryImage[];

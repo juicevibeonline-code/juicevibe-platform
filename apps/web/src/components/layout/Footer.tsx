@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { Mail, Phone, MapPin, Send, CheckCircle, AlertCircle } from "lucide-react";
+import { Mail, Phone, MapPin, Send, CheckCircle, AlertCircle, ArrowRight } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -63,36 +63,43 @@ export function Footer() {
   };
 
   return (
-    <footer className="relative overflow-hidden bg-dark-green text-white">
-      <div className="pointer-events-none absolute inset-0 opacity-5">
-        <div className="absolute -top-40 -right-40 h-80 w-80 rounded-full bg-primary blur-3xl" />
-        <div className="absolute -bottom-40 -left-40 h-80 w-80 rounded-full bg-orange blur-3xl" />
+    <footer className="relative overflow-hidden bg-[#0F2A1E] text-white border-t border-white/5">
+      {/* Decorative Radial Background Glows */}
+      <div className="pointer-events-none absolute inset-0 opacity-10">
+        <div className="absolute top-0 left-1/4 h-[350px] w-[350px] -translate-y-1/2 rounded-full bg-primary blur-[120px]" />
+        <div className="absolute bottom-0 right-1/4 h-[350px] w-[350px] translate-y-1/2 rounded-full bg-orange blur-[120px]" />
       </div>
 
-      <div className="container relative py-16 md:py-20">
-        <div className="grid gap-12 md:grid-cols-2 lg:grid-cols-4">
-          <div className="space-y-5">
-            <Link href="/" className="flex items-center gap-3">
-              <Image
-                src="/images/Logo.jpeg"
-                alt="Juice Vibe"
-                width={40}
-                height={40}
-                className="rounded-xl object-cover"
-              />
-              <span className="font-heading text-xl font-extrabold">
+      {/* Top Thin Glow Bar */}
+      <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
+
+      <div className="container relative py-16 md:py-24">
+        <div className="grid gap-12 sm:grid-cols-2 lg:grid-cols-4">
+          
+          {/* Brand Info */}
+          <div className="space-y-6">
+            <Link href="/" className="flex items-center gap-3 group">
+              <div className="relative h-12 w-12 items-center justify-center rounded-xl overflow-hidden shadow-md border border-white/10 bg-[#1F2E24] flex transition duration-300 group-hover:scale-105">
+                <Image
+                  src="/images/Logo.jpeg"
+                  alt="Juice Vibe Logo"
+                  fill
+                  className="object-cover"
+                />
+              </div>
+              <span className="font-heading text-2xl font-extrabold tracking-tight text-white group-hover:text-primary transition-colors duration-300">
                 Juice <span className="text-primary">Vibe</span>
               </span>
             </Link>
-            <p className="text-sm leading-relaxed text-gray-300">
-              Fresh juices, smoothies, and tropical flavors crafted with love. Sip the good vibes every day.
+            <p className="text-sm leading-relaxed text-gray-400 font-medium">
+              Premium tropical juice café offering fresh, organic, and handcrafted beverages. Experience the finest juices and healthy drinks in Waskaduwa.
             </p>
-            <div className="flex gap-3">
+            <div className="flex gap-3 pt-2">
               {socialLinks.map((social) => (
                 <a
                   key={social.label}
                   href={social.href}
-                  className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/10 text-white transition-all hover:bg-primary hover:scale-110"
+                  className="flex h-9 w-9 items-center justify-center rounded-lg bg-white/5 border border-white/10 text-gray-400 transition-all duration-300 hover:bg-primary hover:text-[#0F2A1E] hover:border-primary hover:-translate-y-0.5"
                   aria-label={social.label}
                 >
                   <social.icon className="h-4 w-4" />
@@ -101,15 +108,17 @@ export function Footer() {
             </div>
           </div>
 
+          {/* Quick Links */}
           <div>
-            <h3 className="mb-5 font-heading text-lg font-bold">Quick Links</h3>
-            <ul className="space-y-3">
+            <h3 className="mb-6 font-heading text-xs font-bold tracking-widest text-primary/80 uppercase">Quick Links</h3>
+            <ul className="space-y-3.5">
               {quickLinks.map((link) => (
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-sm text-gray-300 transition-colors hover:text-primary"
+                    className="group inline-flex items-center gap-1.5 text-sm text-gray-400 font-medium transition-all duration-300 hover:text-primary hover:translate-x-1"
                   >
+                    <ArrowRight className="h-3 w-3 stroke-[2.5] opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300" />
                     {link.label}
                   </Link>
                 </li>
@@ -117,73 +126,90 @@ export function Footer() {
             </ul>
           </div>
 
+          {/* Opening Hours & Contact */}
           <div>
-            <h3 className="mb-5 font-heading text-lg font-bold">Opening Hours</h3>
-            <ul className="space-y-3 text-sm text-gray-300">
-              <li className="flex justify-between">
+            <h3 className="mb-6 font-heading text-xs font-bold tracking-widest text-primary/80 uppercase">Opening Hours</h3>
+            <ul className="space-y-3 text-sm text-gray-400 font-medium">
+              <li className="flex justify-between border-b border-white/5 pb-2">
                 <span>Mon - Fri</span>
-                <span className="font-medium text-white">8 AM - 10 PM</span>
+                <span className="font-mono text-xs font-semibold text-white">08:00 AM - 10:00 PM</span>
               </li>
-              <li className="flex justify-between">
+              <li className="flex justify-between border-b border-white/5 pb-2">
                 <span>Saturday</span>
-                <span className="font-medium text-white">9 AM - 11 PM</span>
+                <span className="font-mono text-xs font-semibold text-white">09:00 AM - 11:00 PM</span>
               </li>
-              <li className="flex justify-between">
+              <li className="flex justify-between border-b border-white/5 pb-2">
                 <span>Sunday</span>
-                <span className="font-medium text-white">10 AM - 9 PM</span>
+                <span className="font-mono text-xs font-semibold text-white">10:00 AM - 09:00 PM</span>
               </li>
             </ul>
-            <div className="mt-5 space-y-2 text-sm text-gray-300">
-              <a href="tel:+94718435876" className="flex items-center gap-2 transition-colors hover:text-primary">
-                <Phone className="h-3.5 w-3.5" />
-                +94 71 843 5876
+            <div className="mt-6 space-y-3 text-sm text-gray-400 font-medium">
+              <a href="tel:+94718435876" className="flex items-center gap-2.5 transition-colors duration-300 hover:text-primary">
+                <Phone className="h-4 w-4 text-primary" />
+                <span className="font-mono text-xs">+94 71 843 5876</span>
               </a>
-              <a href="mailto:hello@juicevibe.com" className="flex items-center gap-2 transition-colors hover:text-primary">
-                <Mail className="h-3.5 w-3.5" />
+              <a href="mailto:hello@juicevibe.com" className="flex items-center gap-2.5 transition-colors duration-300 hover:text-primary">
+                <Mail className="h-4 w-4 text-primary" />
                 hello@juicevibe.com
               </a>
-              <div className="flex items-start gap-2">
-                <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0" />
-                <span>No.89 Bandaragama road, Waskaduwa., Waskaduwa, Sri Lanka, 12580</span>
+              <div className="flex items-start gap-2.5">
+                <MapPin className="mt-0.5 h-4 w-4 text-primary shrink-0" />
+                <span>
+                  No. 89 Bandaragama Road,<br />
+                  Waskaduwa, Sri Lanka, <span className="font-mono text-xs">12580</span>
+                </span>
               </div>
             </div>
           </div>
 
-          <div>
-            <h3 className="mb-5 font-heading text-lg font-bold">Newsletter</h3>
-            <p className="mb-4 text-sm text-gray-300">
-              Subscribe for exclusive offers and new flavors.
+          {/* Newsletter */}
+          <div className="space-y-4">
+            <h3 className="font-heading text-xs font-bold tracking-widest text-primary/80 uppercase">Newsletter</h3>
+            <p className="text-sm text-gray-400 font-medium leading-relaxed">
+              Subscribe for exclusive tropical updates, seasonal menu offers, and new flavors.
             </p>
             <form onSubmit={handleSubscribe} className="flex gap-2">
-              <Input
+              <input
                 type="email"
-                placeholder="Your email"
+                placeholder="Enter your email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="h-11 border-white/20 bg-white/10 text-white placeholder:text-gray-400"
+                className="h-10 w-full px-4 rounded-lg bg-white/5 border border-white/10 text-sm text-white placeholder:text-gray-500 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all duration-300 font-medium"
                 required
               />
-              <Button variant="primary" size="sm" className="h-11 w-11 shrink-0 p-0" type="submit" disabled={isSubscribing}>
+              <button
+                type="submit"
+                disabled={isSubscribing}
+                aria-label="Subscribe"
+                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary text-[#0F2A1E] font-bold shadow-lg shadow-primary/10 transition-all duration-300 hover:bg-primary-dark hover:scale-105 active:scale-95 cursor-pointer disabled:opacity-50"
+              >
                 <Send className="h-4 w-4" />
-              </Button>
+              </button>
             </form>
             {subscribed && (
-              <div className="mt-3 flex items-center gap-2 text-sm text-green-400">
+              <div className="mt-3 flex items-center gap-2 text-xs text-green-400">
                 <CheckCircle className="h-4 w-4" />
                 Subscribed successfully!
               </div>
             )}
             {subscribeError && (
-              <div className="mt-3 flex items-center gap-2 text-sm text-red-400">
+              <div className="mt-3 flex items-center gap-2 text-xs text-red-400">
                 <AlertCircle className="h-4 w-4" />
                 {subscribeError}
               </div>
             )}
           </div>
+
         </div>
 
-        <div className="mt-12 border-t border-white/10 pt-8 text-center text-sm text-gray-400">
-          <p>&copy; {new Date().getFullYear()} Juice Vibe. All rights reserved. Made with fresh vibes.</p>
+        {/* Footer Bottom bar */}
+        <div className="mt-16 border-t border-white/5 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-gray-500 font-medium">
+          <p>
+            &copy; <span className="font-mono text-xs">{new Date().getFullYear()}</span> Juice Vibe. All rights reserved.
+          </p>
+          <p className="flex items-center gap-1 text-gray-400">
+            Sip the good vibes, crafted with 💚 in Sri Lanka.
+          </p>
         </div>
       </div>
     </footer>

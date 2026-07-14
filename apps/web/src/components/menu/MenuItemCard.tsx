@@ -6,7 +6,7 @@ import { Star, Plus, CheckCircle } from "lucide-react";
 import { useState } from "react";
 import { formatPrice } from "@/lib/utils";
 import { useCartStore } from "@/store/cart";
-import type { MenuItem } from "@/data/menu";
+import type { MenuItem } from "@juice-vibe/types";
 import { cn } from "@/lib/utils";
 
 interface MenuItemCardProps {
@@ -89,7 +89,8 @@ export function MenuItemCard({ item, index }: MenuItemCardProps) {
   const addItem = useCartStore((state) => state.addItem);
   const [isAdded, setIsAdded] = useState(false);
 
-  const theme = categoryThemes[item.category] || {
+  const categorySlug = typeof item.category === "string" ? item.category : item.category?.slug || "";
+  const theme = categoryThemes[categorySlug] || {
     btnBg: "bg-primary hover:bg-primary-dark",
     badgeBg: "bg-primary/5 text-primary border-primary/10",
     emoji: "🌿",
@@ -102,7 +103,8 @@ export function MenuItemCard({ item, index }: MenuItemCardProps) {
     setTimeout(() => setIsAdded(false), 1500);
   };
 
-  const isPng = item.image?.toLowerCase().endsWith(".png");
+  const itemImage = item.thumbnail || (item.images && item.images[0]) || (item as any).image;
+  const isPng = itemImage?.toLowerCase().endsWith(".png");
 
   return (
     <motion.div
@@ -112,28 +114,28 @@ export function MenuItemCard({ item, index }: MenuItemCardProps) {
       transition={{ duration: 0.4, delay: index * 0.02 }}
       className="h-full"
     >
-      <div className="group relative flex flex-col justify-between h-full rounded-2xl bg-white dark:bg-zinc-900 border border-slate-100 dark:border-zinc-800 shadow-sm hover:shadow-md transition-all duration-300 p-4 overflow-hidden">
+      <div className="group relative flex flex-col justify-between h-full rounded-2xl bg-white dark:bg-zinc-900 border border-slate-100/80 dark:border-zinc-800/80 shadow-[0_4px_20px_rgba(0,0,0,0.015)] hover:shadow-[0_12px_28px_rgba(34,197,94,0.06)] hover:border-primary/20 dark:hover:border-primary/20 transition-all duration-500 p-4 overflow-hidden">
         
         {/* Full-width Image Section */}
-        <div className="relative w-full aspect-[4/3] rounded-xl overflow-hidden bg-slate-50 dark:bg-zinc-800 border border-slate-100 dark:border-zinc-800/50 flex items-center justify-center mb-4">
+        <div className="relative w-full aspect-[4/3] rounded-xl overflow-hidden bg-slate-50/60 dark:bg-zinc-800/60 border border-slate-100/50 dark:border-zinc-800/20 flex items-center justify-center mb-4">
           
           {/* Overlay Badges */}
           <div className="absolute top-2.5 left-2.5 right-2.5 z-20 flex items-center justify-between pointer-events-none">
-            <span className={cn("px-2 py-0.5 rounded text-[8px] font-bold uppercase tracking-wider shadow-sm border", theme.badgeBg)}>
+            <span className={cn("px-2.5 py-0.75 rounded-full text-[8px] font-extrabold uppercase tracking-widest shadow-sm border", theme.badgeBg)}>
               {theme.tag}
             </span>
-            {item.popular && (
-              <span className="inline-flex items-center gap-0.5 px-2 py-0.5 rounded bg-amber-500 text-white text-[8px] font-bold uppercase tracking-wider shadow-sm">
+            {item.isPopular && (
+              <span className="inline-flex items-center gap-0.5 px-2.5 py-0.75 rounded-full bg-amber-500 text-white text-[8px] font-extrabold uppercase tracking-widest shadow-sm">
                 <Star className="h-2 w-2 fill-current" />
                 Popular
               </span>
             )}
           </div>
           
-          {item.image ? (
+          {itemImage ? (
             <div className="relative w-full h-full z-10 transition-transform duration-500 ease-out group-hover:scale-105">
               <Image
-                src={encodeURI(item.image)}
+                src={encodeURI(itemImage)}
                 alt={item.name}
                 fill
                 sizes="(max-width: 768px) 100vw, 350px"
@@ -152,17 +154,17 @@ export function MenuItemCard({ item, index }: MenuItemCardProps) {
 
         {/* Product Details Section */}
         <div className="flex-1 flex flex-col justify-start mb-3">
-          <h3 className="font-heading text-sm font-bold text-dark-green dark:text-white tracking-tight leading-tight group-hover:text-primary transition-colors duration-300">
+          <h3 className="font-heading text-sm font-extrabold text-dark-green dark:text-white tracking-tight leading-tight group-hover:text-primary transition-colors duration-300">
             {item.name}
           </h3>
-          <p className="mt-1 text-xs text-gray-500 dark:text-gray-400 leading-relaxed font-medium line-clamp-2">
+          <p className="mt-1.5 text-[11px] text-gray-500/90 dark:text-gray-400 leading-relaxed font-medium line-clamp-2">
             {item.description}
           </p>
-          {item.flavours && (
+          {item.variants && item.variants.length > 0 && (
             <div className="mt-2.5 flex flex-wrap gap-1">
-              {item.flavours.map((flavour) => (
-                <span key={flavour} className="text-[9px] font-semibold bg-primary/5 text-primary border border-primary/10 rounded px-1.5 py-0.5">
-                  {flavour}
+              {item.variants.map((v) => (
+                <span key={v.id} className="text-[9px] font-bold bg-primary/5 text-primary border border-primary/10 rounded px-1.5 py-0.5">
+                  {v.name}
                 </span>
               ))}
             </div>
@@ -170,10 +172,10 @@ export function MenuItemCard({ item, index }: MenuItemCardProps) {
         </div>
 
         {/* Footer Actions */}
-        <div className="relative z-10 flex items-center justify-between pt-3 border-t border-slate-100 dark:border-zinc-800 mt-auto">
+        <div className="relative z-10 flex items-center justify-between pt-3 border-t border-slate-100 dark:border-zinc-800/80 mt-auto">
           <div className="flex flex-col">
-            <span className="text-[8px] font-bold text-gray-400 dark:text-zinc-500 uppercase tracking-wider leading-none">Price</span>
-            <span className="font-heading text-base font-black text-dark-green dark:text-primary mt-1">
+            <span className="text-[8px] font-bold text-gray-400/90 dark:text-zinc-500 uppercase tracking-widest leading-none">Price</span>
+            <span className="font-mono text-sm font-bold text-dark-green dark:text-primary mt-1">
               {formatPrice(item.price)}
             </span>
           </div>
@@ -182,14 +184,14 @@ export function MenuItemCard({ item, index }: MenuItemCardProps) {
             onClick={handleAddToCart}
             aria-label={`Order ${item.name}`}
             className={cn(
-              "flex h-8.5 w-8.5 items-center justify-center rounded-lg text-white shadow-sm transition-all duration-300 outline-none cursor-pointer",
+              "flex h-8 w-8 items-center justify-center rounded-lg text-white shadow-sm transition-all duration-300 outline-none cursor-pointer",
               isAdded ? "bg-emerald-500" : `${theme.btnBg} hover:scale-105 active:scale-95`
             )}
           >
             {isAdded ? (
-              <CheckCircle className="h-4.5 w-4.5 stroke-[2.5]" />
+              <CheckCircle className="h-4 w-4 stroke-[2.5]" />
             ) : (
-              <Plus className="h-4.5 w-4.5 stroke-[2.5]" />
+              <Plus className="h-4 w-4 stroke-[2.5]" />
             )}
           </button>
         </div>

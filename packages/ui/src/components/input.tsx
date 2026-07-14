@@ -31,10 +31,10 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
               "w-full rounded-lg border border-border bg-gray-50 text-sm transition-colors",
               "focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary",
               "placeholder:text-muted/60",
+              "px-3 py-2",
               leftIcon && "pl-10",
               rightIcon && "pr-10",
               error && "border-pink focus:ring-pink/20 focus:border-pink",
-              "px-3 py-2",
               className
             )}
             {...props}

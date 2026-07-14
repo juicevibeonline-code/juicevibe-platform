@@ -1,6 +1,8 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { Suspense, useState, useMemo, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
+import { useCartStore } from "@/store/cart";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
@@ -12,15 +14,53 @@ import { WhatsAppButton } from "@/components/shared/WhatsAppButton";
 import { MenuSearch } from "@/components/menu/MenuSearch";
 import { MenuCategoryFilter } from "@/components/menu/MenuCategoryFilter";
 import { MenuItemCard } from "@/components/menu/MenuItemCard";
-import { menuItems, categories } from "@/data/menu";
+import type { MenuItem, MenuCategory } from "@juice-vibe/types";
+import { menuService } from "@juice-vibe/services";
 
-export default function MenuPage() {
+function MenuContent() {
+  const searchParams = useSearchParams();
+  const setTableId = useCartStore((state) => state.setTableId);
+  const tableIdFromStore = useCartStore((state) => state.tableId);
+
   const [search, setSearch] = useState("");
   const [activeCategory, setActiveCategory] = useState("all");
+  const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
+  const [categories, setCategories] = useState<MenuCategory[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const tableId = searchParams.get("tableId");
+    if (tableId) {
+      setTableId(tableId);
+    }
+  }, [searchParams, setTableId]);
+
+  async function loadData() {
+    try {
+      setLoading(true);
+      setError(null);
+      const [itemsData, catsData] = await Promise.all([
+        menuService.getMenuItems(),
+        menuService.getCategories(),
+      ]);
+      setMenuItems(itemsData);
+      setCategories(catsData);
+    } catch (err) {
+      console.error("Failed to load menu data:", err);
+      setError("Unable to connect to the server. Please check if the API is running or try again.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    loadData();
+  }, []);
 
   const popularItems = useMemo(
-    () => menuItems.filter((item) => item.popular).slice(0, 3),
-    []
+    () => menuItems.filter((item) => item.isPopular).slice(0, 3),
+    [menuItems]
   );
 
   const filteredItems = useMemo(() => {
@@ -28,13 +68,18 @@ export default function MenuPage() {
       const matchesSearch =
         item.name.toLowerCase().includes(search.toLowerCase()) ||
         item.description.toLowerCase().includes(search.toLowerCase());
+      
+      const itemCategorySlug = typeof item.category === "string" 
+        ? item.category 
+        : item.category?.slug || "";
+
       const matchesCategory =
-        activeCategory === "all" || item.category === activeCategory;
+        activeCategory === "all" || itemCategorySlug === activeCategory;
       return matchesSearch && matchesCategory;
     });
-  }, [search, activeCategory]);
+  }, [search, activeCategory, menuItems]);
 
-  const currentCategory = categories.find((c) => c.id === activeCategory);
+  const currentCategory = categories.find((c) => c.slug === activeCategory);
 
   return (
     <>
@@ -108,6 +153,7 @@ export default function MenuPage() {
                 transition={{ duration: 0.5, delay: 0.2 }}
               >
                 <MenuCategoryFilter
+                  categories={categories}
                   activeCategory={activeCategory}
                   onCategoryChange={setActiveCategory}
                 />
@@ -164,14 +210,47 @@ export default function MenuPage() {
             )}
 
             <AnimatePresence mode="wait">
-              {filteredItems.length > 0 ? (
+              {loading ? (
+                <motion.div
+                  key="loading"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="mt-16 text-center"
+                >
+                  <div className="text-4xl animate-bounce">🍹</div>
+                  <h3 className="mt-4 font-heading text-lg font-bold text-dark-green uppercase font-mono tracking-wider animate-pulse">
+                    Compiling Fresh Juices Menu...
+                  </h3>
+                </motion.div>
+              ) : error ? (
+                <motion.div
+                  key="error"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="mt-16 text-center animate-fade-in"
+                >
+                  <div className="text-4xl">⚠️</div>
+                  <h3 className="mt-4 font-heading text-xl font-bold text-red-500">
+                    Failed to Load Menu
+                  </h3>
+                  <p className="mt-2 text-gray-500 max-w-md mx-auto font-medium">{error}</p>
+                  <button
+                    onClick={loadData}
+                    className="mt-6 inline-flex items-center justify-center rounded-full bg-primary px-6 py-2.5 text-sm font-semibold text-white shadow-lg shadow-primary/25 hover:bg-primary-dark hover:scale-105 active:scale-95 transition-all duration-300 cursor-pointer"
+                  >
+                    Retry Connection
+                  </button>
+                </motion.div>
+              ) : filteredItems.length > 0 ? (
                 <motion.div
                   key={`${activeCategory}-${search}`}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.3 }}
-                  className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:gap-8"
+                  className="mt-6 grid gap-4 sm:gap-5 lg:gap-6 grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
                 >
                   {filteredItems.map((item, i) => (
                     <MenuItemCard key={item.id} item={item} index={i} />
@@ -200,5 +279,13 @@ export default function MenuPage() {
       <BackToTop />
       <WhatsAppButton />
     </>
+  );
+}
+
+export default function MenuPage() {
+  return (
+    <Suspense>
+      <MenuContent />
+    </Suspense>
   );
 }

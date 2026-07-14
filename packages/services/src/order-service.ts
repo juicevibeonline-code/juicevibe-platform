@@ -9,7 +9,11 @@ export const orderService = {
 
   async getOrders(params?: { status?: string; page?: number; limit?: number }): Promise<{ orders: Order[]; total: number; totalPages: number }> {
     const { data } = await apiClient.get("/orders", { params });
-    return data.data;
+    return {
+      orders: data.data || [],
+      total: data.meta?.total || 0,
+      totalPages: data.meta?.totalPages || 1,
+    };
   },
 
   async getOrder(id: string): Promise<Order> {

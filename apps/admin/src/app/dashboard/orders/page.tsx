@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { orderService } from "@juice-vibe/services";
 import type { Order } from "@juice-vibe/types";
@@ -20,9 +20,12 @@ import {
   XCircle,
   Truck,
   Coffee,
-  Calendar
+  Calendar,
+  Bell,
+  QrCode,
 } from "lucide-react";
 import { cn } from "@juice-vibe/utils";
+import { useOrdersSocket } from "@/hooks/use-orders-socket";
 
 type ViewMode = "kanban" | "list";
 
@@ -31,6 +34,24 @@ export default function OrderDesk() {
   const [viewMode, setViewMode] = useState<ViewMode>("kanban");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [typeFilter, setTypeFilter] = useState<string>("all");
+  const [liveAlert, setLiveAlert] = useState<{ orderNumber: string; table?: number; total: number } | null>(null);
+
+  // ─── Real-time WebSocket ─────────────────────────────────────────────────
+  const handleNewOrder = useCallback((order: any) => {
+    // Invalidate React Query cache so list/kanban updates instantly
+    queryClient.invalidateQueries({ queryKey: ["ordersDesk"] });
+    queryClient.invalidateQueries({ queryKey: ["dashboardOrders"] });
+    // Show live alert banner
+    setLiveAlert({
+      orderNumber: order.orderNumber,
+      table: order.table?.number,
+      total: order.total,
+    });
+    // Auto-dismiss after 6 seconds
+    setTimeout(() => setLiveAlert(null), 6000);
+  }, [queryClient]);
+
+  useOrdersSocket(handleNewOrder);
 
   // Fetch orders (shared state source)
   const { data: ordersResponse, isLoading, refetch, isFetching } = useQuery({
@@ -97,6 +118,29 @@ export default function OrderDesk() {
 
   return (
     <div className="space-y-6">
+      {/* Live Order Alert Banner */}
+      {liveAlert && (
+        <div className="flex items-center gap-3 rounded-xl border border-primary/30 bg-primary/10 px-4 py-3 text-sm text-primary animate-pulse shadow-sm">
+          <Bell className="h-4 w-4 shrink-0 text-primary" />
+          <span className="font-mono font-semibold">NEW ORDER</span>
+          <span className="font-mono text-foreground/70">#{liveAlert.orderNumber}</span>
+          {liveAlert.table && (
+            <span className="flex items-center gap-1 text-foreground/70 font-mono">
+              <QrCode className="h-3.5 w-3.5" />
+              Table {liveAlert.table}
+            </span>
+          )}
+          <span className="ml-auto font-mono font-bold text-primary">
+            LKR {liveAlert.total?.toLocaleString()}
+          </span>
+          <button
+            onClick={() => setLiveAlert(null)}
+            className="ml-2 text-primary/60 hover:text-primary text-xs"
+          >
+            ✕
+          </button>
+        </div>
+      )}
       {/* Header controls */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-border pb-4">
         <div>
