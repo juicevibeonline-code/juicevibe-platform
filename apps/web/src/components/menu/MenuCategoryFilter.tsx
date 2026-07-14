@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
-import { categories } from "@/data/menu";
+import type { MenuCategory } from "@juice-vibe/types";
 import {
   Sparkles,
   Apple,
@@ -34,21 +34,27 @@ const iconMap: Record<string, React.ElementType> = {
 };
 
 interface MenuCategoryFilterProps {
+  categories: MenuCategory[];
   activeCategory: string;
   onCategoryChange: (category: string) => void;
 }
 
-export function MenuCategoryFilter({ activeCategory, onCategoryChange }: MenuCategoryFilterProps) {
+export function MenuCategoryFilter({ categories, activeCategory, onCategoryChange }: MenuCategoryFilterProps) {
+  const allCategories = [
+    { id: "all", slug: "all", name: "All", icon: "Sparkles" },
+    ...categories,
+  ];
+
   return (
     <div className="scrollbar-hide flex gap-2 overflow-x-auto pb-3 pt-1">
-      {categories.map((category) => {
+      {allCategories.map((category) => {
         const Icon = iconMap[category.icon];
-        const isActive = activeCategory === category.id;
+        const isActive = activeCategory === category.slug;
 
         return (
           <button
             key={category.id}
-            onClick={() => onCategoryChange(category.id)}
+            onClick={() => onCategoryChange(category.slug)}
             className={cn(
               "group relative flex shrink-0 items-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold transition-all duration-300 active:scale-95 outline-none select-none",
               isActive

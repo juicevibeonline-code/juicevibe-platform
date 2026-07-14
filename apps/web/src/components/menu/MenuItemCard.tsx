@@ -6,7 +6,7 @@ import { Star, Plus, CheckCircle } from "lucide-react";
 import { useState } from "react";
 import { formatPrice } from "@/lib/utils";
 import { useCartStore } from "@/store/cart";
-import type { MenuItem } from "@/data/menu";
+import type { MenuItem } from "@juice-vibe/types";
 import { cn } from "@/lib/utils";
 
 interface MenuItemCardProps {
@@ -89,7 +89,8 @@ export function MenuItemCard({ item, index }: MenuItemCardProps) {
   const addItem = useCartStore((state) => state.addItem);
   const [isAdded, setIsAdded] = useState(false);
 
-  const theme = categoryThemes[item.category] || {
+  const categorySlug = typeof item.category === "string" ? item.category : item.category?.slug || "";
+  const theme = categoryThemes[categorySlug] || {
     btnBg: "bg-primary hover:bg-primary-dark",
     badgeBg: "bg-primary/5 text-primary border-primary/10",
     emoji: "🌿",
@@ -102,7 +103,8 @@ export function MenuItemCard({ item, index }: MenuItemCardProps) {
     setTimeout(() => setIsAdded(false), 1500);
   };
 
-  const isPng = item.image?.toLowerCase().endsWith(".png");
+  const itemImage = item.thumbnail || (item.images && item.images[0]) || (item as any).image;
+  const isPng = itemImage?.toLowerCase().endsWith(".png");
 
   return (
     <motion.div
@@ -122,7 +124,7 @@ export function MenuItemCard({ item, index }: MenuItemCardProps) {
             <span className={cn("px-2 py-0.5 rounded text-[8px] font-bold uppercase tracking-wider shadow-sm border", theme.badgeBg)}>
               {theme.tag}
             </span>
-            {item.popular && (
+            {item.isPopular && (
               <span className="inline-flex items-center gap-0.5 px-2 py-0.5 rounded bg-amber-500 text-white text-[8px] font-bold uppercase tracking-wider shadow-sm">
                 <Star className="h-2 w-2 fill-current" />
                 Popular
@@ -130,10 +132,10 @@ export function MenuItemCard({ item, index }: MenuItemCardProps) {
             )}
           </div>
           
-          {item.image ? (
+          {itemImage ? (
             <div className="relative w-full h-full z-10 transition-transform duration-500 ease-out group-hover:scale-105">
               <Image
-                src={encodeURI(item.image)}
+                src={encodeURI(itemImage)}
                 alt={item.name}
                 fill
                 sizes="(max-width: 768px) 100vw, 350px"
@@ -158,11 +160,11 @@ export function MenuItemCard({ item, index }: MenuItemCardProps) {
           <p className="mt-1 text-xs text-gray-500 dark:text-gray-400 leading-relaxed font-medium line-clamp-2">
             {item.description}
           </p>
-          {item.flavours && (
+          {item.variants && item.variants.length > 0 && (
             <div className="mt-2.5 flex flex-wrap gap-1">
-              {item.flavours.map((flavour) => (
-                <span key={flavour} className="text-[9px] font-semibold bg-primary/5 text-primary border border-primary/10 rounded px-1.5 py-0.5">
-                  {flavour}
+              {item.variants.map((v) => (
+                <span key={v.id} className="text-[9px] font-semibold bg-primary/5 text-primary border border-primary/10 rounded px-1.5 py-0.5">
+                  {v.name}
                 </span>
               ))}
             </div>

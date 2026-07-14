@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import type { MenuItem } from "@/data/menu";
+import type { MenuItem } from "@juice-vibe/types";
 
 export interface CartItem extends MenuItem {
   cartItemId: string; // Unique ID for the cart item (allows same product with different variations later if needed)

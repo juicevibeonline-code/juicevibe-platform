@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
@@ -9,28 +9,46 @@ import { BackToTop } from "@/components/shared/BackToTop";
 import { WhatsAppButton } from "@/components/shared/WhatsAppButton";
 import { GalleryCard } from "@/components/gallery/GalleryCard";
 import { Lightbox } from "@/components/gallery/Lightbox";
-import { galleryImages } from "@/data/gallery";
+import { galleryService, type GalleryImage } from "@juice-vibe/services";
 
 const categories = [
   { id: "all", label: "All" },
-  { id: "juices", label: "Juices" },
+  { id: "fresh-juices", label: "Juices" },
   { id: "smoothies", label: "Smoothies" },
-  { id: "signature", label: "Signature" },
-  { id: "food", label: "Food" },
+  { id: "mocktails", label: "Mocktails" },
+  { id: "ice-cream", label: "Ice Cream" },
   { id: "milkshakes", label: "Milkshakes" },
   { id: "coffee", label: "Coffee" },
+  { id: "burgers", label: "Burgers" },
+  { id: "sandwiches", label: "Sandwiches" },
 ];
 
 export default function GalleryPage() {
   const [activeCategory, setActiveCategory] = useState("all");
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
+  const [galleryImages, setGalleryImages] = useState<GalleryImage[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadData() {
+      try {
+        const images = await galleryService.getImages();
+        setGalleryImages(images);
+      } catch (error) {
+        console.error("Failed to load gallery images:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadData();
+  }, []);
 
   const filteredImages = useMemo(
     () =>
       activeCategory === "all"
         ? galleryImages
         : galleryImages.filter((img) => img.category === activeCategory),
-    [activeCategory]
+    [activeCategory, galleryImages]
   );
 
   return (
@@ -82,32 +100,41 @@ export default function GalleryPage() {
               ))}
             </motion.div>
 
-            <motion.div
-              layout
-              className="mt-10 columns-1 gap-4 sm:columns-2 lg:columns-3 xl:columns-4"
-            >
-              {filteredImages.map((image, i) => (
-                <motion.div
-                  key={image.id}
-                  layout
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  className="mb-4 break-inside-avoid"
-                >
-                  <GalleryCard
-                    image={image}
-                    index={i}
-                    onOpen={() => setLightboxIndex(i)}
-                  />
-                </motion.div>
-              ))}
-            </motion.div>
-
-            {filteredImages.length === 0 && (
+            {loading ? (
               <div className="mt-16 text-center">
-                <p className="text-gray-500">No images found in this category.</p>
+                <div className="text-4xl animate-bounce">📸</div>
+                <p className="mt-4 font-mono text-sm text-dark-green uppercase tracking-wider animate-pulse">Compiling Tropical Moments...</p>
               </div>
+            ) : (
+              <>
+                <motion.div
+                  layout
+                  className="mt-10 columns-1 gap-4 sm:columns-2 lg:columns-3 xl:columns-4"
+                >
+                  {filteredImages.map((image, i) => (
+                    <motion.div
+                      key={image.id}
+                      layout
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      className="mb-4 break-inside-avoid"
+                    >
+                      <GalleryCard
+                        image={image}
+                        index={i}
+                        onOpen={() => setLightboxIndex(i)}
+                      />
+                    </motion.div>
+                  ))}
+                </motion.div>
+
+                {filteredImages.length === 0 && (
+                  <div className="mt-16 text-center">
+                    <p className="text-gray-500">No images found in this category.</p>
+                  </div>
+                )}
+              </>
             )}
           </div>
         </section>

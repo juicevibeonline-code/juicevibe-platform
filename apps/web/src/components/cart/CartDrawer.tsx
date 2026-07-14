@@ -150,8 +150,8 @@ export function CartDrawer() {
                         {items.map((item) => (
                           <motion.div key={item.cartItemId} layout initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, x: -20 }} className="flex gap-4">
                             <div className="relative w-20 h-20 rounded-2xl bg-gray-50 border border-gray-100 shrink-0 overflow-hidden">
-                              {item.image ? (
-                                <Image src={encodeURI(item.image)} alt={item.name} fill className="object-contain p-2 drop-shadow-md" sizes="80px" />
+                              {item.thumbnail || (item.images && item.images[0]) ? (
+                                <Image src={encodeURI(item.thumbnail || item.images[0])} alt={item.name} fill className="object-contain p-2 drop-shadow-md" sizes="80px" />
                               ) : (
                                 <span className="absolute inset-0 flex items-center justify-center text-3xl">🥤</span>
                               )}

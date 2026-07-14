@@ -5,9 +5,10 @@ import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
+import Image from "next/image";
 import { authService, useAuthStore } from "@juice-vibe/services";
 import { Button, Input } from "@juice-vibe/ui";
-import { ShieldCheck, Mail, Lock, AlertTriangle } from "lucide-react";
+import { Mail, Lock, AlertTriangle, Eye, EyeOff } from "lucide-react";
 
 const loginSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -21,6 +22,7 @@ export default function LoginPage() {
   const setAuth = useAuthStore((state) => state.setAuth);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const {
     register,
@@ -63,76 +65,90 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4 relative overflow-hidden">
+    <div className="flex min-h-screen items-center justify-center bg-background px-4 relative overflow-hidden bg-[radial-gradient(#163b29_1px,transparent_1px)] [background-size:20px_20px]">
       {/* Handcrafted Organic Accent Glows */}
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] rounded-full bg-orange/5 blur-[120px] pointer-events-none" />
-      <div className="absolute bottom-1/4 left-1/3 w-[300px] h-[300px] rounded-full bg-primary/5 blur-[100px] pointer-events-none" />
+      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full bg-primary/5 blur-[120px] pointer-events-none animate-pulse" />
+      <div className="absolute bottom-1/4 left-1/3 w-[300px] h-[300px] rounded-full bg-emerald-950/20 blur-[100px] pointer-events-none" />
       
       <div className="w-full max-w-md space-y-6 relative z-10">
-        <div className="text-center space-y-2">
-          <div className="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 border border-primary/20 text-primary mb-2">
-            <ShieldCheck className="h-6 w-6" />
+        <div className="text-center space-y-3">
+          <div className="relative inline-flex h-16 w-16 items-center justify-center rounded-2xl border border-primary/20 overflow-hidden mb-1 shadow-md bg-[#0F2A1E]">
+            <Image
+              src="/images/Logo.jpeg"
+              alt="Juice Vibe Logo"
+              fill
+              className="object-cover"
+              priority
+            />
           </div>
-          <h1 className="text-2xl font-bold tracking-tight text-foreground font-heading">
+          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-foreground font-heading">
             Juice Vibe OS
           </h1>
-          <p className="text-sm text-muted-foreground uppercase tracking-widest font-mono text-[10px]">
-            Enterprise Operations Management
+          <p className="text-xs text-muted-foreground uppercase tracking-wider font-mono text-[9px] flex items-center justify-center gap-1.5">
+            <span className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
+            SECURE MANAGEMENT CONSOLE
           </p>
         </div>
 
-        <div className="terminal-card p-8 border border-border shadow-2xl relative overflow-hidden bg-card glow-border-yellow">
-          <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-yellow/50 to-transparent" />
+        <div className="terminal-card p-6 sm:p-8 border border-border shadow-2xl relative overflow-hidden bg-card glow-border">
+          <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-primary/50 to-transparent" />
           
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             {errorMsg && (
-              <div className="flex items-center gap-2 rounded-lg border border-pink/30 bg-pink/10 p-3 text-xs text-pink">
+              <div className="flex items-center gap-2 rounded-lg border border-rose/30 bg-rose/10 p-3 text-xs text-rose">
                 <AlertTriangle className="h-4 w-4 shrink-0" />
                 <span className="font-mono">{errorMsg}</span>
               </div>
             )}
 
-            <div className="space-y-1">
-              <label className="text-[11px] font-mono uppercase tracking-wider text-muted-foreground">
-                Security Identity (Email)
+            <div className="space-y-1.5">
+              <label className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground/80 flex justify-between">
+                <span>Security Identity (Email)</span>
+                <span className="text-primary/50 font-semibold">SYS.USR</span>
               </label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                <Input
-                  type="email"
-                  placeholder="name@juicevibe.com"
-                  className="pl-10 w-full bg-ink-dark border-border text-foreground focus:border-primary focus:ring-1 focus:ring-primary/20 placeholder:text-muted-foreground/50 h-10 font-mono text-xs rounded-lg"
-                  disabled={loading}
-                  {...register("email")}
-                />
-              </div>
-              {errors.email && (
-                <p className="text-[11px] font-mono text-pink mt-1">{errors.email.message}</p>
-              )}
+              <Input
+                type="email"
+                placeholder="name@juicevibe.com"
+                leftIcon={<Mail className="h-4 w-4 text-muted-foreground" />}
+                error={errors.email?.message}
+                className="w-full bg-[#0F2A1E] border-border text-foreground focus:border-primary focus:ring-1 focus:ring-primary/20 placeholder:text-muted-foreground/40 h-10 font-mono text-xs rounded-lg"
+                disabled={loading}
+                {...register("email")}
+              />
             </div>
 
-            <div className="space-y-1">
-              <label className="text-[11px] font-mono uppercase tracking-wider text-muted-foreground">
-                Access Token (Password)
+            <div className="space-y-1.5">
+              <label className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground/80 flex justify-between">
+                <span>Access Token (Password)</span>
+                <span className="text-primary/50 font-semibold">SYS.PWD</span>
               </label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                <Input
-                  type="password"
-                  placeholder="••••••••"
-                  className="pl-10 w-full bg-ink-dark border-border text-foreground focus:border-primary focus:ring-1 focus:ring-primary/20 placeholder:text-muted-foreground/50 h-10 font-mono text-xs rounded-lg"
-                  disabled={loading}
-                  {...register("password")}
-                />
-              </div>
-              {errors.password && (
-                <p className="text-[11px] font-mono text-pink mt-1">{errors.password.message}</p>
-              )}
+              <Input
+                type={showPassword ? "text" : "password"}
+                placeholder="••••••••"
+                leftIcon={<Lock className="h-4 w-4 text-muted-foreground" />}
+                rightIcon={
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="text-muted-foreground hover:text-foreground cursor-pointer focus:outline-none flex items-center justify-center"
+                  >
+                    {showPassword ? (
+                      <EyeOff className="h-4 w-4" />
+                    ) : (
+                      <Eye className="h-4 w-4" />
+                    )}
+                  </button>
+                }
+                error={errors.password?.message}
+                className="w-full bg-[#0F2A1E] border-border text-foreground focus:border-primary focus:ring-1 focus:ring-primary/20 placeholder:text-muted-foreground/40 h-10 font-mono text-xs rounded-lg"
+                disabled={loading}
+                {...register("password")}
+              />
             </div>
 
             <Button
               type="submit"
-              className="w-full bg-primary hover:bg-primary-dark text-ink-dark font-semibold h-10 mt-6 shadow-md transition-all uppercase tracking-wider text-xs font-heading disabled:opacity-50"
+              className="w-full bg-primary hover:bg-primary-dark text-[#0F2A1E] font-bold h-10 mt-6 shadow-lg shadow-primary/10 transition-all uppercase tracking-wider text-xs font-heading disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer"
               disabled={loading}
               loading={loading}
             >
@@ -141,8 +157,9 @@ export default function LoginPage() {
           </form>
         </div>
 
-        <div className="text-center font-mono text-[10px] text-muted-foreground/60">
-          SECURE CHANNEL // SYSTEM ID: <span className="font-numeral">JVM-908A</span>
+        <div className="text-center font-mono text-[9px] text-muted-foreground/40 space-y-1">
+          <div>SECURE SUBSYSTEM PORT // ID: <span className="font-numeral text-primary/70">JVM-908A</span></div>
+          <div>STATUS: <span className="text-primary font-bold">ONLINE</span></div>
         </div>
       </div>
     </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
@@ -12,15 +12,37 @@ import { WhatsAppButton } from "@/components/shared/WhatsAppButton";
 import { MenuSearch } from "@/components/menu/MenuSearch";
 import { MenuCategoryFilter } from "@/components/menu/MenuCategoryFilter";
 import { MenuItemCard } from "@/components/menu/MenuItemCard";
-import { menuItems, categories } from "@/data/menu";
+import type { MenuItem, MenuCategory } from "@juice-vibe/types";
+import { menuService } from "@juice-vibe/services";
 
 export default function MenuPage() {
   const [search, setSearch] = useState("");
   const [activeCategory, setActiveCategory] = useState("all");
+  const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
+  const [categories, setCategories] = useState<MenuCategory[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadData() {
+      try {
+        const [itemsData, catsData] = await Promise.all([
+          menuService.getMenuItems(),
+          menuService.getCategories(),
+        ]);
+        setMenuItems(itemsData);
+        setCategories(catsData);
+      } catch (error) {
+        console.error("Failed to load menu data:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadData();
+  }, []);
 
   const popularItems = useMemo(
-    () => menuItems.filter((item) => item.popular).slice(0, 3),
-    []
+    () => menuItems.filter((item) => item.isPopular).slice(0, 3),
+    [menuItems]
   );
 
   const filteredItems = useMemo(() => {
@@ -28,13 +50,18 @@ export default function MenuPage() {
       const matchesSearch =
         item.name.toLowerCase().includes(search.toLowerCase()) ||
         item.description.toLowerCase().includes(search.toLowerCase());
+      
+      const itemCategorySlug = typeof item.category === "string" 
+        ? item.category 
+        : item.category?.slug || "";
+
       const matchesCategory =
-        activeCategory === "all" || item.category === activeCategory;
+        activeCategory === "all" || itemCategorySlug === activeCategory;
       return matchesSearch && matchesCategory;
     });
-  }, [search, activeCategory]);
+  }, [search, activeCategory, menuItems]);
 
-  const currentCategory = categories.find((c) => c.id === activeCategory);
+  const currentCategory = categories.find((c) => c.slug === activeCategory);
 
   return (
     <>
@@ -108,6 +135,7 @@ export default function MenuPage() {
                 transition={{ duration: 0.5, delay: 0.2 }}
               >
                 <MenuCategoryFilter
+                  categories={categories}
                   activeCategory={activeCategory}
                   onCategoryChange={setActiveCategory}
                 />
@@ -164,7 +192,20 @@ export default function MenuPage() {
             )}
 
             <AnimatePresence mode="wait">
-              {filteredItems.length > 0 ? (
+              {loading ? (
+                <motion.div
+                  key="loading"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="mt-16 text-center"
+                >
+                  <div className="text-4xl animate-bounce">🍹</div>
+                  <h3 className="mt-4 font-heading text-lg font-bold text-dark-green uppercase font-mono tracking-wider animate-pulse">
+                    Compiling Fresh Juices Menu...
+                  </h3>
+                </motion.div>
+              ) : filteredItems.length > 0 ? (
                 <motion.div
                   key={`${activeCategory}-${search}`}
                   initial={{ opacity: 0 }}
