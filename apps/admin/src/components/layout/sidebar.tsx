@@ -10,22 +10,13 @@ import {
   LayoutDashboard,
   ClipboardList,
   Utensils,
-  Users,
   Warehouse,
-  ChefHat,
   Settings,
   LogOut,
   ChevronLeft,
   ChevronRight,
-  TrendingUp,
-  Server,
   Leaf,
-  QrCode,
-  Tag,
-  MessageSquare,
-  Mail,
-  Heart,
-  BookOpen
+  QrCode
 } from "lucide-react";
 import { Button } from "@juice-vibe/ui";
 
@@ -44,68 +35,48 @@ export function Sidebar({ collapsed, setCollapsed }: SidebarProps) {
     router.replace("/login");
   };
 
-  const navItems = [
+  const userRole = user?.role || "admin";
+
+  const allNavItems = [
     {
       label: "Mission Control",
       href: "/dashboard",
       icon: LayoutDashboard,
+      roles: ["admin", "manager"],
     },
     {
       label: "Order Desk",
       href: "/dashboard/orders",
       icon: ClipboardList,
+      roles: ["admin", "manager", "cashier", "kitchen", "editor"],
     },
     {
       label: "Menu Catalog",
       href: "/dashboard/menu",
       icon: Utensils,
-    },
-    {
-      label: "CRM Customers",
-      href: "/dashboard/customers",
-      icon: Users,
+      roles: ["admin", "manager", "cashier", "kitchen", "editor"],
     },
     {
       label: "Inventory Log",
       href: "/dashboard/inventory",
       icon: Warehouse,
-    },
-    {
-      label: "Staff Roster",
-      href: "/dashboard/employees",
-      icon: ChefHat,
+      roles: ["admin", "manager", "cashier", "kitchen", "editor"],
     },
     {
       label: "Tables & QR",
       href: "/dashboard/tables",
       icon: QrCode,
-    },
-    {
-      label: "Coupons",
-      href: "/dashboard/coupons",
-      icon: Tag,
-    },
-    {
-      label: "Testimonials",
-      href: "/dashboard/testimonials",
-      icon: Heart,
-    },
-    {
-      label: "Subscribers",
-      href: "/dashboard/subscribers",
-      icon: Mail,
-    },
-    {
-      label: "Blog Posts",
-      href: "/dashboard/blog",
-      icon: BookOpen,
+      roles: ["admin", "manager", "cashier"],
     },
     {
       label: "System Settings",
       href: "/dashboard/settings",
       icon: Settings,
+      roles: ["admin", "manager"],
     },
   ];
+
+  const navItems = allNavItems.filter((item) => item.roles.includes(userRole));
 
 
 

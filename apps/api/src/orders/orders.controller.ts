@@ -25,7 +25,7 @@ export class OrdersController {
 
   @Get()
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles("admin", "manager", "cashier")
+  @Roles("admin", "manager", "cashier", "kitchen")
   @ApiBearerAuth()
   @ApiOperation({ summary: "Get all orders (admin)" })
   async getOrders(

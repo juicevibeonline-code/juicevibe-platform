@@ -349,6 +349,39 @@ export default function OrderDesk() {
                         </div>
                       </div>
 
+                      {/* Order Items Details */}
+                      <div className="border-t border-border/40 pt-2 space-y-1.5 font-mono text-[9px] text-muted-foreground">
+                        {order.items?.map((item) => (
+                          <div key={item.id} className="flex flex-col border-b border-border/10 pb-1 last:border-b-0 last:pb-0">
+                            <div className="flex items-start justify-between text-foreground">
+                              <span className="font-sans line-clamp-2 flex-1 leading-snug">
+                                {item.name}
+                                {item.variant && <span className="text-[8px] text-muted-foreground block font-mono mt-0.5">({item.variant})</span>}
+                              </span>
+                              <span className="font-numeral font-bold shrink-0 ml-1.5">x{item.quantity}</span>
+                            </div>
+                            
+                            {item.addOns && (item.addOns as any).length > 0 && (
+                              <div className="pl-2 text-[8px] text-primary/70 leading-normal mt-0.5">
+                                + {(item.addOns as any).map((add: any) => add.name).join(", ")}
+                              </div>
+                            )}
+
+                            {item.notes && (
+                              <div className="pl-2 text-[8px] text-orange italic leading-normal mt-0.5">
+                                Note: {item.notes}
+                              </div>
+                            )}
+                          </div>
+                        ))}
+
+                        {order.notes && (
+                          <div className="p-1 bg-orange/5 border border-orange/15 rounded text-[8px] text-orange leading-normal mt-1">
+                            <span className="font-bold">General Note:</span> {order.notes}
+                          </div>
+                        )}
+                      </div>
+
                       <div className="flex items-center justify-between border-t border-border/40 pt-2 text-[10px] font-mono">
                         <span className="text-muted-foreground">Total:</span>
                         <span className="font-numeral text-primary font-semibold">{formatPrice(order.total)}</span>
@@ -395,6 +428,7 @@ export default function OrderDesk() {
                 <tr className="border-b border-border/80 text-[10px] text-muted-foreground uppercase tracking-wider bg-ink-dark/30">
                   <th className="py-3 px-4 font-semibold">Order ID</th>
                   <th className="py-3 px-4 font-semibold">Customer</th>
+                  <th className="py-3 px-4 font-semibold">Items & Notes</th>
                   <th className="py-3 px-4 font-semibold">Type</th>
                   <th className="py-3 px-4 font-semibold">Status</th>
                   <th className="py-3 px-4 font-semibold">Price total</th>
@@ -410,6 +444,36 @@ export default function OrderDesk() {
                       <div className="flex flex-col">
                         <span className="font-semibold text-foreground font-sans">{order.customerName}</span>
                         <span className="text-[10px] text-muted-foreground">{order.customerPhone}</span>
+                      </div>
+                    </td>
+                    <td className="py-3.5 px-4 max-w-xs">
+                      <div className="flex flex-col space-y-1 font-mono text-[10px] text-muted-foreground">
+                        {order.items?.map((item) => (
+                          <div key={item.id} className="flex flex-col leading-tight border-b border-border/10 pb-1 last:border-b-0 last:pb-0">
+                            <div className="flex items-start justify-between text-foreground">
+                              <span className="font-sans font-medium">
+                                {item.name}
+                                {item.variant && <span className="text-[9px] text-muted-foreground block mt-0.5">({item.variant})</span>}
+                              </span>
+                              <span className="font-numeral font-bold shrink-0 ml-2">x{item.quantity}</span>
+                            </div>
+                            {item.addOns && (item.addOns as any).length > 0 && (
+                              <div className="text-[9px] text-primary/70 mt-0.5">
+                                + {(item.addOns as any).map((a: any) => a.name).join(", ")}
+                              </div>
+                            )}
+                            {item.notes && (
+                              <div className="text-[9px] text-orange italic mt-0.5">
+                                Note: {item.notes}
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                        {order.notes && (
+                          <div className="mt-1 text-[9px] text-orange bg-orange/5 p-1 rounded border border-orange/10">
+                            <span className="font-bold">Note:</span> {order.notes}
+                          </div>
+                        )}
                       </div>
                     </td>
                     <td className="py-3.5 px-4">
@@ -509,6 +573,10 @@ export default function OrderDesk() {
                             <span className="text-[8px] text-muted-foreground block uppercase mt-0.5">
                               {order.status}
                             </span>
+                            {/* Summary of items */}
+                            <div className="text-[8px] text-muted-foreground mt-1 max-w-[120px] truncate">
+                              {order.items?.map((i: any) => `${i.name} (x${i.quantity})`).join(", ")}
+                            </div>
                           </div>
                           <button
                             onClick={() => handleStatusTransition(order.id, order.status)}

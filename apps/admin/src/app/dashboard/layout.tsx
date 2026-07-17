@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { useAuthStore } from "@juice-vibe/services";
 import { Sidebar } from "@/components/layout/sidebar";
 import { Header } from "@/components/layout/header";
@@ -27,6 +27,7 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const router = useRouter();
+  const pathname = usePathname();
   const { isAuthenticated, isLoading, user } = useAuthStore();
   
   const [collapsed, setCollapsed] = useState(false);
@@ -41,10 +42,18 @@ export default function DashboardLayout({
 
   // Auth Guard redirect
   useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
-      router.replace("/login");
+    if (!isLoading) {
+      if (!isAuthenticated) {
+        router.replace("/login");
+      } else if (user) {
+        if (pathname === "/dashboard" || pathname === "/dashboard/") {
+          if (user.role === "kitchen" || user.role === "cashier") {
+            router.replace("/dashboard/orders");
+          }
+        }
+      }
     }
-  }, [isAuthenticated, isLoading, router]);
+  }, [isAuthenticated, isLoading, user, pathname, router]);
 
   // Keyboard shortcut listener for Command Palette (Ctrl+K)
   useEffect(() => {
@@ -69,24 +78,18 @@ export default function DashboardLayout({
     );
   }
 
-  // Handle Command Palette execution
-  const commands = [
-    { name: "Go to Mission Control", desc: "Overview analytics dashboard", action: () => router.push("/dashboard") },
-    { name: "Open Order Desk", desc: "Manage live customer orders", action: () => router.push("/dashboard/orders") },
-    { name: "View Menu Catalog", desc: "Edit categories and beverages", action: () => router.push("/dashboard/menu") },
-    { name: "CRM Directory", desc: "View customer details & LTV", action: () => router.push("/dashboard/customers") },
-    { name: "Inventory Log", desc: "Check raw materials inventory", action: () => router.push("/dashboard/inventory") },
-    { name: "Staff Shifts", desc: "Track employee position profiles", action: () => router.push("/dashboard/employees") },
-    { name: "Tables & QR Codes", desc: "Manage dine-in tables and QR codes", action: () => router.push("/dashboard/tables") },
-    { name: "Coupons & Promotions", desc: "Manage discount codes and limits", action: () => router.push("/dashboard/coupons") },
-    { name: "Moderate Testimonials", desc: "Approve or feature customer testimonials", action: () => router.push("/dashboard/testimonials") },
-    { name: "Newsletter Subscribers", desc: "Manage newsletter subscription list", action: () => router.push("/dashboard/subscribers") },
-    { name: "Manage Blog Posts", desc: "Write or publish cafe articles", action: () => router.push("/dashboard/blog") },
-    { name: "Workspace Settings", desc: "Adjust system variables", action: () => router.push("/dashboard/settings") },
+  const userRole = user?.role || "admin";
 
-
-
+  const allCommands = [
+    { name: "Go to Mission Control", desc: "Overview analytics dashboard", action: () => router.push("/dashboard"), roles: ["admin", "manager"] },
+    { name: "Open Order Desk", desc: "Manage live customer orders", action: () => router.push("/dashboard/orders"), roles: ["admin", "manager", "cashier", "kitchen", "editor"] },
+    { name: "View Menu Catalog", desc: "Edit categories and beverages", action: () => router.push("/dashboard/menu"), roles: ["admin", "manager", "cashier", "kitchen", "editor"] },
+    { name: "Inventory Log", desc: "Check raw materials inventory", action: () => router.push("/dashboard/inventory"), roles: ["admin", "manager", "cashier", "kitchen", "editor"] },
+    { name: "Tables & QR Codes", desc: "Manage dine-in tables and QR codes", action: () => router.push("/dashboard/tables"), roles: ["admin", "manager", "cashier"] },
+    { name: "Workspace Settings", desc: "Adjust system variables", action: () => router.push("/dashboard/settings"), roles: ["admin", "manager"] },
   ];
+
+  const commands = allCommands.filter((c) => c.roles.includes(userRole));
 
   const filteredCommands = commands.filter(
     (c) =>
