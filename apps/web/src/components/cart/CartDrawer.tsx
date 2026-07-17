@@ -19,7 +19,7 @@ interface CheckoutForm {
   customerPhone: string;
   customerEmail: string;
   type: "pickup" | "dine_in";
-  paymentMethod: "cash" | "card";
+  paymentMethod: "cash";
   notes: string;
 }
 
@@ -258,18 +258,17 @@ export function CartDrawer() {
                       </div>
                     </div>
 
-                    {/* Payment Method */}
+                    {/* Payment Method — Cash Only */}
                     <div className="space-y-2">
                       <h3 className="font-bold text-dark-green text-sm">Payment Method</h3>
-                      <div className="grid grid-cols-2 gap-2">
-                        {(["cash", "card"] as const).map(m => (
-                          <button key={m} onClick={() => setForm(f => ({ ...f, paymentMethod: m }))}
-                            className={`h-12 rounded-xl border text-sm font-bold transition-all ${form.paymentMethod === m ? "bg-primary text-white border-primary shadow-md shadow-primary/20" : "bg-white text-gray-500 border-gray-200 hover:border-primary/50"}`}
-                          >
-                            {m === "cash" ? "💵 Cash" : "💳 Card"}
-                          </button>
-                        ))}
+                      <div className="flex items-center gap-3 h-12 px-4 rounded-xl border border-primary bg-primary/5">
+                        <span className="text-base">💵</span>
+                        <span className="text-sm font-bold text-dark-green">Cash on Delivery / At Counter</span>
+                        <span className="ml-auto h-2.5 w-2.5 rounded-full bg-primary shrink-0" />
                       </div>
+                      <p className="text-[11px] text-gray-400 leading-snug px-1">
+                        Card &amp; online payments coming soon.
+                      </p>
                     </div>
 
                     {/* Notes */}

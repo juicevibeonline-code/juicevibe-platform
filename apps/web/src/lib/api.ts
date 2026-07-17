@@ -6,7 +6,7 @@ export interface CreateOrderPayload {
   customerPhone: string;
   customerEmail?: string;
   type: "pickup" | "dine_in" | "delivery";
-  paymentMethod: "cash" | "card" | "online";
+  paymentMethod: "cash"; // card & online will be added in a future release
   notes?: string;
   tableId?: string;
   items: {
