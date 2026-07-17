@@ -8,9 +8,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  ShoppingBag, User, Phone, Mail, MapPin, CreditCard,
-  Banknote, Smartphone, Tag, Trash2, ChevronLeft, CheckCircle2,
-  QrCode, Loader2, AlertCircle,
+  ShoppingBag, User, Phone, Mail, MapPin, Banknote,
+  Tag, Trash2, ChevronLeft, CheckCircle2,
+  QrCode, Loader2, AlertCircle, Info,
 } from "lucide-react";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
@@ -24,18 +24,17 @@ const schema = z.object({
     .string()
     .regex(/^[0-9+\- ]{7,15}$/, "Enter a valid phone number"),
   customerEmail: z.string().email("Invalid email").optional().or(z.literal("")),
-  paymentMethod: z.enum(["cash", "card", "online"]),
+  // Only cash is supported for now; card & online will be added in a future release
+  paymentMethod: z.literal("cash"),
   notes: z.string().optional(),
   couponCode: z.string().optional(),
   deliveryAddress: z.string().optional(),
 });
 type FormData = z.infer<typeof schema>;
 
-// ─── Payment method config ──────────────────────────────────────────────────
+// Only cash is active; card & online will be enabled in a future release
 const paymentMethods = [
   { id: "cash" as const, label: "Cash on Delivery", icon: Banknote, color: "text-emerald-600" },
-  { id: "card" as const, label: "Card Payment", icon: CreditCard, color: "text-blue-600" },
-  { id: "online" as const, label: "Online Transfer", icon: Smartphone, color: "text-purple-600" },
 ];
 
 // ─── Component ─────────────────────────────────────────────────────────────────
@@ -311,34 +310,30 @@ export default function CheckoutPage() {
                   </div>
                 </section>
 
-                {/* Payment Methods */}
+                {/* Payment Methods — Cash Only */}
                 <section className="rounded-2xl bg-white p-6 shadow-sm border border-gray-100">
                   <h2 className="font-heading text-lg font-bold text-dark-green mb-4 flex items-center gap-2">
-                    <CreditCard className="h-5 w-5 text-primary" /> Payment Method
+                    <Banknote className="h-5 w-5 text-primary" /> Payment Method
                   </h2>
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                    {paymentMethods.map(({ id, label, icon: Icon, color }) => (
-                      <label
-                        key={id}
-                        className={`relative flex cursor-pointer flex-col items-center gap-2 rounded-2xl border-2 p-4 text-center transition-all ${
-                          selectedPayment === id
-                            ? "border-primary bg-primary/5"
-                            : "border-gray-100 hover:border-primary/30"
-                        }`}
-                      >
-                        <input
-                          {...register("paymentMethod")}
-                          type="radio"
-                          value={id}
-                          className="sr-only"
-                        />
-                        <Icon className={`h-6 w-6 ${selectedPayment === id ? "text-primary" : color}`} />
-                        <span className="text-xs font-semibold text-gray-700">{label}</span>
-                        {selectedPayment === id && (
-                          <span className="absolute top-2 right-2 h-2 w-2 rounded-full bg-primary" />
-                        )}
-                      </label>
-                    ))}
+                  {/* Active method: Cash */}
+                  <div className="flex items-center gap-4 rounded-2xl border-2 border-primary bg-primary/5 p-4">
+                    <Banknote className="h-7 w-7 text-primary shrink-0" />
+                    <div>
+                      <p className="text-sm font-bold text-dark-green">Cash on Delivery / At Counter</p>
+                      <p className="text-xs text-gray-500 mt-0.5">
+                        Pay with cash when your order is ready.
+                      </p>
+                    </div>
+                    <span className="ml-auto h-2.5 w-2.5 rounded-full bg-primary" />
+                    {/* Hidden input locks the form value to 'cash' */}
+                    <input {...register("paymentMethod")} type="hidden" value="cash" />
+                  </div>
+                  {/* Coming soon notice */}
+                  <div className="mt-3 flex items-start gap-2 rounded-xl bg-gray-50 border border-gray-100 px-4 py-3">
+                    <Info className="h-4 w-4 text-gray-400 shrink-0 mt-0.5" />
+                    <p className="text-[11px] text-gray-400 leading-snug">
+                      Card and online payment options are coming soon and will be available in a future update.
+                    </p>
                   </div>
                 </section>
 
