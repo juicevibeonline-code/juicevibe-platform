@@ -26,6 +26,11 @@ export const orderService = {
     return data.data;
   },
 
+  async updateOrderPaymentStatus(id: string, status: string): Promise<Order> {
+    const { data } = await apiClient.patch(`/orders/${id}/payment-status`, { status });
+    return data.data;
+  },
+
   async getMyOrders(): Promise<Order[]> {
     const { data } = await apiClient.get("/orders/my");
     return data.data;

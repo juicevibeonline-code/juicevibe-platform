@@ -23,6 +23,10 @@ import {
   Calendar,
   Bell,
   QrCode,
+  Banknote,
+  CreditCard,
+  Smartphone,
+  BadgeCheck,
 } from "lucide-react";
 import { cn } from "@juice-vibe/utils";
 import { useOrdersSocket } from "@/hooks/use-orders-socket";
@@ -79,6 +83,15 @@ export default function OrderDesk() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["ordersDesk"] });
       queryClient.invalidateQueries({ queryKey: ["dashboardOrders"] });
+    },
+  });
+
+  // Update Payment Status mutation
+  const updatePaymentMutation = useMutation({
+    mutationFn: ({ id, status }: { id: string; status: string }) =>
+      orderService.updateOrderPaymentStatus(id, status),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["ordersDesk"] });
     },
   });
 
@@ -387,8 +400,30 @@ export default function OrderDesk() {
                         <span className="font-numeral text-primary font-semibold">{formatPrice(order.total)}</span>
                       </div>
 
+                      {/* Payment status indicator */}
+                      <div className="flex items-center justify-between text-[9px] font-mono">
+                        <span className="text-muted-foreground flex items-center gap-1">
+                          {order.paymentMethod === "online" ? <Smartphone className="h-3 w-3" /> : <Banknote className="h-3 w-3" />}
+                          {order.paymentMethod === "online" ? "Bank Transfer" : "Cash"}
+                        </span>
+                        {order.paymentStatus === "paid" ? (
+                          <span className="flex items-center gap-0.5 text-primary font-semibold">
+                            <BadgeCheck className="h-3 w-3" /> Paid
+                          </span>
+                        ) : (
+                          <span className={cn(
+                            "px-1.5 py-0.5 rounded font-bold uppercase tracking-wider",
+                            order.paymentMethod === "online"
+                              ? "bg-amber-500/10 text-amber-500 border border-amber-500/30 animate-pulse"
+                              : "bg-muted/30 text-muted-foreground border border-border/40"
+                          )}>
+                            {order.paymentStatus || "pending"}
+                          </span>
+                        )}
+                      </div>
+
                       {/* Operations buttons */}
-                      <div className="flex items-center gap-1.5 pt-1">
+                      <div className="flex items-center gap-1.5 pt-1 flex-wrap">
                         {status !== "completed" && (
                           <button
                             onClick={() => handleStatusTransition(order.id, order.status)}
@@ -396,6 +431,17 @@ export default function OrderDesk() {
                           >
                             <span>Advance</span>
                             <ChevronRight className="h-2.5 w-2.5" />
+                          </button>
+                        )}
+                        {/* Mark Paid button — for online transfer orders awaiting payment confirmation */}
+                        {order.paymentMethod === "online" && order.paymentStatus !== "paid" && (
+                          <button
+                            onClick={() => updatePaymentMutation.mutate({ id: order.id, status: "paid" })}
+                            disabled={updatePaymentMutation.isPending}
+                            className="flex-1 inline-flex items-center justify-center gap-1 py-1.5 px-2 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-500 text-[9px] font-mono font-semibold rounded uppercase tracking-wider cursor-pointer disabled:opacity-50"
+                          >
+                            <BadgeCheck className="h-2.5 w-2.5" />
+                            <span>Mark Paid</span>
                           </button>
                         )}
                         {status === "pending" && (

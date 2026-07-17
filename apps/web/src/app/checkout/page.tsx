@@ -10,7 +10,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   ShoppingBag, User, Phone, Mail, MapPin, Banknote,
   Tag, Trash2, ChevronLeft, CheckCircle2,
-  QrCode, Loader2, AlertCircle, Info,
+  QrCode, Loader2, AlertCircle, Info, Smartphone
 } from "lucide-react";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
@@ -24,17 +24,16 @@ const schema = z.object({
     .string()
     .regex(/^[0-9+\- ]{7,15}$/, "Enter a valid phone number"),
   customerEmail: z.string().email("Invalid email").optional().or(z.literal("")),
-  // Only cash is supported for now; card & online will be added in a future release
-  paymentMethod: z.literal("cash"),
+  paymentMethod: z.enum(["cash", "online"]),
   notes: z.string().optional(),
   couponCode: z.string().optional(),
   deliveryAddress: z.string().optional(),
 });
 type FormData = z.infer<typeof schema>;
 
-// Only cash is active; card & online will be enabled in a future release
 const paymentMethods = [
   { id: "cash" as const, label: "Cash on Delivery", icon: Banknote, color: "text-emerald-600" },
+  { id: "online" as const, label: "Online Transfer", icon: Smartphone, color: "text-purple-600" },
 ];
 
 // ─── Component ─────────────────────────────────────────────────────────────────
@@ -44,6 +43,7 @@ export default function CheckoutPage() {
   const [orderNumber, setOrderNumber] = useState("");
   const [loading, setLoading] = useState(false);
   const [apiError, setApiError] = useState<string | null>(null);
+  const [successPaymentMethod, setSuccessPaymentMethod] = useState<"cash" | "online">("cash");
 
   const [appliedCoupon, setAppliedCoupon] = useState<any | null>(null);
   const [couponError, setCouponError] = useState<string | null>(null);
@@ -117,6 +117,7 @@ export default function CheckoutPage() {
         })),
       });
       setOrderNumber((order as any).orderNumber || "JV-XXXX");
+      setSuccessPaymentMethod(data.paymentMethod);
       clearCart();
       setSuccess(true);
     } catch (err: any) {
@@ -157,6 +158,30 @@ export default function CheckoutPage() {
               </p>
             )}
           </div>
+          {successPaymentMethod === "online" && (
+            <div className="mt-6 rounded-2xl bg-purple-50 border border-purple-100 p-4 text-left space-y-3 font-sans">
+              <p className="text-xs font-bold text-purple-800 flex items-center gap-1.5">
+                <Info className="h-4 w-4" /> Bank Transfer Required
+              </p>
+              <p className="text-[11px] text-gray-600 leading-normal">
+                Please transfer **LKR {total.toLocaleString()}** to the account below and send a receipt screenshot via WhatsApp:
+              </p>
+              <div className="text-[10px] space-y-1 text-gray-700 bg-white p-2.5 rounded-lg border border-purple-100/50">
+                <div><span className="text-gray-400 font-medium">Bank:</span> Commercial Bank of Ceylon</div>
+                <div><span className="text-gray-400 font-medium">Account Name:</span> Juice Vibe Bentota</div>
+                <div><span className="text-gray-400 font-medium">Account Number:</span> 8010156942</div>
+                <div><span className="text-gray-400 font-medium">Branch:</span> Bentota</div>
+              </div>
+              <a
+                href={`https://wa.me/94718435876?text=Hi%20Juice%20Vibe!%20Here%20is%20the%20payment%20receipt%20for%20my%20order%20%23${orderNumber}.`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full h-10 rounded-xl bg-[#25D366] text-white flex items-center justify-center gap-1.5 text-xs font-bold hover:opacity-90 transition-opacity"
+              >
+                Send WhatsApp Receipt
+              </a>
+            </div>
+          )}
           <div className="mt-8 flex flex-col gap-3">
             <Link
               href="/menu"
@@ -310,31 +335,66 @@ export default function CheckoutPage() {
                   </div>
                 </section>
 
-                {/* Payment Methods — Cash Only */}
-                <section className="rounded-2xl bg-white p-6 shadow-sm border border-gray-100">
+                {/* Payment Methods */}
+                <section className="rounded-2xl bg-white p-6 shadow-sm border border-gray-100 space-y-4">
                   <h2 className="font-heading text-lg font-bold text-dark-green mb-4 flex items-center gap-2">
                     <Banknote className="h-5 w-5 text-primary" /> Payment Method
                   </h2>
-                  {/* Active method: Cash */}
-                  <div className="flex items-center gap-4 rounded-2xl border-2 border-primary bg-primary/5 p-4">
-                    <Banknote className="h-7 w-7 text-primary shrink-0" />
-                    <div>
-                      <p className="text-sm font-bold text-dark-green">Cash on Delivery / At Counter</p>
-                      <p className="text-xs text-gray-500 mt-0.5">
-                        Pay with cash when your order is ready.
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {paymentMethods.map(({ id, label, icon: Icon, color }) => (
+                      <label
+                        key={id}
+                        className={`relative flex cursor-pointer flex-col items-center gap-2 rounded-2xl border-2 p-4 text-center transition-all ${
+                          selectedPayment === id
+                            ? "border-primary bg-primary/5"
+                            : "border-gray-100 hover:border-primary/30"
+                        }`}
+                      >
+                        <input
+                          {...register("paymentMethod")}
+                          type="radio"
+                          value={id}
+                          className="sr-only"
+                        />
+                        <Icon className={`h-6 w-6 ${selectedPayment === id ? "text-primary" : color}`} />
+                        <span className="text-xs font-semibold text-gray-700">{label}</span>
+                        {selectedPayment === id && (
+                          <span className="absolute top-2 right-2 h-2 w-2 rounded-full bg-primary" />
+                        )}
+                      </label>
+                    ))}
+                  </div>
+
+                  {/* Bank Transfer details if 'online' is selected */}
+                  {selectedPayment === "online" && (
+                    <div className="mt-4 p-4 rounded-2xl bg-purple-50/50 border border-purple-100 space-y-3 font-sans">
+                      <div className="flex items-center gap-2 text-purple-800 font-bold text-sm">
+                        <Info className="h-4 w-4" />
+                        <span>Online Bank Transfer Instructions</span>
+                      </div>
+                      <p className="text-xs text-gray-600 leading-relaxed">
+                        Please transfer the order total to our bank account. Once transferred, send a screenshot of the receipt via WhatsApp. We will process your order as soon as payment is confirmed.
                       </p>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs bg-white p-3.5 rounded-xl border border-purple-100/50">
+                        <div>
+                          <span className="text-[10px] uppercase font-semibold text-gray-400 tracking-wider block">Bank</span>
+                          <span className="font-bold text-dark-green">Commercial Bank of Ceylon</span>
+                        </div>
+                        <div>
+                          <span className="text-[10px] uppercase font-semibold text-gray-400 tracking-wider block">Branch</span>
+                          <span className="font-bold text-dark-green">Bentota</span>
+                        </div>
+                        <div>
+                          <span className="text-[10px] uppercase font-semibold text-gray-400 tracking-wider block">Account Name</span>
+                          <span className="font-bold text-dark-green">Juice Vibe Bentota</span>
+                        </div>
+                        <div>
+                          <span className="text-[10px] uppercase font-semibold text-gray-400 tracking-wider block">Account Number</span>
+                          <span className="font-bold text-dark-green font-mono">8010156942</span>
+                        </div>
+                      </div>
                     </div>
-                    <span className="ml-auto h-2.5 w-2.5 rounded-full bg-primary" />
-                    {/* Hidden input locks the form value to 'cash' */}
-                    <input {...register("paymentMethod")} type="hidden" value="cash" />
-                  </div>
-                  {/* Coming soon notice */}
-                  <div className="mt-3 flex items-start gap-2 rounded-xl bg-gray-50 border border-gray-100 px-4 py-3">
-                    <Info className="h-4 w-4 text-gray-400 shrink-0 mt-0.5" />
-                    <p className="text-[11px] text-gray-400 leading-snug">
-                      Card and online payment options are coming soon and will be available in a future update.
-                    </p>
-                  </div>
+                  )}
                 </section>
 
                 {/* Extra Notes & Coupon */}

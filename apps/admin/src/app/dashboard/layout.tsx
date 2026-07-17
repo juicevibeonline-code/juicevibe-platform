@@ -16,7 +16,13 @@ import {
   ArrowRight,
   TrendingUp,
   Package,
-  AlertCircle
+  AlertCircle,
+  Bell,
+  X,
+  CheckCheck,
+  AlertTriangle,
+  Info,
+  ShoppingBag
 } from "lucide-react";
 import { LoadingSpinner } from "@juice-vibe/ui";
 import { cn } from "@juice-vibe/utils";
@@ -34,11 +40,23 @@ export default function DashboardLayout({
   const [mobileOpen, setMobileOpen] = useState(false);
   const [aiPanelOpen, setAiPanelOpen] = useState(false);
   const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
+  const [notifPanelOpen, setNotifPanelOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [aiMessage, setAiMessage] = useState("");
   const [aiConversation, setAiConversation] = useState<{ role: "user" | "system"; text: string }[]>([
     { role: "system", text: "Systems online. Ask me about inventory warnings, revenue status, or shift summaries." }
   ]);
+
+  const [notifications, setNotifications] = useState([
+    { id: "1", type: "warning" as const, title: "Low Stock Alert", message: "Mango Pulp is running low (2 units remaining). Restock recommended.", time: "Just now", read: false },
+    { id: "2", type: "info" as const, title: "New Online Order", message: "Order #JV-A3B2 placed via Online Bank Transfer — awaiting payment confirmation.", time: "5m ago", read: false },
+    { id: "3", type: "system" as const, title: "System Ready", message: "JuiceVibe admin panel started successfully. All services online.", time: "30m ago", read: true },
+  ]);
+
+  const unreadCount = notifications.filter(n => !n.read).length;
+
+  const markAllRead = () => setNotifications(prev => prev.map(n => ({ ...n, read: true })));
+  const markOneRead = (id: string) => setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n));
 
   // Auth Guard redirect
   useEffect(() => {
@@ -163,8 +181,8 @@ export default function DashboardLayout({
           onOpenCommandPalette={() => setCommandPaletteOpen(true)}
           onToggleAiPanel={() => setAiPanelOpen(!aiPanelOpen)}
           aiPanelOpen={aiPanelOpen}
-          notificationCount={2}
-          onOpenNotifications={() => alert("Notification center: [System Notice] Low stock count on Mango Pulp.")}
+          notificationCount={unreadCount}
+          onOpenNotifications={() => setNotifPanelOpen(true)}
         />
 
         <main className="flex-1 overflow-y-auto bg-background p-6">
@@ -244,6 +262,114 @@ export default function DashboardLayout({
               </div>
             </form>
           </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* ─── Notifications Drawer ───────────────────────────────────────── */}
+      <AnimatePresence>
+        {notifPanelOpen && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setNotifPanelOpen(false)}
+              className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40"
+            />
+            <motion.div
+              initial={{ x: "100%" }}
+              animate={{ x: 0 }}
+              exit={{ x: "100%" }}
+              transition={{ type: "spring", damping: 28, stiffness: 300 }}
+              className="fixed top-0 right-0 bottom-0 w-[340px] bg-card border-l border-border z-50 flex flex-col shadow-2xl"
+            >
+              {/* Header */}
+              <div className="h-16 flex items-center justify-between px-5 border-b border-border shrink-0">
+                <div className="flex items-center gap-2">
+                  <Bell className="h-4 w-4 text-primary" />
+                  <span className="text-sm font-bold font-heading">Notifications</span>
+                  {unreadCount > 0 && (
+                    <span className="ml-1 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[9px] font-bold text-white">
+                      {unreadCount}
+                    </span>
+                  )}
+                </div>
+                <div className="flex items-center gap-2">
+                  {unreadCount > 0 && (
+                    <button
+                      onClick={markAllRead}
+                      className="text-[10px] font-mono text-muted-foreground hover:text-primary transition-colors flex items-center gap-1 cursor-pointer"
+                    >
+                      <CheckCheck className="h-3 w-3" /> Mark all read
+                    </button>
+                  )}
+                  <button
+                    onClick={() => setNotifPanelOpen(false)}
+                    className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-ink-dark/60 transition-colors cursor-pointer"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                </div>
+              </div>
+
+              {/* Notifications List */}
+              <div className="flex-1 overflow-y-auto p-3 space-y-2">
+                {notifications.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center h-full gap-3 text-center">
+                    <Bell className="h-10 w-10 text-muted-foreground/30" />
+                    <p className="text-sm text-muted-foreground font-mono">No notifications</p>
+                  </div>
+                ) : (
+                  notifications.map((notif) => {
+                    const Icon = notif.type === "warning" ? AlertTriangle : notif.type === "info" ? ShoppingBag : Info;
+                    const iconColor = notif.type === "warning" ? "text-amber-500" : notif.type === "info" ? "text-primary" : "text-muted-foreground";
+                    const bgColor = notif.type === "warning" ? "bg-amber-500/5 border-amber-500/20" : notif.type === "info" ? "bg-primary/5 border-primary/20" : "bg-ink-dark/40 border-border";
+                    return (
+                      <div
+                        key={notif.id}
+                        className={cn(
+                          "relative rounded-xl border p-3.5 transition-all",
+                          bgColor,
+                          !notif.read && "ring-1 ring-primary/30"
+                        )}
+                      >
+                        {!notif.read && (
+                          <span className="absolute top-3 right-3 h-2 w-2 rounded-full bg-primary" />
+                        )}
+                        <div className="flex items-start gap-3">
+                          <div className={cn("mt-0.5 shrink-0", iconColor)}>
+                            <Icon className="h-4 w-4" />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-xs font-bold text-foreground">{notif.title}</p>
+                            <p className="text-[11px] text-muted-foreground mt-0.5 leading-snug">{notif.message}</p>
+                            <div className="flex items-center justify-between mt-2">
+                              <span className="text-[10px] font-mono text-muted-foreground/60">{notif.time}</span>
+                              {!notif.read && (
+                                <button
+                                  onClick={() => markOneRead(notif.id)}
+                                  className="text-[10px] font-mono text-primary hover:underline cursor-pointer"
+                                >
+                                  Mark read
+                                </button>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })
+                )}
+              </div>
+
+              {/* Footer */}
+              <div className="p-3 border-t border-border shrink-0">
+                <p className="text-[10px] text-center font-mono text-muted-foreground/50">
+                  JuiceVibe Admin · Notification Centre
+                </p>
+              </div>
+            </motion.div>
+          </>
         )}
       </AnimatePresence>
 

@@ -206,6 +206,17 @@ export class OrdersService {
     });
   }
 
+  async updateOrderPaymentStatus(id: string, paymentStatus: string) {
+    const order = await prisma.order.findUnique({ where: { id } });
+    if (!order) throw new NotFoundException("Order not found");
+
+    return prisma.order.update({
+      where: { id },
+      data: { paymentStatus: paymentStatus as any },
+      include: { items: true },
+    });
+  }
+
   async getRecentOrders(limit = 10) {
     return prisma.order.findMany({
       include: { items: true },

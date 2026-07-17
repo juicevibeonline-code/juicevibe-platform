@@ -162,6 +162,12 @@ export class UpdateOrderStatusDto {
   status: string;
 }
 
+export class UpdateOrderPaymentStatusDto {
+  @ApiProperty({ enum: ["pending", "paid", "refunded", "failed"] })
+  @IsString()
+  status: string;
+}
+
 export class CreateMenuItemDto {
   @ApiProperty()
   @IsString()

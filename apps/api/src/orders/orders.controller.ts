@@ -4,7 +4,7 @@ import { OrdersService } from "./orders.service";
 import { CurrentUser } from "../common/decorators";
 import { JwtAuthGuard, RolesGuard, Roles, OptionalAuthGuard } from "../common/guards";
 import { ApiResponseDto } from "../common/dto";
-import { CreateOrderDto, UpdateOrderStatusDto } from "../common/dto";
+import { CreateOrderDto, UpdateOrderStatusDto, UpdateOrderPaymentStatusDto } from "../common/dto";
 import { Prisma } from "@juice-vibe/database";
 
 type OrderWithItems = Prisma.OrderGetPayload<{ include: { items: true } }>;
@@ -81,5 +81,15 @@ export class OrdersController {
   async updateOrderStatus(@Param("id") id: string, @Body() body: UpdateOrderStatusDto): Promise<ApiResponseDto<OrderWithItems>> {
     const order = await this.ordersService.updateOrderStatus(id, body.status);
     return ApiResponseDto.ok(order, "Order status updated");
+  }
+
+  @Patch(":id/payment-status")
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles("admin", "manager", "cashier")
+  @ApiBearerAuth()
+  @ApiOperation({ summary: "Update order payment status" })
+  async updateOrderPaymentStatus(@Param("id") id: string, @Body() body: UpdateOrderPaymentStatusDto): Promise<ApiResponseDto<OrderWithItems>> {
+    const order = await this.ordersService.updateOrderPaymentStatus(id, body.status);
+    return ApiResponseDto.ok(order, "Order payment status updated");
   }
 }
