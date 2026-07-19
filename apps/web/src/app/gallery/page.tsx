@@ -59,7 +59,7 @@ export default function GalleryPage() {
             width: 800,
             height: 600,
             category: categorySlug,
-            isVideo: false,
+            createdAt: new Date().toISOString(),
           };
         });
 
