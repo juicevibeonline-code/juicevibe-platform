@@ -123,15 +123,15 @@ A powerful, secure REST API built with NestJS 11:
 
 ---
 
-## 📞 Support & Maintenance
+## 📞 Support, Hosting & Maintenance Options
 
-| Type | Details |
-|---|---|
-| **Bug Fixes** | Included for 30 days after launch |
-| **Content Updates** | Via the admin panel (self-service) |
-| **Technical Support** | Contact [devlakruwan@gmail.com / WhatsApp-0714089493] |
-| **Hosting Cost** | Vercel Free Tier ($0/month for this traffic level) |
-| **Database Cost** | Neon Free Tier ($0/month up to 0.5 GB) |
+| Hosting Option | Description | Monthly Cost |
+|---|---|---|
+| **Option 1: Managed Cloud (Recommended)** | Vercel Free + Neon PostgreSQL Free + Cloudinary Free | **$0 / month (LKR 0)** |
+| **Option 2: Dedicated Single VPS** | Hetzner / DigitalOcean Docker containerized setup | **~$12 / month (~LKR 3,600)** |
+| **Option 3: Enterprise Cloud** | Vercel Pro + Render Web Service + Supabase Pro | **~$32 / month (~LKR 9,600)** |
+
+*Domain registration (`.lk` domain): ~LKR 3,500 - 4,500 / year via LK Domain Registry.*
 
 ---
 

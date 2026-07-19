@@ -4,7 +4,7 @@ import { OrdersService } from "./orders.service";
 import { CurrentUser } from "../common/decorators";
 import { JwtAuthGuard, RolesGuard, Roles, OptionalAuthGuard } from "../common/guards";
 import { ApiResponseDto } from "../common/dto";
-import { CreateOrderDto, UpdateOrderStatusDto } from "../common/dto";
+import { CreateOrderDto, UpdateOrderStatusDto, UpdateOrderPaymentStatusDto } from "../common/dto";
 import { Prisma } from "@juice-vibe/database";
 
 type OrderWithItems = Prisma.OrderGetPayload<{ include: { items: true } }>;
@@ -25,7 +25,7 @@ export class OrdersController {
 
   @Get()
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles("admin", "manager", "cashier")
+  @Roles("admin", "manager", "cashier", "kitchen")
   @ApiBearerAuth()
   @ApiOperation({ summary: "Get all orders (admin)" })
   async getOrders(
@@ -56,6 +56,13 @@ export class OrdersController {
     return ApiResponseDto.ok(orders);
   }
 
+  @Get("track/:orderNumber")
+  @ApiOperation({ summary: "Track order by order number (Public)" })
+  async trackOrder(@Param("orderNumber") orderNumber: string): Promise<ApiResponseDto<OrderWithItems>> {
+    const order = await this.ordersService.getOrderByNumber(orderNumber);
+    return ApiResponseDto.ok(order);
+  }
+
   @Get(":id")
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
@@ -65,6 +72,7 @@ export class OrdersController {
     return ApiResponseDto.ok(order);
   }
 
+
   @Patch(":id/status")
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles("admin", "manager", "cashier", "kitchen")
@@ -73,5 +81,15 @@ export class OrdersController {
   async updateOrderStatus(@Param("id") id: string, @Body() body: UpdateOrderStatusDto): Promise<ApiResponseDto<OrderWithItems>> {
     const order = await this.ordersService.updateOrderStatus(id, body.status);
     return ApiResponseDto.ok(order, "Order status updated");
+  }
+
+  @Patch(":id/payment-status")
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles("admin", "manager", "cashier")
+  @ApiBearerAuth()
+  @ApiOperation({ summary: "Update order payment status" })
+  async updateOrderPaymentStatus(@Param("id") id: string, @Body() body: UpdateOrderPaymentStatusDto): Promise<ApiResponseDto<OrderWithItems>> {
+    const order = await this.ordersService.updateOrderPaymentStatus(id, body.status);
+    return ApiResponseDto.ok(order, "Order payment status updated");
   }
 }

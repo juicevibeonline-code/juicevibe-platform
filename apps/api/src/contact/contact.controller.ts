@@ -61,4 +61,41 @@ export class ContactController {
     await this.contactService.deleteMessage(id);
     return ApiResponseDto.ok(null, "Message deleted");
   }
+
+  @Get("subscribers")
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles("admin", "manager")
+  @ApiBearerAuth()
+  @ApiOperation({ summary: "Get newsletter subscribers (Admin/Manager)" })
+  async getSubscribers(
+    @Query("page") page?: number,
+    @Query("limit") limit?: number,
+  ) {
+    const result = await this.contactService.getSubscribers({
+      page: Number(page) || 1,
+      limit: Number(limit) || 20,
+    });
+    return ApiResponseDto.paginated(result.subscribers, result.total, result.page, result.limit);
+  }
+
+  @Patch("subscribers/:id/toggle")
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles("admin", "manager")
+  @ApiBearerAuth()
+  @ApiOperation({ summary: "Toggle subscriber active/inactive status" })
+  async toggleSubscriber(@Param("id") id: string) {
+    const sub = await this.contactService.toggleSubscriber(id);
+    return ApiResponseDto.ok(sub, "Subscriber status updated");
+  }
+
+  @Delete("subscribers/:id")
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles("admin", "manager")
+  @ApiBearerAuth()
+  @ApiOperation({ summary: "Delete / remove a newsletter subscriber" })
+  async deleteSubscriber(@Param("id") id: string) {
+    await this.contactService.deleteSubscriber(id);
+    return ApiResponseDto.ok(null, "Subscriber removed successfully");
+  }
 }
+

@@ -20,6 +20,14 @@ export const siteConfig = {
       country: "Sri Lanka",
     },
   },
+  bankDetails: {
+    bankName: "Commercial Bank of Ceylon",
+    branch: "Bentota",
+    accountName: "Juice Vibe Bentota",
+    accountNumber: "8010156942",
+    whatsappReceipt: "+94 71 843 5876",
+    whatsappReceiptRaw: "94718435876",
+  },
   hours: {
     weekdays: "8:00 AM - 10:00 PM",
     saturday: "9:00 AM - 11:00 PM",

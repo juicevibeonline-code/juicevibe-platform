@@ -2,10 +2,14 @@ import { Injectable, NotFoundException, BadRequestException } from "@nestjs/comm
 import { prisma, Prisma } from "@juice-vibe/database";
 import { randomBytes } from "crypto";
 import { OrdersGateway } from "./orders.gateway";
+import { EmailService } from "../email/email.service";
 
 @Injectable()
 export class OrdersService {
-  constructor(private ordersGateway: OrdersGateway) {}
+  constructor(
+    private ordersGateway: OrdersGateway,
+    private emailService: EmailService
+  ) {}
 
   async createOrder(input: {
     items: { menuItemId?: string; name?: string; price?: number; quantity: number; variant?: string; addOnIds?: string[]; notes?: string }[];
@@ -137,6 +141,12 @@ export class OrdersService {
     // Emit live event to dashboard
     this.ordersGateway.emitNewOrder(order);
 
+    if (order.customerEmail) {
+      this.emailService.sendOrderConfirmation(order.customerEmail, order).catch((err) => {
+        console.error("Order confirmation email async send error:", err.message);
+      });
+    }
+
     return order;
   }
 
@@ -172,6 +182,16 @@ export class OrdersService {
     return order;
   }
 
+  async getOrderByNumber(orderNumber: string) {
+    const order = await prisma.order.findUnique({
+      where: { orderNumber },
+      include: { items: true },
+    });
+    if (!order) throw new NotFoundException(`Order with number ${orderNumber} not found`);
+    return order;
+  }
+
+
   async updateOrderStatus(id: string, status: string) {
     const order = await prisma.order.findUnique({ where: { id } });
     if (!order) throw new NotFoundException("Order not found");
@@ -182,6 +202,17 @@ export class OrdersService {
     return prisma.order.update({
       where: { id },
       data: updateData,
+      include: { items: true },
+    });
+  }
+
+  async updateOrderPaymentStatus(id: string, paymentStatus: string) {
+    const order = await prisma.order.findUnique({ where: { id } });
+    if (!order) throw new NotFoundException("Order not found");
+
+    return prisma.order.update({
+      where: { id },
+      data: { paymentStatus: paymentStatus as any },
       include: { items: true },
     });
   }

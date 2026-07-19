@@ -18,7 +18,7 @@ const contactInfo = [
   {
     icon: MapPin,
     title: "Visit Us",
-    details: ["Galle Road", "Bentota, Sri Lanka"],
+    details: ["No. 89 Bandaragama Road", "Waskaduwa, Sri Lanka 12580"],
   },
   {
     icon: Phone,
@@ -43,6 +43,7 @@ export default function ContactPage() {
   const [formState, setFormState] = useState({
     name: "",
     email: "",
+    phone: "",
     subject: "",
     message: "",
   });
@@ -59,11 +60,12 @@ export default function ContactPage() {
       await submitContactForm({
         name: formState.name,
         email: formState.email,
+        phone: formState.phone || undefined,
         subject: formState.subject,
         message: formState.message,
       });
       setSubmitted(true);
-      setFormState({ name: "", email: "", subject: "", message: "" });
+      setFormState({ name: "", email: "", phone: "", subject: "", message: "" });
       setTimeout(() => setSubmitted(false), 5000);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to send message. Please try again.");
@@ -149,6 +151,14 @@ export default function ContactPage() {
                         />
                       </div>
                       <Input
+                        id="phone"
+                        label="Phone Number"
+                        type="tel"
+                        placeholder="+94 71 234 5678"
+                        value={formState.phone}
+                        onChange={(e) => setFormState({ ...formState, phone: e.target.value })}
+                      />
+                      <Input
                         id="subject"
                         label="Subject"
                         placeholder="How can we help?"
@@ -233,7 +243,7 @@ export default function ContactPage() {
             >
               <div className="aspect-[21/9] w-full bg-gray-200">
                 <iframe
-                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2000!2d79.94654846191406!3d6.631149768829346!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNsKwMzcnNTIuMSJOIDc5wrA1Nic0Ny42IkU!5e0!3m2!1sen!2sin!4v1"
+                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d63372.6!2d79.9460964!3d6.6306512!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3ae237c15ed1a1db%3A0x61cf3db0c115e726!2s89+Waskaduwa+-+Bandaragama+Rd%2C+Wadduwa!5e0!3m2!1sen!2sin!4v1"
                   width="100%"
                   height="100%"
                   style={{ border: 0, minHeight: "300px" }}

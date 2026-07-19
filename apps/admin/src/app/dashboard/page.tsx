@@ -60,30 +60,18 @@ export default function MissionControlDashboard() {
     retry: 1,
   });
 
-  // Fallbacks if backend is missing / seeding only
-  const fallbackStats: DashboardStats = {
-    revenue: 125430,
-    revenueChange: 14.2,
-    orders: 342,
-    ordersChange: 8.5,
-    customers: 87,
-    customersChange: 12.3,
-    averageOrderValue: 366,
-    aovChange: 5.2,
+  const currentStats: DashboardStats = stats || {
+    revenue: 0,
+    revenueChange: 0,
+    orders: 0,
+    ordersChange: 0,
+    customers: 0,
+    customersChange: 0,
+    averageOrderValue: 0,
+    aovChange: 0,
   };
+  const currentChart = chartData || [];
 
-  const fallbackChartData: RevenueChartData[] = [
-    { date: "Jul 05", revenue: 12000, orders: 32 },
-    { date: "Jul 06", revenue: 15400, orders: 41 },
-    { date: "Jul 07", revenue: 14200, orders: 38 },
-    { date: "Jul 08", revenue: 19800, orders: 50 },
-    { date: "Jul 09", revenue: 18100, orders: 48 },
-    { date: "Jul 10", revenue: 22400, orders: 60 },
-    { date: "Jul 11", revenue: 23530, orders: 73 },
-  ];
-
-  const currentStats = stats || fallbackStats;
-  const currentChart = chartData || fallbackChartData;
 
   const handleRefreshAll = () => {
     refetchStats();
@@ -130,10 +118,10 @@ export default function MissionControlDashboard() {
             <TrendingUp className="h-4 w-4 text-primary text-glow" />
           </div>
           <div className="font-numeral text-2xl font-bold text-foreground">
-            {formatPrice(currentStats.revenue)}
+            {statsLoading || !stats ? "—" : formatPrice(currentStats.revenue)}
           </div>
           <div className="mt-2 flex items-center gap-1.5 text-[10px] font-mono text-primary">
-            <span>+{currentStats.revenueChange}%</span>
+            <span>{statsLoading || !stats ? "—" : `${currentStats.revenueChange >= 0 ? "+" : ""}${currentStats.revenueChange}%`}</span>
             <span className="text-muted-foreground/60">vs last segment</span>
           </div>
         </div>
@@ -145,10 +133,10 @@ export default function MissionControlDashboard() {
             <ShoppingBag className="h-4 w-4 text-orange text-glow-orange" />
           </div>
           <div className="font-numeral text-2xl font-bold text-foreground">
-            {currentStats.orders}
+            {statsLoading || !stats ? "—" : currentStats.orders}
           </div>
           <div className="mt-2 flex items-center gap-1.5 text-[10px] font-mono text-orange">
-            <span>+{currentStats.ordersChange}%</span>
+            <span>{statsLoading || !stats ? "—" : `${currentStats.ordersChange >= 0 ? "+" : ""}${currentStats.ordersChange}%`}</span>
             <span className="text-muted-foreground/60">completed dispatch</span>
           </div>
         </div>
@@ -160,10 +148,10 @@ export default function MissionControlDashboard() {
             <UserCheck className="h-4 w-4 text-yellow text-glow-yellow" />
           </div>
           <div className="font-numeral text-2xl font-bold text-foreground">
-            {currentStats.customers}
+            {statsLoading || !stats ? "—" : currentStats.customers}
           </div>
           <div className="mt-2 flex items-center gap-1.5 text-[10px] font-mono text-yellow">
-            <span>+{currentStats.customersChange}%</span>
+            <span>{statsLoading || !stats ? "—" : `${currentStats.customersChange >= 0 ? "+" : ""}${currentStats.customersChange}%`}</span>
             <span className="text-muted-foreground/60">loyalty acquisitions</span>
           </div>
         </div>
@@ -175,10 +163,10 @@ export default function MissionControlDashboard() {
             <Clock className="h-4 w-4 text-primary text-glow" />
           </div>
           <div className="font-numeral text-2xl font-bold text-foreground">
-            {formatPrice(currentStats.averageOrderValue)}
+            {statsLoading || !stats ? "—" : formatPrice(currentStats.averageOrderValue)}
           </div>
           <div className="mt-2 flex items-center gap-1.5 text-[10px] font-mono text-primary">
-            <span>+{currentStats.aovChange}%</span>
+            <span>{statsLoading || !stats ? "—" : `${currentStats.aovChange >= 0 ? "+" : ""}${currentStats.aovChange}%`}</span>
             <span className="text-muted-foreground/60">ticket average size</span>
           </div>
         </div>
@@ -326,22 +314,24 @@ export default function MissionControlDashboard() {
               <span>Top Operational Items</span>
             </h3>
             <div className="divide-y divide-border/40 font-mono text-[10px]">
-              {(topSelling || [
-                { name: "Strawberry Milkshake", quantity: 34, revenue: 11900 },
-                { name: "Chocolate Milkshake", quantity: 28, revenue: 8400 },
-                { name: "Mango Milkshake", quantity: 22, revenue: 7700 }
-              ]).map((item: any, idx: number) => (
-                <div key={idx} className="py-2.5 flex items-center justify-between first:pt-0 last:pb-0">
-                  <div className="flex items-center gap-2">
-                    <span className="text-muted-foreground">0{idx + 1}.</span>
-                    <span className="font-medium text-foreground font-sans">{item.name}</span>
+              {topSelling && topSelling.length > 0 ? (
+                topSelling.map((item: any, idx: number) => (
+                  <div key={idx} className="py-2.5 flex items-center justify-between first:pt-0 last:pb-0">
+                    <div className="flex items-center gap-2">
+                      <span className="text-muted-foreground">0{idx + 1}.</span>
+                      <span className="font-medium text-foreground font-sans">{item.name}</span>
+                    </div>
+                    <div className="flex items-center gap-4">
+                      <span className="text-muted-foreground">{item.quantity} orders</span>
+                      <span className="font-numeral text-primary">{formatPrice(item.revenue)}</span>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-4">
-                    <span className="text-muted-foreground">{item.quantity} orders</span>
-                    <span className="font-numeral text-primary">{formatPrice(item.revenue)}</span>
-                  </div>
+                ))
+              ) : (
+                <div className="text-center py-6 text-muted-foreground/60 uppercase">
+                  No operational sales data recorded.
                 </div>
-              ))}
+              )}
             </div>
           </div>
         </div>
@@ -376,38 +366,42 @@ export default function MissionControlDashboard() {
               </tr>
             </thead>
             <tbody className="divide-y divide-border/30">
-              {(ordersData?.orders?.slice(0, 4) || [
-                { orderNumber: "ORD-8947", customerName: "Arjun Nair", type: "pickup", total: 1250, status: "preparing", createdAt: "2026-07-12T00:01:00Z" },
-                { orderNumber: "ORD-8946", customerName: "Neha Gupta", type: "delivery", total: 3450, status: "pending", createdAt: "2026-07-11T23:45:00Z" },
-                { orderNumber: "ORD-8945", customerName: "Priya Sharma", type: "pickup", total: 900, status: "ready", createdAt: "2026-07-11T23:30:00Z" }
-              ]).map((order: any) => (
-                <tr key={order.orderNumber} className="hover:bg-ink-dark/30 transition-colors">
-                  <td className="py-3.5 px-4 font-bold text-foreground">{order.orderNumber}</td>
-                  <td className="py-3.5 px-4">{order.customerName}</td>
-                  <td className="py-3.5 px-4">
-                    <span className="uppercase text-[9px] tracking-wider text-muted-foreground border border-border px-1.5 py-0.5 rounded">
-                      {order.type}
-                    </span>
-                  </td>
-                  <td className="py-3.5 px-4 font-numeral text-primary">{formatPrice(order.total)}</td>
-                  <td className="py-3.5 px-4">
-                    <span
-                      className={cn(
-                        "text-[9px] uppercase tracking-widest px-2 py-0.5 rounded font-bold",
-                        order.status === "pending" && "bg-orange-500/10 text-orange-400 border border-orange-500/20",
-                        order.status === "preparing" && "bg-primary/10 text-primary border border-primary/20",
-                        order.status === "ready" && "bg-primary/20 text-primary-light border border-primary/30",
-                        order.status === "completed" && "bg-ink-dark text-muted-foreground border border-border"
-                      )}
-                    >
-                      {order.status}
-                    </span>
-                  </td>
-                  <td className="py-3.5 px-4 text-right text-[10px] text-muted-foreground">
-                    {new Date(order.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+              {ordersData?.orders && ordersData.orders.length > 0 ? (
+                ordersData.orders.slice(0, 4).map((order: any) => (
+                  <tr key={order.orderNumber} className="hover:bg-ink-dark/30 transition-colors">
+                    <td className="py-3.5 px-4 font-bold text-foreground">{order.orderNumber}</td>
+                    <td className="py-3.5 px-4">{order.customerName}</td>
+                    <td className="py-3.5 px-4">
+                      <span className="uppercase text-[9px] tracking-wider text-muted-foreground border border-border px-1.5 py-0.5 rounded">
+                        {order.type}
+                      </span>
+                    </td>
+                    <td className="py-3.5 px-4 font-numeral text-primary">{formatPrice(order.total)}</td>
+                    <td className="py-3.5 px-4">
+                      <span
+                        className={cn(
+                          "text-[9px] uppercase tracking-widest px-2 py-0.5 rounded font-bold",
+                          order.status === "pending" && "bg-orange-500/10 text-orange-400 border border-orange-500/20",
+                          order.status === "preparing" && "bg-primary/10 text-primary border border-primary/20",
+                          order.status === "ready" && "bg-primary/20 text-primary-light border border-primary/30",
+                          order.status === "completed" && "bg-ink-dark text-muted-foreground border border-border"
+                        )}
+                      >
+                        {order.status}
+                      </span>
+                    </td>
+                    <td className="py-3.5 px-4 text-right text-[10px] text-muted-foreground">
+                      {new Date(order.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={6} className="text-center py-8 text-muted-foreground/50 uppercase">
+                    No active orders processing.
                   </td>
                 </tr>
-              ))}
+              )}
             </tbody>
           </table>
         </div>

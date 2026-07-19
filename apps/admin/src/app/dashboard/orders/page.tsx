@@ -2,7 +2,7 @@
 
 import React, { useState, useCallback } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { orderService } from "@juice-vibe/services";
+import { orderService, tableService } from "@juice-vibe/services";
 import type { Order } from "@juice-vibe/types";
 import { LoadingSpinner } from "@juice-vibe/ui";
 import { formatPrice, formatDate } from "@juice-vibe/utils";
@@ -23,11 +23,15 @@ import {
   Calendar,
   Bell,
   QrCode,
+  Banknote,
+  CreditCard,
+  Smartphone,
+  BadgeCheck,
 } from "lucide-react";
 import { cn } from "@juice-vibe/utils";
 import { useOrdersSocket } from "@/hooks/use-orders-socket";
 
-type ViewMode = "kanban" | "list";
+type ViewMode = "kanban" | "list" | "table_map";
 
 export default function OrderDesk() {
   const queryClient = useQueryClient();
@@ -35,6 +39,13 @@ export default function OrderDesk() {
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [typeFilter, setTypeFilter] = useState<string>("all");
   const [liveAlert, setLiveAlert] = useState<{ orderNumber: string; table?: number; total: number } | null>(null);
+
+  const { data: tables = [] } = useQuery<any[]>({
+    queryKey: ["tables"],
+    queryFn: () => tableService.getTables(),
+    enabled: viewMode === "table_map",
+  });
+
 
   // ─── Real-time WebSocket ─────────────────────────────────────────────────
   const handleNewOrder = useCallback((order: any) => {
@@ -75,6 +86,15 @@ export default function OrderDesk() {
     },
   });
 
+  // Update Payment Status mutation
+  const updatePaymentMutation = useMutation({
+    mutationFn: ({ id, status }: { id: string; status: string }) =>
+      orderService.updateOrderPaymentStatus(id, status),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["ordersDesk"] });
+    },
+  });
+
   // Handle local status transition
   const handleStatusTransition = (orderId: string, currentStatus: string) => {
     const nextStatusMap: Record<string, string> = {
@@ -94,6 +114,59 @@ export default function OrderDesk() {
       updateStatusMutation.mutate({ id: orderId, status: "cancelled" });
     }
   };
+
+  const handleExportCSV = () => {
+    if (filteredOrders.length === 0) {
+      alert("No orders to export");
+      return;
+    }
+
+    const headers = [
+      "Order Number",
+      "Customer Name",
+      "Phone",
+      "Email",
+      "Type",
+      "Status",
+      "Payment Method",
+      "Subtotal",
+      "Tax",
+      "Discount",
+      "Total",
+      "Created At"
+    ];
+
+    const rows = filteredOrders.map(order => [
+      order.orderNumber,
+      order.customerName,
+      order.customerPhone,
+      order.customerEmail || "",
+      order.type,
+      order.status,
+      order.paymentMethod,
+      order.subtotal,
+      order.tax,
+      order.discount,
+      order.total,
+      order.createdAt
+    ]);
+
+    const csvContent = [
+      headers.join(","),
+      ...rows.map(row => row.map(val => `"${String(val).replace(/"/g, '""')}"`).join(","))
+    ].join("\n");
+
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", `orders_export_${new Date().toISOString().split("T")[0]}.csv`);
+    link.style.visibility = "hidden";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
 
   // Filter type client-side to enforce same state source
   const filteredOrders = orders.filter((order: Order) => {
@@ -175,6 +248,16 @@ export default function OrderDesk() {
               <ListIcon className="h-3.5 w-3.5" />
               <span>GRID LIST</span>
             </button>
+            <button
+              onClick={() => setViewMode("table_map")}
+              className={cn(
+                "p-1.5 rounded-md text-xs font-mono flex items-center gap-1.5 cursor-pointer transition-all",
+                viewMode === "table_map" ? "bg-primary/20 text-primary border border-primary/10" : "text-muted-foreground hover:text-foreground"
+              )}
+            >
+              <QrCode className="h-3.5 w-3.5" />
+              <span>TABLE MAP</span>
+            </button>
           </div>
 
           {/* Type Filter */}
@@ -205,6 +288,13 @@ export default function OrderDesk() {
               <option value="cancelled">Cancelled</option>
             </select>
           )}
+
+          <button
+            onClick={handleExportCSV}
+            className="px-3 py-1.5 rounded-lg bg-ink-dark border border-border hover:border-primary/40 hover:text-foreground transition-colors text-muted-foreground cursor-pointer text-xs font-mono font-bold uppercase tracking-wider"
+          >
+            Export CSV
+          </button>
 
           <button
             onClick={() => refetch()}
@@ -272,13 +362,68 @@ export default function OrderDesk() {
                         </div>
                       </div>
 
+                      {/* Order Items Details */}
+                      <div className="border-t border-border/40 pt-2 space-y-1.5 font-mono text-[9px] text-muted-foreground">
+                        {order.items?.map((item) => (
+                          <div key={item.id} className="flex flex-col border-b border-border/10 pb-1 last:border-b-0 last:pb-0">
+                            <div className="flex items-start justify-between text-foreground">
+                              <span className="font-sans line-clamp-2 flex-1 leading-snug">
+                                {item.name}
+                                {item.variant && <span className="text-[8px] text-muted-foreground block font-mono mt-0.5">({item.variant})</span>}
+                              </span>
+                              <span className="font-numeral font-bold shrink-0 ml-1.5">x{item.quantity}</span>
+                            </div>
+                            
+                            {item.addOns && (item.addOns as any).length > 0 && (
+                              <div className="pl-2 text-[8px] text-primary/70 leading-normal mt-0.5">
+                                + {(item.addOns as any).map((add: any) => add.name).join(", ")}
+                              </div>
+                            )}
+
+                            {item.notes && (
+                              <div className="pl-2 text-[8px] text-orange italic leading-normal mt-0.5">
+                                Note: {item.notes}
+                              </div>
+                            )}
+                          </div>
+                        ))}
+
+                        {order.notes && (
+                          <div className="p-1 bg-orange/5 border border-orange/15 rounded text-[8px] text-orange leading-normal mt-1">
+                            <span className="font-bold">General Note:</span> {order.notes}
+                          </div>
+                        )}
+                      </div>
+
                       <div className="flex items-center justify-between border-t border-border/40 pt-2 text-[10px] font-mono">
                         <span className="text-muted-foreground">Total:</span>
                         <span className="font-numeral text-primary font-semibold">{formatPrice(order.total)}</span>
                       </div>
 
+                      {/* Payment status indicator */}
+                      <div className="flex items-center justify-between text-[9px] font-mono">
+                        <span className="text-muted-foreground flex items-center gap-1">
+                          {order.paymentMethod === "online" ? <Smartphone className="h-3 w-3" /> : <Banknote className="h-3 w-3" />}
+                          {order.paymentMethod === "online" ? "Bank Transfer" : "Cash"}
+                        </span>
+                        {order.paymentStatus === "paid" ? (
+                          <span className="flex items-center gap-0.5 text-primary font-semibold">
+                            <BadgeCheck className="h-3 w-3" /> Paid
+                          </span>
+                        ) : (
+                          <span className={cn(
+                            "px-1.5 py-0.5 rounded font-bold uppercase tracking-wider",
+                            order.paymentMethod === "online"
+                              ? "bg-amber-500/10 text-amber-500 border border-amber-500/30 animate-pulse"
+                              : "bg-muted/30 text-muted-foreground border border-border/40"
+                          )}>
+                            {order.paymentStatus || "pending"}
+                          </span>
+                        )}
+                      </div>
+
                       {/* Operations buttons */}
-                      <div className="flex items-center gap-1.5 pt-1">
+                      <div className="flex items-center gap-1.5 pt-1 flex-wrap">
                         {status !== "completed" && (
                           <button
                             onClick={() => handleStatusTransition(order.id, order.status)}
@@ -286,6 +431,17 @@ export default function OrderDesk() {
                           >
                             <span>Advance</span>
                             <ChevronRight className="h-2.5 w-2.5" />
+                          </button>
+                        )}
+                        {/* Mark Paid button — for online transfer orders awaiting payment confirmation */}
+                        {order.paymentMethod === "online" && order.paymentStatus !== "paid" && (
+                          <button
+                            onClick={() => updatePaymentMutation.mutate({ id: order.id, status: "paid" })}
+                            disabled={updatePaymentMutation.isPending}
+                            className="flex-1 inline-flex items-center justify-center gap-1 py-1.5 px-2 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-500 text-[9px] font-mono font-semibold rounded uppercase tracking-wider cursor-pointer disabled:opacity-50"
+                          >
+                            <BadgeCheck className="h-2.5 w-2.5" />
+                            <span>Mark Paid</span>
                           </button>
                         )}
                         {status === "pending" && (
@@ -309,7 +465,7 @@ export default function OrderDesk() {
             );
           })}
         </div>
-      ) : (
+      ) : viewMode === "list" ? (
         /* GRID LIST VIEW */
         <div className="terminal-card bg-card border border-border overflow-hidden">
           <div className="overflow-x-auto">
@@ -318,6 +474,7 @@ export default function OrderDesk() {
                 <tr className="border-b border-border/80 text-[10px] text-muted-foreground uppercase tracking-wider bg-ink-dark/30">
                   <th className="py-3 px-4 font-semibold">Order ID</th>
                   <th className="py-3 px-4 font-semibold">Customer</th>
+                  <th className="py-3 px-4 font-semibold">Items & Notes</th>
                   <th className="py-3 px-4 font-semibold">Type</th>
                   <th className="py-3 px-4 font-semibold">Status</th>
                   <th className="py-3 px-4 font-semibold">Price total</th>
@@ -333,6 +490,36 @@ export default function OrderDesk() {
                       <div className="flex flex-col">
                         <span className="font-semibold text-foreground font-sans">{order.customerName}</span>
                         <span className="text-[10px] text-muted-foreground">{order.customerPhone}</span>
+                      </div>
+                    </td>
+                    <td className="py-3.5 px-4 max-w-xs">
+                      <div className="flex flex-col space-y-1 font-mono text-[10px] text-muted-foreground">
+                        {order.items?.map((item) => (
+                          <div key={item.id} className="flex flex-col leading-tight border-b border-border/10 pb-1 last:border-b-0 last:pb-0">
+                            <div className="flex items-start justify-between text-foreground">
+                              <span className="font-sans font-medium">
+                                {item.name}
+                                {item.variant && <span className="text-[9px] text-muted-foreground block mt-0.5">({item.variant})</span>}
+                              </span>
+                              <span className="font-numeral font-bold shrink-0 ml-2">x{item.quantity}</span>
+                            </div>
+                            {item.addOns && (item.addOns as any).length > 0 && (
+                              <div className="text-[9px] text-primary/70 mt-0.5">
+                                + {(item.addOns as any).map((a: any) => a.name).join(", ")}
+                              </div>
+                            )}
+                            {item.notes && (
+                              <div className="text-[9px] text-orange italic mt-0.5">
+                                Note: {item.notes}
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                        {order.notes && (
+                          <div className="mt-1 text-[9px] text-orange bg-orange/5 p-1 rounded border border-orange/10">
+                            <span className="font-bold">Note:</span> {order.notes}
+                          </div>
+                        )}
                       </div>
                     </td>
                     <td className="py-3.5 px-4">
@@ -384,6 +571,73 @@ export default function OrderDesk() {
               </tbody>
             </table>
           </div>
+        </div>
+      ) : (
+        /* TABLE MAP VIEW */
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          {tables.map((table: any) => {
+            const activeStatuses = ["pending", "confirmed", "preparing", "ready"];
+            const tableOrders = filteredOrders.filter(
+              (o: any) => o.tableId === table.id && activeStatuses.includes(o.status)
+            );
+            const hasActiveOrders = tableOrders.length > 0;
+
+            return (
+              <div 
+                key={table.id} 
+                className={cn(
+                  "terminal-card bg-card border p-5 flex flex-col justify-between space-y-4 hover:shadow-lg transition-all",
+                  hasActiveOrders ? "border-primary/50 shadow-md" : "border-border/60"
+                )}
+              >
+                <div>
+                  <div className="flex items-center justify-between border-b border-border/40 pb-2">
+                    <span className="text-[10px] font-mono font-bold text-muted-foreground uppercase">
+                      Table Record
+                    </span>
+                    <span className={cn(
+                      "h-2.5 w-2.5 rounded-full",
+                      hasActiveOrders ? "bg-primary animate-pulse" : "bg-muted-foreground/30"
+                    )} />
+                  </div>
+
+                  <div className="py-4 text-center">
+                    <h2 className="text-4xl font-bold font-mono text-primary tracking-tight">
+                      {table.number}
+                    </h2>
+                    <span className="text-[9px] font-mono text-muted-foreground uppercase tracking-widest block mt-1">
+                      {hasActiveOrders ? `${tableOrders.length} active orders` : "table empty"}
+                    </span>
+                  </div>
+
+                  {hasActiveOrders && (
+                    <div className="space-y-2 border-t border-border/40 pt-3">
+                      {tableOrders.map((order: any) => (
+                        <div key={order.id} className="p-2 bg-ink-dark/30 rounded border border-border/40 flex items-center justify-between text-[10px] font-mono">
+                          <div>
+                            <span className="text-foreground font-semibold">#{order.orderNumber}</span>
+                            <span className="text-[8px] text-muted-foreground block uppercase mt-0.5">
+                              {order.status}
+                            </span>
+                            {/* Summary of items */}
+                            <div className="text-[8px] text-muted-foreground mt-1 max-w-[120px] truncate">
+                              {order.items?.map((i: any) => `${i.name} (x${i.quantity})`).join(", ")}
+                            </div>
+                          </div>
+                          <button
+                            onClick={() => handleStatusTransition(order.id, order.status)}
+                            className="bg-primary/10 text-primary border border-primary/20 hover:bg-primary/20 px-2 py-0.5 rounded text-[8px] font-bold uppercase transition-all"
+                          >
+                            Next
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            );
+          })}
         </div>
       )}
     </div>

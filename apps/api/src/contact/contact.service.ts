@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, NotFoundException } from "@nestjs/common";
 import { prisma } from "@juice-vibe/database";
 
 @Injectable()
@@ -38,4 +38,33 @@ export class ContactService {
       create: { email },
     });
   }
+
+  async getSubscribers(params?: { page?: number; limit?: number }) {
+    const page = params?.page || 1;
+    const limit = params?.limit || 20;
+    const skip = (page - 1) * limit;
+
+    const [subscribers, total] = await Promise.all([
+      prisma.newsletterSubscriber.findMany({ orderBy: { createdAt: "desc" }, skip, take: limit }),
+      prisma.newsletterSubscriber.count(),
+    ]);
+
+    return { subscribers, total, page, limit, totalPages: Math.ceil(total / limit) };
+  }
+
+  async toggleSubscriber(id: string) {
+    const sub = await prisma.newsletterSubscriber.findUnique({ where: { id } });
+    if (!sub) throw new NotFoundException("Subscriber not found");
+    return prisma.newsletterSubscriber.update({
+      where: { id },
+      data: { isActive: !sub.isActive },
+    });
+  }
+
+  async deleteSubscriber(id: string) {
+    const sub = await prisma.newsletterSubscriber.findUnique({ where: { id } });
+    if (!sub) throw new NotFoundException("Subscriber not found");
+    return prisma.newsletterSubscriber.delete({ where: { id } });
+  }
 }
+

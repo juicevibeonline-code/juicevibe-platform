@@ -35,6 +35,10 @@ export class TestimonialsService {
     return prisma.testimonial.update({ where: { id }, data: { isApproved: true } });
   }
 
+  async update(id: string, input: { isApproved?: boolean; isFeatured?: boolean; name?: string; role?: string; avatar?: string; rating?: number; text?: string }) {
+    return prisma.testimonial.update({ where: { id }, data: input });
+  }
+
   async delete(id: string) {
     return prisma.testimonial.delete({ where: { id } });
   }

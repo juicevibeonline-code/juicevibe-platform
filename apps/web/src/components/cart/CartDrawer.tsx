@@ -19,7 +19,7 @@ interface CheckoutForm {
   customerPhone: string;
   customerEmail: string;
   type: "pickup" | "dine_in";
-  paymentMethod: "cash" | "card";
+  paymentMethod: "cash" | "online";
   notes: string;
 }
 
@@ -259,17 +259,31 @@ export function CartDrawer() {
                     </div>
 
                     {/* Payment Method */}
-                    <div className="space-y-2">
+                    <div className="space-y-2 font-sans">
                       <h3 className="font-bold text-dark-green text-sm">Payment Method</h3>
                       <div className="grid grid-cols-2 gap-2">
-                        {(["cash", "card"] as const).map(m => (
-                          <button key={m} onClick={() => setForm(f => ({ ...f, paymentMethod: m }))}
-                            className={`h-12 rounded-xl border text-sm font-bold transition-all ${form.paymentMethod === m ? "bg-primary text-white border-primary shadow-md shadow-primary/20" : "bg-white text-gray-500 border-gray-200 hover:border-primary/50"}`}
+                        {(["cash", "online"] as const).map(m => (
+                          <button key={m} type="button" onClick={() => setForm(f => ({ ...f, paymentMethod: m }))}
+                            className={`h-12 rounded-xl border text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${form.paymentMethod === m ? "bg-primary text-white border-primary shadow-md shadow-primary/20" : "bg-white text-gray-500 border-gray-200 hover:border-primary/50"}`}
                           >
-                            {m === "cash" ? "💵 Cash" : "💳 Card"}
+                            <span>{m === "cash" ? "💵 Cash" : "🏦 Transfer"}</span>
                           </button>
                         ))}
                       </div>
+                      
+                      {form.paymentMethod === "online" && (
+                        <div className="mt-2 p-3 bg-purple-50/50 border border-purple-100 rounded-xl space-y-2 text-[10px]">
+                          <p className="font-bold text-purple-800">Bank Transfer Account Details:</p>
+                          <div className="space-y-0.5 text-gray-600">
+                            <div><span className="font-semibold text-gray-400">Bank:</span> Commercial Bank</div>
+                            <div><span className="font-semibold text-gray-400">Account:</span> 8010156942</div>
+                            <div><span className="font-semibold text-gray-400">Name:</span> Juice Vibe Bentota</div>
+                          </div>
+                          <p className="text-[9px] text-purple-600/70 italic">
+                            * Please send the transfer receipt to our WhatsApp.
+                          </p>
+                        </div>
+                      )}
                     </div>
 
                     {/* Notes */}
@@ -303,7 +317,7 @@ export function CartDrawer() {
 
               {/* === STEP: SUCCESS === */}
               {step === "success" && (
-                <motion.div key="success" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="flex-1 flex flex-col items-center justify-center p-8 text-center gap-4">
+                <motion.div key="success" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="flex-1 flex flex-col items-center justify-center p-8 text-center gap-4 overflow-y-auto max-h-[85vh] scrollbar-hide">
                   <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: "spring", stiffness: 200, damping: 15, delay: 0.1 }}>
                     <CheckCircle2 className="w-24 h-24 text-primary drop-shadow-lg" />
                   </motion.div>
@@ -314,6 +328,30 @@ export function CartDrawer() {
                     )}
                     <p className="text-gray-500 text-sm max-w-[260px] mx-auto">We've received your order and the team is on it. Sit tight!</p>
                   </div>
+                  {form.paymentMethod === "online" && (
+                    <div className="w-full text-left p-3.5 bg-purple-50 border border-purple-100 rounded-2xl space-y-2.5 font-sans my-2">
+                      <p className="text-xs font-bold text-purple-800 flex items-center gap-1">
+                        <span>ℹ️</span> Bank Transfer Required
+                      </p>
+                      <p className="text-[10px] text-gray-600 leading-normal font-medium">
+                        Please transfer **{formatPrice(total)}** to:
+                      </p>
+                      <div className="text-[9px] space-y-0.5 text-gray-700 bg-white p-2.5 rounded-lg border border-purple-100/50 leading-relaxed">
+                        <div><span className="text-gray-400 font-medium">Bank:</span> Commercial Bank of Ceylon</div>
+                        <div><span className="text-gray-400 font-medium">Account:</span> 8010156942</div>
+                        <div><span className="text-gray-400 font-medium">Name:</span> Juice Vibe Bentota</div>
+                        <div><span className="text-gray-400 font-medium">Branch:</span> Bentota</div>
+                      </div>
+                      <a
+                        href={`https://wa.me/94718435876?text=Hi%20Juice%20Vibe!%20Here%20is%20the%20payment%20receipt%20for%20my%20order%20%23${orderNumber}.`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="w-full h-10 rounded-xl bg-[#25D366] text-white flex items-center justify-center gap-1.5 text-[11px] font-bold hover:opacity-90 transition-opacity"
+                      >
+                        Send WhatsApp Receipt
+                      </a>
+                    </div>
+                  )}
                   <div className="mt-4 w-full space-y-2">
                     <Button variant="primary" className="w-full h-12 rounded-2xl" onClick={() => setIsOpen(false)}>
                       Continue Shopping

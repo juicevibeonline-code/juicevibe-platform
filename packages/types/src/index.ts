@@ -8,3 +8,8 @@ export * from "./coupon";
 export * from "./analytics";
 export * from "./common";
 export * from "./api";
+export * from "./table";
+export * from "./inventory";
+export * from "./employee";
+
+

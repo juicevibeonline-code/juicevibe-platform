@@ -16,7 +16,7 @@ async function bootstrap() {
 
   // Only serve uploads from disk when running locally (not on Vercel serverless)
   if (process.env.NODE_ENV !== "production") {
-    app.useStaticAssets(join(__dirname, "..", "public", "uploads"), {
+    app.useStaticAssets(join(process.cwd(), "public", "uploads"), {
       prefix: "/uploads/",
     });
   }
@@ -31,7 +31,7 @@ async function bootstrap() {
           "script-src": ["'self'", "'unsafe-inline'", "cdnjs.cloudflare.com"],
           "style-src": ["'self'", "'unsafe-inline'", "cdnjs.cloudflare.com", "fonts.googleapis.com"],
           "font-src": ["'self'", "fonts.gstatic.com"],
-          "img-src": ["'self'", "data:", "cdn.jsdelivr.net"],
+          "img-src": ["'self'", "data:", "cdn.jsdelivr.net", "res.cloudinary.com", "http:", "https:", "blob:"],
         },
       },
     })

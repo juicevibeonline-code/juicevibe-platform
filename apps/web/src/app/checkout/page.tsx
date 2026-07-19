@@ -8,14 +8,14 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  ShoppingBag, User, Phone, Mail, MapPin, CreditCard,
-  Banknote, Smartphone, Tag, Trash2, ChevronLeft, CheckCircle2,
-  QrCode, Loader2, AlertCircle,
+  ShoppingBag, User, Phone, Mail, MapPin, Banknote,
+  Tag, Trash2, ChevronLeft, CheckCircle2,
+  QrCode, Loader2, AlertCircle, Info, Smartphone
 } from "lucide-react";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { useCartStore } from "@/store/cart";
-import { orderService } from "@juice-vibe/services";
+import { orderService, couponService } from "@juice-vibe/services";
 
 // ─── Schema ────────────────────────────────────────────────────────────────────
 const schema = z.object({
@@ -24,17 +24,15 @@ const schema = z.object({
     .string()
     .regex(/^[0-9+\- ]{7,15}$/, "Enter a valid phone number"),
   customerEmail: z.string().email("Invalid email").optional().or(z.literal("")),
-  paymentMethod: z.enum(["cash", "card", "online"]),
+  paymentMethod: z.enum(["cash", "online"]),
   notes: z.string().optional(),
   couponCode: z.string().optional(),
   deliveryAddress: z.string().optional(),
 });
 type FormData = z.infer<typeof schema>;
 
-// ─── Payment method config ──────────────────────────────────────────────────
 const paymentMethods = [
   { id: "cash" as const, label: "Cash on Delivery", icon: Banknote, color: "text-emerald-600" },
-  { id: "card" as const, label: "Card Payment", icon: CreditCard, color: "text-blue-600" },
   { id: "online" as const, label: "Online Transfer", icon: Smartphone, color: "text-purple-600" },
 ];
 
@@ -45,10 +43,16 @@ export default function CheckoutPage() {
   const [orderNumber, setOrderNumber] = useState("");
   const [loading, setLoading] = useState(false);
   const [apiError, setApiError] = useState<string | null>(null);
+  const [successPaymentMethod, setSuccessPaymentMethod] = useState<"cash" | "online">("cash");
+
+  const [appliedCoupon, setAppliedCoupon] = useState<any | null>(null);
+  const [couponError, setCouponError] = useState<string | null>(null);
+  const [validatingCoupon, setValidatingCoupon] = useState(false);
+  const [discountVal, setDiscountVal] = useState(0);
 
   const { subtotal, count } = getTotals();
   const tax = subtotal * 0.05;
-  const total = subtotal + tax;
+  const total = Math.max(0, subtotal + tax - discountVal);
 
   const isDineIn = Boolean(tableId);
 
@@ -65,6 +69,30 @@ export default function CheckoutPage() {
   });
 
   const selectedPayment = watch("paymentMethod");
+  const couponCodeValue = watch("couponCode");
+
+  const handleApplyCoupon = async () => {
+    if (!couponCodeValue) return;
+    setValidatingCoupon(true);
+    setCouponError(null);
+    try {
+      const result = await couponService.validateCoupon(couponCodeValue.toUpperCase(), subtotal);
+      if (result.valid) {
+        setAppliedCoupon(result.coupon);
+        setDiscountVal(result.discount);
+      } else {
+        setCouponError("Invalid coupon");
+        setAppliedCoupon(null);
+        setDiscountVal(0);
+      }
+    } catch (err: any) {
+      setCouponError(err.response?.data?.message || err.message || "Invalid coupon");
+      setAppliedCoupon(null);
+      setDiscountVal(0);
+    } finally {
+      setValidatingCoupon(false);
+    }
+  };
 
   // ─── Submit ─────────────────────────────────────────────────────────────────
   const onSubmit = async (data: FormData) => {
@@ -89,6 +117,7 @@ export default function CheckoutPage() {
         })),
       });
       setOrderNumber((order as any).orderNumber || "JV-XXXX");
+      setSuccessPaymentMethod(data.paymentMethod);
       clearCart();
       setSuccess(true);
     } catch (err: any) {
@@ -129,6 +158,30 @@ export default function CheckoutPage() {
               </p>
             )}
           </div>
+          {successPaymentMethod === "online" && (
+            <div className="mt-6 rounded-2xl bg-purple-50 border border-purple-100 p-4 text-left space-y-3 font-sans">
+              <p className="text-xs font-bold text-purple-800 flex items-center gap-1.5">
+                <Info className="h-4 w-4" /> Bank Transfer Required
+              </p>
+              <p className="text-[11px] text-gray-600 leading-normal">
+                Please transfer **LKR {total.toLocaleString()}** to the account below and send a receipt screenshot via WhatsApp:
+              </p>
+              <div className="text-[10px] space-y-1 text-gray-700 bg-white p-2.5 rounded-lg border border-purple-100/50">
+                <div><span className="text-gray-400 font-medium">Bank:</span> Commercial Bank of Ceylon</div>
+                <div><span className="text-gray-400 font-medium">Account Name:</span> Juice Vibe Bentota</div>
+                <div><span className="text-gray-400 font-medium">Account Number:</span> 8010156942</div>
+                <div><span className="text-gray-400 font-medium">Branch:</span> Bentota</div>
+              </div>
+              <a
+                href={`https://wa.me/94718435876?text=Hi%20Juice%20Vibe!%20Here%20is%20the%20payment%20receipt%20for%20my%20order%20%23${orderNumber}.`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full h-10 rounded-xl bg-[#25D366] text-white flex items-center justify-center gap-1.5 text-xs font-bold hover:opacity-90 transition-opacity"
+              >
+                Send WhatsApp Receipt
+              </a>
+            </div>
+          )}
           <div className="mt-8 flex flex-col gap-3">
             <Link
               href="/menu"
@@ -283,11 +336,11 @@ export default function CheckoutPage() {
                 </section>
 
                 {/* Payment Methods */}
-                <section className="rounded-2xl bg-white p-6 shadow-sm border border-gray-100">
+                <section className="rounded-2xl bg-white p-6 shadow-sm border border-gray-100 space-y-4">
                   <h2 className="font-heading text-lg font-bold text-dark-green mb-4 flex items-center gap-2">
-                    <CreditCard className="h-5 w-5 text-primary" /> Payment Method
+                    <Banknote className="h-5 w-5 text-primary" /> Payment Method
                   </h2>
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     {paymentMethods.map(({ id, label, icon: Icon, color }) => (
                       <label
                         key={id}
@@ -311,6 +364,37 @@ export default function CheckoutPage() {
                       </label>
                     ))}
                   </div>
+
+                  {/* Bank Transfer details if 'online' is selected */}
+                  {selectedPayment === "online" && (
+                    <div className="mt-4 p-4 rounded-2xl bg-purple-50/50 border border-purple-100 space-y-3 font-sans">
+                      <div className="flex items-center gap-2 text-purple-800 font-bold text-sm">
+                        <Info className="h-4 w-4" />
+                        <span>Online Bank Transfer Instructions</span>
+                      </div>
+                      <p className="text-xs text-gray-600 leading-relaxed">
+                        Please transfer the order total to our bank account. Once transferred, send a screenshot of the receipt via WhatsApp. We will process your order as soon as payment is confirmed.
+                      </p>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs bg-white p-3.5 rounded-xl border border-purple-100/50">
+                        <div>
+                          <span className="text-[10px] uppercase font-semibold text-gray-400 tracking-wider block">Bank</span>
+                          <span className="font-bold text-dark-green">Commercial Bank of Ceylon</span>
+                        </div>
+                        <div>
+                          <span className="text-[10px] uppercase font-semibold text-gray-400 tracking-wider block">Branch</span>
+                          <span className="font-bold text-dark-green">Bentota</span>
+                        </div>
+                        <div>
+                          <span className="text-[10px] uppercase font-semibold text-gray-400 tracking-wider block">Account Name</span>
+                          <span className="font-bold text-dark-green">Juice Vibe Bentota</span>
+                        </div>
+                        <div>
+                          <span className="text-[10px] uppercase font-semibold text-gray-400 tracking-wider block">Account Number</span>
+                          <span className="font-bold text-dark-green font-mono">8010156942</span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </section>
 
                 {/* Extra Notes & Coupon */}
@@ -319,11 +403,29 @@ export default function CheckoutPage() {
                     <label className="text-xs font-semibold text-gray-600 uppercase tracking-wide flex items-center gap-1.5">
                       <Tag className="h-3.5 w-3.5" /> Coupon Code
                     </label>
-                    <input
-                      {...register("couponCode")}
-                      placeholder="Enter code (if any)"
-                      className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
-                    />
+                    <div className="flex gap-2">
+                      <input
+                        {...register("couponCode")}
+                        placeholder="Enter code (if any)"
+                        className="flex-1 rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all uppercase"
+                      />
+                      <button
+                        type="button"
+                        onClick={handleApplyCoupon}
+                        disabled={validatingCoupon || !couponCodeValue}
+                        className="px-4 py-2.5 bg-primary text-white rounded-xl text-xs font-mono font-bold hover:bg-primary-dark transition-all disabled:opacity-50"
+                      >
+                        {validatingCoupon ? "Applying..." : "Apply"}
+                      </button>
+                    </div>
+                    {couponError && (
+                      <p className="text-xs text-pink font-mono">{couponError}</p>
+                    )}
+                    {appliedCoupon && (
+                      <p className="text-xs text-primary font-mono">
+                        Coupon Applied! Discount: LKR {discountVal.toLocaleString()} ({appliedCoupon.code})
+                      </p>
+                    )}
                   </div>
                   <div className="space-y-1.5">
                     <label className="text-xs font-semibold text-gray-600 uppercase tracking-wide">
@@ -403,6 +505,12 @@ export default function CheckoutPage() {
                       <span>Tax (5%)</span>
                       <span>LKR {tax.toFixed(0)}</span>
                     </div>
+                    {discountVal > 0 && (
+                      <div className="flex justify-between text-emerald-600 font-semibold font-mono text-xs">
+                        <span>Discount ({appliedCoupon?.code})</span>
+                        <span>- LKR {discountVal.toLocaleString()}</span>
+                      </div>
+                    )}
                     <div className="flex justify-between font-bold text-dark-green text-base pt-2 border-t border-gray-100">
                       <span>Total</span>
                       <span className="text-primary">LKR {total.toLocaleString()}</span>

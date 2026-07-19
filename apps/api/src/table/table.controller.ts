@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, UseGuards } from "@nestjs/common";
+import { Controller, Get, Post, Body, Param, UseGuards, Delete } from "@nestjs/common";
 import { ApiTags, ApiBearerAuth, ApiOperation } from "@nestjs/swagger";
 import { TableService } from "./table.service";
 import { CreateTableDto } from "./dto/create-table.dto";
@@ -33,4 +33,15 @@ export class TableController {
     const table = await this.tableService.getTable(id);
     return ApiResponseDto.ok(table);
   }
+
+  @Delete(":id")
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles("admin", "manager")
+  @ApiBearerAuth()
+  @ApiOperation({ summary: "Delete a table (Admin/Manager)" })
+  async deleteTable(@Param("id") id: string) {
+    await this.tableService.deleteTable(id);
+    return ApiResponseDto.ok(null, "Table deleted successfully");
+  }
 }
+

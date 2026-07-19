@@ -13,7 +13,7 @@ export function useOrdersSocket(onNewOrder: (order: any) => void) {
 
   useEffect(() => {
     const socket = io(apiConfig.wsUrl, {
-      transports: ["websocket"],
+      transports: ["polling", "websocket"],
       reconnectionAttempts: 5,
       reconnectionDelay: 2000,
     });
