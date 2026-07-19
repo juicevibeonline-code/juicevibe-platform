@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { Expand } from "lucide-react";
 import type { GalleryImage } from "@juice-vibe/services";
@@ -12,7 +13,11 @@ interface GalleryCardProps {
   index: number;
 }
 
+const FALLBACK_IMAGE = "/images/MenuItems/FreshOrange.png";
+
 export function GalleryCard({ image, onOpen, index }: GalleryCardProps) {
+  const [imgSrc, setImgSrc] = useState(image.src || FALLBACK_IMAGE);
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -24,14 +29,15 @@ export function GalleryCard({ image, onOpen, index }: GalleryCardProps) {
     >
       <div
         className="relative w-full overflow-hidden rounded-2xl bg-gray-100"
-        style={{ aspectRatio: `${image.width}/${image.height}` }}
+        style={{ aspectRatio: `${image.width || 800}/${image.height || 600}` }}
       >
         <Image
-          src={encodeURI(image.src)}
+          src={encodeURI(imgSrc)}
           alt={image.alt}
           fill
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           className="object-cover transition-transform duration-700 group-hover:scale-110"
+          onError={() => setImgSrc(FALLBACK_IMAGE)}
         />
       </div>
 

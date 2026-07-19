@@ -104,7 +104,8 @@ export function MenuItemCard({ item, index }: MenuItemCardProps) {
   };
 
   const itemImage = item.thumbnail || (item.images && item.images[0]) || (item as any).image;
-  const isPng = itemImage?.toLowerCase().endsWith(".png");
+  const [imgSrc, setImgSrc] = useState<string | null>(itemImage || null);
+  const isPng = imgSrc?.toLowerCase().endsWith(".png");
 
   return (
     <motion.div
@@ -132,10 +133,10 @@ export function MenuItemCard({ item, index }: MenuItemCardProps) {
             )}
           </div>
           
-          {itemImage ? (
+          {imgSrc ? (
             <div className="relative w-full h-full z-10 transition-transform duration-500 ease-out group-hover:scale-105">
               <Image
-                src={encodeURI(itemImage)}
+                src={encodeURI(imgSrc)}
                 alt={item.name}
                 fill
                 sizes="(max-width: 768px) 100vw, 350px"
@@ -143,6 +144,7 @@ export function MenuItemCard({ item, index }: MenuItemCardProps) {
                   "transition-all duration-500",
                   isPng ? "object-contain p-4" : "object-cover"
                 )}
+                onError={() => setImgSrc(null)}
               />
             </div>
           ) : (

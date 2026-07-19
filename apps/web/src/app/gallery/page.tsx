@@ -9,7 +9,8 @@ import { BackToTop } from "@/components/shared/BackToTop";
 import { WhatsAppButton } from "@/components/shared/WhatsAppButton";
 import { GalleryCard } from "@/components/gallery/GalleryCard";
 import { Lightbox } from "@/components/gallery/Lightbox";
-import { galleryService, type GalleryImage } from "@juice-vibe/services";
+import { galleryService, menuService, type GalleryImage } from "@juice-vibe/services";
+import { formatPrice } from "@juice-vibe/utils";
 
 const categories = [
   { id: "all", label: "All" },
@@ -21,6 +22,7 @@ const categories = [
   { id: "coffee", label: "Coffee" },
   { id: "burgers", label: "Burgers" },
   { id: "sandwiches", label: "Sandwiches" },
+  { id: "tea", label: "Tea" },
 ];
 
 export default function GalleryPage() {
@@ -34,8 +36,42 @@ export default function GalleryPage() {
     try {
       setLoading(true);
       setError(null);
-      const images = await galleryService.getImages();
-      setGalleryImages(images);
+
+      const [rawGallery, menuItems] = await Promise.all([
+        galleryService.getImages().catch(() => []),
+        menuService.getMenuItems().catch(() => []),
+      ]);
+
+      // Transform all menu items that have an image into GalleryImage items
+      const productImages: GalleryImage[] = menuItems
+        .filter((item) => item.thumbnail || item.images?.[0] || (item as any).image)
+        .map((item) => {
+          const src = item.thumbnail || item.images?.[0] || (item as any).image || "";
+          const categorySlug =
+            typeof item.category === "string"
+              ? item.category
+              : item.category?.slug || "general";
+
+          return {
+            id: `menu-${item.id}`,
+            src,
+            alt: `${item.name} — LKR ${formatPrice(item.price)}`,
+            width: 800,
+            height: 600,
+            category: categorySlug,
+            isVideo: false,
+          };
+        });
+
+      // Combine menu product images + standalone gallery images (excluding team and interior photos)
+      const combined = [...productImages, ...rawGallery].filter(
+        (img) =>
+          img.category !== "team" &&
+          img.category !== "interior" &&
+          !img.alt?.toLowerCase().includes("team") &&
+          !img.alt?.toLowerCase().includes("interior")
+      );
+      setGalleryImages(combined);
     } catch (err) {
       console.error("Failed to load gallery images:", err);
       setError("Unable to connect to the server. Please check if the API is running or try again.");
@@ -48,13 +84,24 @@ export default function GalleryPage() {
     loadData();
   }, []);
 
-  const filteredImages = useMemo(
-    () =>
-      activeCategory === "all"
-        ? galleryImages
-        : galleryImages.filter((img) => img.category === activeCategory),
-    [activeCategory, galleryImages]
-  );
+  const filteredImages = useMemo(() => {
+    if (activeCategory === "all") return galleryImages;
+    const target = activeCategory.toLowerCase();
+
+    return galleryImages.filter((img) => {
+      const cat = (img.category || "").toLowerCase();
+      if (cat === target) return true;
+      if (target === "fresh-juices" && (cat.includes("juice") || cat === "fresh-juices")) return true;
+      if (target === "smoothies" && cat.includes("smoothie")) return true;
+      if (target === "milkshakes" && cat.includes("shake")) return true;
+      if (target === "burgers" && cat.includes("burger")) return true;
+      if (target === "sandwiches" && cat.includes("sandwich")) return true;
+      if (target === "ice-cream" && (cat.includes("ice") || cat.includes("cream"))) return true;
+      if (target === "coffee" && cat.includes("coffee")) return true;
+      if (target === "tea" && cat.includes("tea")) return true;
+      return false;
+    });
+  }, [activeCategory, galleryImages]);
 
   return (
     <>
@@ -73,14 +120,14 @@ export default function GalleryPage() {
               className="mx-auto max-w-2xl text-center"
             >
               <span className="inline-block rounded-full bg-primary/10 px-4 py-2 text-sm font-medium text-primary">
-                Gallery
+                Gallery & Menu Catalog
               </span>
               <h1 className="mt-4 font-heading text-4xl font-extrabold text-dark-green md:text-5xl lg:text-6xl">
                 A Visual{" "}
                 <span className="text-gradient-warm">Journey</span>
               </h1>
               <p className="mt-4 text-lg text-gray-600">
-                Explore our vibrant world of flavors, moments, and memories.
+                Explore our vibrant world of tropical juices, smoothies, meals, and cafe moments.
               </p>
             </motion.div>
 
@@ -108,7 +155,9 @@ export default function GalleryPage() {
             {loading ? (
               <div className="mt-16 text-center">
                 <div className="text-4xl animate-bounce">📸</div>
-                <p className="mt-4 font-mono text-sm text-dark-green uppercase tracking-wider animate-pulse">Compiling Tropical Moments...</p>
+                <p className="mt-4 font-mono text-sm text-dark-green uppercase tracking-wider animate-pulse">
+                  Compiling Tropical Moments & Menu Catalog...
+                </p>
               </div>
             ) : error ? (
               <div className="mt-16 text-center">
@@ -148,7 +197,7 @@ export default function GalleryPage() {
 
                 {filteredImages.length === 0 && (
                   <div className="mt-16 text-center">
-                    <p className="text-gray-500">No images found in this category.</p>
+                    <p className="text-gray-500 font-medium">No product images found in this category.</p>
                   </div>
                 )}
               </>

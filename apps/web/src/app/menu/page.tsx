@@ -5,7 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { useCartStore } from "@/store/cart";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
-import { X } from "lucide-react";
+import { Star, Plus, CheckCircle, X } from "lucide-react";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { ScrollProgress } from "@/components/shared/ScrollProgress";
@@ -16,11 +16,79 @@ import { MenuCategoryFilter } from "@/components/menu/MenuCategoryFilter";
 import { MenuItemCard } from "@/components/menu/MenuItemCard";
 import type { MenuItem, MenuCategory } from "@juice-vibe/types";
 import { menuService } from "@juice-vibe/services";
+import { formatPrice } from "@juice-vibe/utils";
+import { cn } from "@/lib/utils";
+
+function PopularHighlightCard({ item }: { item: MenuItem }) {
+  const addItem = useCartStore((state) => state.addItem);
+  const [isAdded, setIsAdded] = useState(false);
+  const itemImage = item.thumbnail || (item.images && item.images[0]) || (item as any).image;
+  const [imgSrc, setImgSrc] = useState<string | null>(itemImage || null);
+
+  const handleAdd = () => {
+    addItem(item);
+    setIsAdded(true);
+    setTimeout(() => setIsAdded(false), 1500);
+  };
+
+  return (
+    <div className="group relative flex flex-col justify-between rounded-3xl border border-white/80 bg-white/80 backdrop-blur-xl p-4 shadow-sm hover:shadow-xl hover:bg-white transition-all duration-500 text-left overflow-hidden">
+      <div>
+        <div className="relative w-full aspect-[4/3] rounded-2xl overflow-hidden bg-slate-100/60 mb-3 border border-slate-100 flex items-center justify-center">
+          <span className="absolute top-2 left-2 z-20 inline-flex items-center gap-0.5 rounded-full bg-amber-500 text-white px-2.5 py-0.75 text-[9px] font-black uppercase tracking-wider shadow-sm">
+            <Star className="h-2.5 w-2.5 fill-current" /> Popular
+          </span>
+          {imgSrc ? (
+            <Image
+              src={encodeURI(imgSrc)}
+              alt={item.name}
+              fill
+              sizes="(max-width: 768px) 100vw, 300px"
+              className="object-cover transition-transform duration-500 group-hover:scale-105"
+              onError={() => setImgSrc(null)}
+            />
+          ) : (
+            <span className="text-4xl select-none">🍹</span>
+          )}
+        </div>
+
+        <h3 className="text-sm font-black text-dark-green leading-snug group-hover:text-primary transition-colors">
+          {item.name}
+        </h3>
+        <p className="mt-1 text-xs text-gray-500 font-medium leading-relaxed line-clamp-2">
+          {item.description}
+        </p>
+      </div>
+
+      <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between">
+        <span className="font-mono text-sm font-extrabold text-dark-green">
+          {formatPrice(item.price)}
+        </span>
+        <button
+          onClick={handleAdd}
+          className={cn(
+            "flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-bold text-white transition-all shadow-sm cursor-pointer outline-none",
+            isAdded ? "bg-emerald-600" : "bg-primary hover:bg-primary-dark hover:scale-105 active:scale-95"
+          )}
+        >
+          {isAdded ? (
+            <>
+              <CheckCircle className="h-3.5 w-3.5 stroke-[2.5]" /> Added!
+            </>
+          ) : (
+            <>
+              <Plus className="h-3.5 w-3.5 stroke-[2.5]" /> Add
+            </>
+          )}
+        </button>
+      </div>
+    </div>
+  );
+}
 
 function MenuContent() {
   const searchParams = useSearchParams();
   const setTableId = useCartStore((state) => state.setTableId);
-  const tableIdFromStore = useCartStore((state) => state.tableId);
 
   const [search, setSearch] = useState("");
   const [activeCategory, setActiveCategory] = useState("all");
@@ -107,38 +175,37 @@ function MenuContent() {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
-              className="mx-auto max-w-2xl text-center"
+              className="mx-auto max-w-4xl text-center"
             >
               <span className="inline-block rounded-full bg-primary/10 px-4 py-2 text-sm font-semibold text-primary">
-                Our Menu
+                Our Menu Catalog
               </span>
               <h1 className="mt-4 font-heading text-4xl font-extrabold text-dark-green md:text-5xl lg:text-6xl">
-                Explore Our{" "}
-                <span className="text-gradient">Flavors</span>
+                Explore Our <span className="text-gradient">Flavors</span>
               </h1>
-              <p className="mt-4 text-lg text-gray-600 font-medium leading-relaxed">
-                From fresh juices to gourmet burgers, discover your new favorite.
+              <p className="mt-4 text-lg text-gray-600 font-medium leading-relaxed max-w-2xl mx-auto">
+                From fresh juices to gourmet burgers, discover your new favorite drinks and food.
               </p>
 
-              <div className="mt-10 grid gap-6 sm:grid-cols-3">
-                {popularItems.map((item) => (
-                  <div key={item.id} className="rounded-[2.5rem] border border-white/50 bg-white/40 backdrop-blur-xl p-6 shadow-sm transition duration-500 hover:-translate-y-1.5 hover:shadow-xl hover:bg-white/60">
-                    <div className="flex items-center justify-between gap-3">
-                      <span className="rounded-full bg-primary/10 px-3 py-1 text-[10px] font-extrabold uppercase tracking-widest text-primary">
-                        Popular
-                      </span>
-                      <span className="text-sm font-bold text-dark-green">
-                        {new Intl.NumberFormat("en-LK", { style: "currency", currency: "LKR", minimumFractionDigits: 0 }).format(item.price)}
-                      </span>
-                    </div>
-                    <h3 className="mt-5 text-lg font-extrabold text-dark-green leading-tight">{item.name}</h3>
-                    <p className="mt-2 text-sm text-gray-500/90 leading-relaxed font-medium line-clamp-3">{item.description}</p>
+              {/* Popular Highlights Grid */}
+              {popularItems.length > 0 && (
+                <div className="mt-10">
+                  <div className="flex items-center justify-center gap-2 mb-6">
+                    <Star className="h-4 w-4 text-amber-500 fill-current" />
+                    <span className="text-xs font-black uppercase tracking-widest text-dark-green">
+                      Popular Customer Highlights
+                    </span>
                   </div>
-                ))}
-              </div>
+                  <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+                    {popularItems.map((item) => (
+                      <PopularHighlightCard key={item.id} item={item} />
+                    ))}
+                  </div>
+                </div>
+              )}
             </motion.div>
 
-            <div className="mt-12 space-y-6">
+            <div className="mt-14 space-y-6">
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -160,7 +227,7 @@ function MenuContent() {
               </motion.div>
             </div>
 
-            <div className="mt-3 flex items-center justify-between text-sm text-gray-500 font-medium">
+            <div className="mt-4 flex items-center justify-between text-sm text-gray-500 font-medium">
               <p>
                 {filteredItems.length} item{filteredItems.length !== 1 ? "s" : ""}
                 {currentCategory && activeCategory !== "all" && (
@@ -172,7 +239,7 @@ function MenuContent() {
               {(search || activeCategory !== "all") && (
                 <button
                   onClick={() => { setSearch(""); setActiveCategory("all"); }}
-                  className="flex items-center gap-1 text-primary font-bold transition-colors hover:text-primary-dark outline-none"
+                  className="flex items-center gap-1 text-primary font-bold transition-colors hover:text-primary-dark outline-none cursor-pointer"
                 >
                   <X className="h-4 w-4 stroke-[2.5]" />
                   Clear Filters
@@ -184,17 +251,17 @@ function MenuContent() {
               <motion.div
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="mt-4 rounded-2xl bg-orange/5 border border-orange/20 p-4 text-sm text-gray-600"
+                className="mt-4 rounded-2xl bg-orange/5 border border-orange/20 p-4 text-sm text-gray-600 font-medium"
               >
                 <span className="font-semibold text-orange">Add BOBA</span> — Add bubble boba to any milkshake for just{" "}
-                <span className="font-semibold text-orange">{new Intl.NumberFormat("en-LK", { style: "currency", currency: "LKR", minimumFractionDigits: 0 }).format(100)}</span>
+                <span className="font-semibold text-orange">LKR 100</span>
               </motion.div>
             )}
             {activeCategory === "mocktails" && (
               <motion.div
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="mt-4 rounded-2xl bg-pink/5 border border-pink/20 p-4 text-sm text-gray-600"
+                className="mt-4 rounded-2xl bg-pink/5 border border-pink/20 p-4 text-sm text-gray-600 font-medium"
               >
                 <span className="font-semibold text-pink">Available Flavours:</span> Mango, Mandarin, Passion Fruit, Blackcurrant
               </motion.div>
@@ -203,7 +270,7 @@ function MenuContent() {
               <motion.div
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="mt-4 rounded-2xl bg-pink/5 border border-pink/20 p-4 text-sm text-gray-600"
+                className="mt-4 rounded-2xl bg-pink/5 border border-pink/20 p-4 text-sm text-gray-600 font-medium"
               >
                 <span className="font-semibold text-pink">Ice Cream Flavours:</span> Vanilla, Chocolate, Strawberry, Fruit & Nut, Mango
               </motion.div>

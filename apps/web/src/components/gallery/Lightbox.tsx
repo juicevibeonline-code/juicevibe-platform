@@ -2,7 +2,7 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import { X, ChevronLeft, ChevronRight } from "lucide-react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import type { GalleryImage } from "@juice-vibe/services";
 
@@ -16,6 +16,13 @@ interface LightboxProps {
 
 export function Lightbox({ images, currentIndex, onClose, onPrev, onNext }: LightboxProps) {
   const current = images[currentIndex];
+  const [imgSrc, setImgSrc] = useState(current?.src || "/images/MenuItems/FreshOrange.png");
+
+  useEffect(() => {
+    if (current?.src) {
+      setImgSrc(current.src);
+    }
+  }, [current?.src]);
 
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
@@ -30,6 +37,8 @@ export function Lightbox({ images, currentIndex, onClose, onPrev, onNext }: Ligh
       document.body.style.overflow = "";
     };
   }, [onClose, onPrev, onNext]);
+
+  if (!current) return null;
 
   return (
     <AnimatePresence>
@@ -85,12 +94,13 @@ export function Lightbox({ images, currentIndex, onClose, onPrev, onNext }: Ligh
             }}
           >
             <Image
-              src={encodeURI(current.src)}
+              src={encodeURI(imgSrc)}
               alt={current.alt}
               fill
               className="object-contain"
               sizes="100vw"
               priority
+              onError={() => setImgSrc("/images/MenuItems/FreshOrange.png")}
             />
           </div>
           <div className="mt-4 text-center">
