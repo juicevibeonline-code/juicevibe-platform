@@ -1,3 +1,6 @@
+import dotenv from "dotenv";
+import path from "path";
+dotenv.config({ path: path.resolve(__dirname, "../.env") });
 import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
@@ -58,7 +61,7 @@ async function main() {
   }) => {
     await prisma.menuItem.upsert({
       where: { slug: data.slug },
-      update: { price: data.price, description: data.description },
+      update: { price: data.price, description: data.description, thumbnail: data.thumbnail },
       create: {
         name: data.name,
         slug: data.slug,
@@ -83,8 +86,8 @@ async function main() {
     { name: "Strawberry",     slug: "strawberry-milkshake",     description: "Fresh strawberry milkshake",               price: 300,                thumbnail: "/images/MenuItems/Milkshakes-Strawberry.png" },
     { name: "Mango",          slug: "mango-milkshake",          description: "Thick tropical mango milkshake",           price: 300, popular: true,  thumbnail: "/images/MenuItems/Milkshakes-Mango – LKR 300.00.png" },
     { name: "Passion Fruit",  slug: "passion-fruit-milkshake",  description: "Tropical passion fruit milkshake",         price: 300,                thumbnail: "/images/MenuItems/Milkshakes-Passion Fruit.png" },
-    { name: "Banana",         slug: "banana-milkshake",         description: "Fresh banana & milk creamy shake",         price: 300 },
-    { name: "Date & Almond",  slug: "date-almond-milkshake",    description: "Healthy energy-boosting date & almond shake", price: 400, popular: true },
+    { name: "Banana",         slug: "banana-milkshake",         description: "Fresh banana & milk creamy shake",         price: 300,                thumbnail: "/images/MenuItems/Milkshakes-Banana.png" },
+    { name: "Date & Almond",  slug: "date-almond-milkshake",    description: "Healthy energy-boosting date & almond shake", price: 400, popular: true,  thumbnail: "/images/MenuItems/Milkshakes-Date-Almond.png" },
   ];
   for (const item of milkshakeItems) {
     await upsertItem({ ...item, categoryId: milkshakes.id });
@@ -208,14 +211,15 @@ async function main() {
       price: 500, popular: true, featured: true,
       thumbnail: "/images/MenuItems/Jaggery & Cashew Dream – LKR 500.00.jpg",
     },
-    { name: "Banana Boat",                slug: "banana-boat",                 description: "Banana split with ice cream & indulgent toppings", price: 500 },
-    { name: "Fruit Salad",               slug: "fruit-salad",                 description: "Fresh seasonal tropical fruit salad",              price: 300 },
-    { name: "Fruit Salad with Ice Cream",slug: "fruit-salad-with-ice-cream",  description: "Fresh fruit salad topped with creamy ice cream",   price: 350 },
+    { name: "Banana Boat",                slug: "banana-boat",                 description: "Banana split with ice cream & indulgent toppings", price: 500, thumbnail: "/images/MenuItems/IceCream-BananaBoat.png" },
+    { name: "Fruit Salad",               slug: "fruit-salad",                 description: "Fresh seasonal tropical fruit salad",              price: 300, thumbnail: "/images/MenuItems/IceCream-FruitSalad.png" },
+    { name: "Fruit Salad with Ice Cream",slug: "fruit-salad-with-ice-cream",  description: "Fresh fruit salad topped with creamy ice cream",   price: 350, thumbnail: "/images/MenuItems/IceCream-FruitSaladWithIceCream.png" },
     {
       name: "Choice of Ice Cream (3 Scoops)", slug: "ice-cream-3-scoops",
       description: "Mix & match: Vanilla · Chocolate · Strawberry · Fruit & Nut · Mango",
       price: 350,
       tags: ["Vanilla", "Chocolate", "Strawberry", "Fruit & Nut", "Mango"],
+      thumbnail: "/images/MenuItems/IceCream-3Scoops.png",
     },
   ];
   for (const item of iceCreamItems) {
@@ -225,8 +229,8 @@ async function main() {
   // ─── BURGERS ──────────────────────────────────────────────────
   const burgers = await getCategory("burgers");
   const burgerItems = [
-    { name: "Chicken Burger",            slug: "chicken-burger",      description: "Grilled chicken patty with fresh toppings",    price: 400, popular: true },
-    { name: "Vegetable & Cheese Burger", slug: "veg-cheese-burger",   description: "Crispy veggie patty with melted cheese",       price: 300 },
+    { name: "Chicken Burger",            slug: "chicken-burger",      description: "Grilled chicken patty with fresh toppings",    price: 400, popular: true, thumbnail: "/images/MenuItems/Burgers-ChickenBurger.png" },
+    { name: "Vegetable & Cheese Burger", slug: "veg-cheese-burger",   description: "Crispy veggie patty with melted cheese",       price: 300,                thumbnail: "/images/MenuItems/Burgers-VegCheeseBurger.png" },
   ];
   for (const item of burgerItems) {
     await upsertItem({ ...item, categoryId: burgers.id });
@@ -235,8 +239,8 @@ async function main() {
   // ─── SANDWICHES ───────────────────────────────────────────────
   const sandwiches = await getCategory("sandwiches");
   const sandwichItems = [
-    { name: "Cheese & Tomato Sandwich",       slug: "cheese-tomato-sandwich",      description: "Grilled cheese with fresh ripe tomato",          price: 250 },
-    { name: "Chicken Ham & Cheese Sandwich",  slug: "chicken-ham-cheese-sandwich", description: "Chicken ham with melted cheese on toasted bread", price: 300, popular: true },
+    { name: "Cheese & Tomato Sandwich",       slug: "cheese-tomato-sandwich",      description: "Grilled cheese with fresh ripe tomato",          price: 250,                thumbnail: "/images/MenuItems/Sandwiches-CheeseTomato.png" },
+    { name: "Chicken Ham & Cheese Sandwich",  slug: "chicken-ham-cheese-sandwich", description: "Chicken ham with melted cheese on toasted bread", price: 300, popular: true,  thumbnail: "/images/MenuItems/Sandwiches-ChickenHamCheese.png" },
   ];
   for (const item of sandwichItems) {
     await upsertItem({ ...item, categoryId: sandwiches.id });
