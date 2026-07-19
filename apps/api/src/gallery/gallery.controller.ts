@@ -36,7 +36,7 @@ export class GalleryController {
 
   @Post("upload")
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles("admin", "editor")
+  @Roles("admin", "manager", "editor")
   @ApiBearerAuth()
   @UseInterceptors(FileInterceptor("file"))
   @ApiOperation({ summary: "Upload file and add to gallery" })

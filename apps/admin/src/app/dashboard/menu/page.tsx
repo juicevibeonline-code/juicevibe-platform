@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { menuService } from "@juice-vibe/services";
+import { menuService, galleryService } from "@juice-vibe/services";
 import type { MenuCategory, MenuItem } from "@juice-vibe/types";
 import { formatPrice } from "@juice-vibe/utils";
 import { useForm } from "react-hook-form";
@@ -21,7 +21,10 @@ import {
   Layers,
   ChevronRight,
   TrendingUp,
-  Tag
+  Tag,
+  Upload,
+  Loader2,
+  X
 } from "lucide-react";
 import { cn } from "@juice-vibe/utils";
 import { Badge } from "@juice-vibe/ui";
@@ -37,12 +40,14 @@ const menuItemSchema = z.object({
   calories: z.number().optional(),
   ingredientsStr: z.string().optional(),
   tagsStr: z.string().optional(),
+  thumbnail: z.string().optional(),
 });
 
 type MenuItemSchema = z.infer<typeof menuItemSchema>;
 
 export default function MenuCatalog() {
   const queryClient = useQueryClient();
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [selectedCategorySlug, setSelectedCategorySlug] = useState<string>("all");
   const [editingItem, setEditingItem] = useState<MenuItem | null>(null);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
@@ -97,6 +102,7 @@ export default function MenuCatalog() {
     register,
     handleSubmit,
     setValue,
+    watch,
     reset,
     formState: { errors },
   } = useForm<MenuItemSchema>({
@@ -112,8 +118,11 @@ export default function MenuCatalog() {
       calories: 0,
       ingredientsStr: "",
       tagsStr: "",
+      thumbnail: "",
     },
   });
+
+  const currentThumbnail = watch("thumbnail");
 
   const handleOpenEdit = (item: MenuItem) => {
     setEditingItem(item);
@@ -127,6 +136,7 @@ export default function MenuCatalog() {
     setValue("calories", item.calories || 0);
     setValue("ingredientsStr", item.ingredients?.join(", ") || "");
     setValue("tagsStr", item.tags?.join(", ") || "");
+    setValue("thumbnail", item.thumbnail || (item.images && item.images[0]) || "");
   };
 
   const onSubmit = (data: MenuItemSchema) => {
@@ -136,6 +146,7 @@ export default function MenuCatalog() {
       tags: data.tagsStr ? data.tagsStr.split(",").map(t => t.trim()) : [],
       price: Number(data.price),
       calories: data.calories ? Number(data.calories) : undefined,
+      thumbnail: data.thumbnail || undefined,
     };
 
     if (editingItem) {
@@ -145,13 +156,30 @@ export default function MenuCatalog() {
     }
   };
 
-  const handleUploadImageMock = () => {
-    setUploadProgress(true);
-    // Simulating Cloudinary operational upload pipeline
-    setTimeout(() => {
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      setUploadProgress(true);
+      const result = await galleryService.uploadImage(
+        file,
+        watch("name") || file.name,
+        "menu"
+      );
+      if (result && result.src) {
+        setValue("thumbnail", result.src);
+      }
+    } catch (err: any) {
+      console.error("Failed to upload image:", err);
+      alert(
+        err?.response?.data?.message ||
+          err?.message ||
+          "Failed to upload image. Please ensure API server is running and Cloudinary/Storage is reachable."
+      );
+    } finally {
       setUploadProgress(false);
-      alert("Media compiled & uploaded successfully to Cloudinary secure vault.");
-    }, 1500);
+    }
   };
 
   const handleDeleteItem = (id: string) => {
@@ -237,18 +265,34 @@ export default function MenuCatalog() {
             >
               {/* Top Row / Badges */}
               <div className="space-y-3">
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <h3 className="text-sm font-bold text-foreground leading-tight group-hover:text-primary transition-colors">
-                      {item.name}
-                    </h3>
-                    <span className="text-[10px] font-mono text-muted-foreground uppercase mt-1 block">
+                <div className="flex items-start gap-3">
+                  {item.thumbnail ? (
+                    <div className="relative h-14 w-14 rounded-lg overflow-hidden border border-border/60 shrink-0 bg-slate-900/50 flex items-center justify-center">
+                      <img
+                        src={item.thumbnail}
+                        alt={item.name}
+                        className="h-full w-full object-cover"
+                      />
+                    </div>
+                  ) : (
+                    <div className="h-14 w-14 rounded-lg border border-dashed border-border/40 shrink-0 bg-ink-dark flex items-center justify-center text-xl">
+                      🍹
+                    </div>
+                  )}
+
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-start justify-between gap-2">
+                      <h3 className="text-sm font-bold text-foreground leading-tight truncate">
+                        {item.name}
+                      </h3>
+                      <span className="font-numeral text-xs font-bold text-primary shrink-0 bg-primary/10 border border-primary/20 px-2 py-0.5 rounded">
+                        {formatPrice(item.price)}
+                      </span>
+                    </div>
+                    <span className="text-[10px] font-mono text-muted-foreground uppercase mt-0.5 block">
                       {categories.find((c: any) => c.id === item.categoryId)?.name || "Uncategorized"}
                     </span>
                   </div>
-                  <span className="font-numeral text-xs font-bold text-primary shrink-0 bg-primary/10 border border-primary/20 px-2 py-0.5 rounded">
-                    {formatPrice(item.price)}
-                  </span>
                 </div>
 
                 <p className="text-[11px] text-muted-foreground leading-relaxed line-clamp-2">
@@ -438,18 +482,83 @@ export default function MenuCatalog() {
 
               {/* Media Upload secure segment */}
               <div className="space-y-2 border border-border/80 bg-ink-dark/40 rounded-lg p-3">
-                <label className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground block">Cloudinary Media Integration</label>
-                <div className="flex items-center gap-3">
-                  <button
-                    type="button"
-                    onClick={handleUploadImageMock}
-                    disabled={uploadProgress}
-                    className="inline-flex items-center gap-2 px-3 py-2 bg-ink-dark hover:bg-ink-dark/80 border border-border hover:border-primary/30 text-xs font-mono text-muted-foreground hover:text-foreground rounded cursor-pointer transition-all disabled:opacity-50"
-                  >
-                    <ImageIcon className="h-4 w-4 text-primary" />
-                    <span>{uploadProgress ? "Compiling storage vault..." : "Upload menu image"}</span>
-                  </button>
-                  <span className="text-[9px] font-mono text-muted-foreground/60">AVIF/WebP supported. Re-sampled automatically.</span>
+                <div className="flex items-center justify-between">
+                  <label className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground block">
+                    Cloudinary / Media Vault Integration
+                  </label>
+                  {currentThumbnail && (
+                    <button
+                      type="button"
+                      onClick={() => setValue("thumbnail", "")}
+                      className="text-[9px] font-mono text-pink hover:underline flex items-center gap-1 cursor-pointer"
+                    >
+                      <X className="h-3 w-3" /> Clear image
+                    </button>
+                  )}
+                </div>
+
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  onChange={handleFileChange}
+                  accept="image/*"
+                  className="hidden"
+                />
+
+                {currentThumbnail ? (
+                  <div className="flex items-center gap-3 bg-ink-dark p-2 rounded-lg border border-primary/20">
+                    <div className="relative h-14 w-14 rounded-lg overflow-hidden border border-border shrink-0 bg-slate-900 flex items-center justify-center">
+                      <img
+                        src={currentThumbnail}
+                        alt="Product preview"
+                        className="h-full w-full object-cover"
+                      />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-[10px] font-mono text-primary font-bold truncate">
+                        {currentThumbnail}
+                      </p>
+                      <button
+                        type="button"
+                        onClick={() => fileInputRef.current?.click()}
+                        disabled={uploadProgress}
+                        className="mt-1 text-[9px] font-mono text-muted-foreground hover:text-foreground underline cursor-pointer"
+                      >
+                        Change photo
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-3">
+                    <button
+                      type="button"
+                      onClick={() => fileInputRef.current?.click()}
+                      disabled={uploadProgress}
+                      className="inline-flex items-center gap-2 px-3 py-2 bg-ink-dark hover:bg-ink-dark/80 border border-border hover:border-primary/30 text-xs font-mono text-muted-foreground hover:text-foreground rounded cursor-pointer transition-all disabled:opacity-50"
+                    >
+                      {uploadProgress ? (
+                        <Loader2 className="h-4 w-4 text-primary animate-spin" />
+                      ) : (
+                        <Upload className="h-4 w-4 text-primary" />
+                      )}
+                      <span>{uploadProgress ? "Uploading to storage vault..." : "Upload menu image"}</span>
+                    </button>
+                    <span className="text-[9px] font-mono text-muted-foreground/60">
+                      PNG, JPG, WebP (Max 10MB).
+                    </span>
+                  </div>
+                )}
+
+                <div className="mt-2 space-y-1">
+                  <label className="text-[9px] font-mono uppercase text-muted-foreground block">
+                    Or Direct Image URL
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="/images/MenuItems/Ambarella.png or https://..."
+                    className="w-full bg-ink-dark border border-border text-foreground font-mono text-[10px] px-2.5 py-1.5 rounded focus:outline-none focus:border-primary/50"
+                    {...register("thumbnail")}
+                  />
                 </div>
               </div>
 
