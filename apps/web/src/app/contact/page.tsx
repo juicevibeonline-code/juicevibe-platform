@@ -109,7 +109,7 @@ export default function ContactPage() {
                 transition={{ duration: 0.6, delay: 0.2 }}
                 className="space-y-4 lg:col-span-3"
               >
-                <Card className="p-8">
+                <Card className="p-8 bg-white border border-slate-200/80 shadow-sm">
                   <h2 className="font-heading text-2xl font-bold text-dark-green">Send a Message</h2>
                   <p className="mt-2 text-sm text-gray-500">
                     We&apos;ll get back to you within 24 hours.
@@ -195,17 +195,17 @@ export default function ContactPage() {
                 className="space-y-4 lg:col-span-2"
               >
                 {contactInfo.map((info) => (
-                  <Card key={info.title} className="group transition-all hover:shadow-lg">
+                  <Card key={info.title} className="group transition-all duration-300 hover:shadow-md border border-slate-200/80 bg-white">
                     <CardContent className="flex items-start gap-4 p-5">
-                      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary/10 transition-all group-hover:bg-primary group-hover:text-white">
-                        <info.icon className="h-5 w-5 text-primary transition-all group-hover:text-white" />
+                      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary transition-all duration-300 group-hover:bg-primary group-hover:text-white">
+                        <info.icon className="h-5 w-5 text-primary transition-all duration-300 group-hover:text-white" />
                       </div>
                       <div>
                         <h3 className="font-heading text-base font-bold text-dark-green">{info.title}</h3>
                         {info.details.map((detail, i) => (
-                          <p key={i} className="text-sm text-gray-500">
+                          <p key={i} className="text-sm text-gray-600 mt-0.5">
                             {info.href ? (
-                              <a href={info.href} className="hover:text-primary transition-colors">
+                              <a href={info.href} className="hover:text-primary font-medium transition-colors">
                                 {detail}
                               </a>
                             ) : (
@@ -222,14 +222,14 @@ export default function ContactPage() {
                   href="https://wa.me/94718435876"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-3 rounded-2xl bg-[#25D366]/10 p-5 transition-all hover:bg-[#25D366]/20"
+                  className="flex items-center gap-4 rounded-2xl bg-white border border-emerald-200/90 p-5 shadow-sm transition-all duration-300 hover:border-[#25D366] hover:shadow-md group"
                 >
-                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#25D366]">
-                    <MessageCircle className="h-5 w-5 text-white" />
+                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#25D366] text-white shadow-md shadow-[#25D366]/20">
+                    <MessageCircle className="h-6 w-6 text-white fill-current" />
                   </div>
                   <div>
-                    <div className="font-heading text-base font-bold text-dark-green">Chat on WhatsApp</div>
-                    <div className="text-sm text-gray-500">Quick replies, usually within 5 min</div>
+                    <div className="font-heading text-base font-bold text-dark-green group-hover:text-[#128C7E] transition-colors">Chat on WhatsApp</div>
+                    <div className="text-xs text-gray-500 font-medium mt-0.5">Quick replies, usually within 5 min</div>
                   </div>
                 </a>
               </motion.div>
