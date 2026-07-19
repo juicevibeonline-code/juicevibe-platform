@@ -48,9 +48,19 @@ export const brandColors = {
   white: "#FFFFFF",
 } as const;
 
-const rawApiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000/api";
+const rawApiUrl =
+  process.env.NEXT_PUBLIC_API_URL ||
+  (process.env.NODE_ENV === "production"
+    ? "https://juice-vibe-waskaduwa-api.vercel.app/api"
+    : "http://localhost:4000/api");
+
 export const apiConfig = {
   baseUrl: rawApiUrl.endsWith("/api") ? rawApiUrl : `${rawApiUrl}/api`,
-  wsUrl: process.env.NEXT_PUBLIC_WS_URL || "http://localhost:4000",
+  wsUrl:
+    process.env.NEXT_PUBLIC_WS_URL ||
+    (process.env.NODE_ENV === "production"
+      ? "https://juice-vibe-waskaduwa-api.vercel.app"
+      : "http://localhost:4000"),
   timeout: 10000,
 } as const;
+

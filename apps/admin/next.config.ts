@@ -9,9 +9,17 @@ const nextConfig: NextConfig = {
         hostname: "res.cloudinary.com",
       },
       {
+        protocol: "https",
+        hostname: "juice-vibe-waskaduwa-api.vercel.app",
+      },
+      {
         protocol: "http",
         hostname: "localhost",
-      }
+      },
+      {
+        protocol: "https",
+        hostname: "images.unsplash.com",
+      },
     ],
   },
 };
