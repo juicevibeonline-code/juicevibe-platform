@@ -48,19 +48,42 @@ export const brandColors = {
   white: "#FFFFFF",
 } as const;
 
-const rawApiUrl =
-  process.env.NEXT_PUBLIC_API_URL ||
-  (process.env.NODE_ENV === "production"
-    ? "https://juice-vibe-waskaduwa-api.vercel.app/api"
-    : "http://localhost:4000/api");
+export function getApiBaseUrl(): string {
+  if (process.env.NEXT_PUBLIC_API_URL) {
+    const raw = process.env.NEXT_PUBLIC_API_URL;
+    return raw.endsWith("/api") ? raw : `${raw}/api`;
+  }
+  if (
+    typeof window !== "undefined" &&
+    window.location.hostname !== "localhost" &&
+    window.location.hostname !== "127.0.0.1"
+  ) {
+    return "https://juice-vibe-waskaduwa-api.vercel.app/api";
+  }
+  if (process.env.NODE_ENV === "production") {
+    return "https://juice-vibe-waskaduwa-api.vercel.app/api";
+  }
+  return "http://localhost:4000/api";
+}
 
 export const apiConfig = {
-  baseUrl: rawApiUrl.endsWith("/api") ? rawApiUrl : `${rawApiUrl}/api`,
-  wsUrl:
-    process.env.NEXT_PUBLIC_WS_URL ||
-    (process.env.NODE_ENV === "production"
-      ? "https://juice-vibe-waskaduwa-api.vercel.app"
-      : "http://localhost:4000"),
+  get baseUrl() {
+    return getApiBaseUrl();
+  },
+  get wsUrl() {
+    if (process.env.NEXT_PUBLIC_WS_URL) return process.env.NEXT_PUBLIC_WS_URL;
+    if (
+      typeof window !== "undefined" &&
+      window.location.hostname !== "localhost" &&
+      window.location.hostname !== "127.0.0.1"
+    ) {
+      return "https://juice-vibe-waskaduwa-api.vercel.app";
+    }
+    if (process.env.NODE_ENV === "production") {
+      return "https://juice-vibe-waskaduwa-api.vercel.app";
+    }
+    return "http://localhost:4000";
+  },
   timeout: 10000,
-} as const;
+};
 

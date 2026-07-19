@@ -1,9 +1,20 @@
-const rawUrl =
-  process.env.NEXT_PUBLIC_API_URL ||
-  (process.env.NODE_ENV === "production"
-    ? "https://juice-vibe-waskaduwa-api.vercel.app/api"
-    : "http://localhost:4000/api");
-const API_URL = rawUrl.endsWith("/api") ? rawUrl : `${rawUrl}/api`;
+export function getApiUrl(): string {
+  if (process.env.NEXT_PUBLIC_API_URL) {
+    const raw = process.env.NEXT_PUBLIC_API_URL;
+    return raw.endsWith("/api") ? raw : `${raw}/api`;
+  }
+  if (
+    typeof window !== "undefined" &&
+    window.location.hostname !== "localhost" &&
+    window.location.hostname !== "127.0.0.1"
+  ) {
+    return "https://juice-vibe-waskaduwa-api.vercel.app/api";
+  }
+  if (process.env.NODE_ENV === "production") {
+    return "https://juice-vibe-waskaduwa-api.vercel.app/api";
+  }
+  return "http://localhost:4000/api";
+}
 
 export interface CreateOrderPayload {
   customerName: string;
@@ -29,7 +40,7 @@ export interface OrderResponse {
 }
 
 export async function createOrder(payload: CreateOrderPayload): Promise<OrderResponse> {
-  const res = await fetch(`${API_URL}/orders`, {
+  const res = await fetch(`${getApiUrl()}/orders`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
@@ -53,7 +64,7 @@ export interface ContactPayload {
 }
 
 export async function submitContactForm(payload: ContactPayload): Promise<void> {
-  const res = await fetch(`${API_URL}/contact`, {
+  const res = await fetch(`${getApiUrl()}/contact`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
@@ -66,7 +77,7 @@ export async function submitContactForm(payload: ContactPayload): Promise<void> 
 }
 
 export async function subscribeToNewsletter(email: string): Promise<void> {
-  const res = await fetch(`${API_URL}/contact/subscribe`, {
+  const res = await fetch(`${getApiUrl()}/contact/subscribe`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ email }),
