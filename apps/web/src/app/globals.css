@@ -3,6 +3,8 @@
 
 
 
+@source "../**/*.tsx";
+@source "../**/*.ts";
 @source "../../packages/ui/src/**/*.tsx";
 @source "../../packages/ui/src/**/*.ts";
 @source "../../../../packages/ui/src/**/*.tsx";

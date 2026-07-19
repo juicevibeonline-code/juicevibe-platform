@@ -65,7 +65,7 @@ export default function TrackOrderPage() {
                 placeholder="e.g. JV-XXXX"
                 value={orderNumber}
                 onChange={(e) => setOrderNumber(e.target.value)}
-                className="flex-1 rounded-2xl border border-gray-200 bg-gray-50 px-5 py-3.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all uppercase font-mono"
+                className="flex-1 rounded-2xl border border-gray-200 bg-gray-50 px-5 py-3.5 text-sm text-gray-900 font-medium focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all uppercase font-mono"
                 required
               />
               <button

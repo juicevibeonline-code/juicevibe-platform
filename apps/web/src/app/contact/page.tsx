@@ -188,24 +188,23 @@ export default function ContactPage() {
                 </Card>
               </motion.div>
 
-              <motion.div
-                initial={{ opacity: 0, x: 30 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.6, delay: 0.3 }}
-                className="space-y-4 lg:col-span-2"
-              >
-                {contactInfo.map((info) => (
-                  <Card key={info.title} className="group transition-all duration-300 hover:shadow-md border border-slate-200/80 bg-white">
-                    <CardContent className="flex items-start gap-4 p-5">
+              <div className="space-y-4 lg:col-span-2">
+                {contactInfo.map((info) => {
+                  const Icon = info.icon;
+                  return (
+                    <div
+                      key={info.title}
+                      className="flex items-start gap-4 rounded-2xl border border-slate-200/90 bg-white p-5 shadow-sm transition-all duration-300 hover:shadow-md hover:border-primary/40 group"
+                    >
                       <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary transition-all duration-300 group-hover:bg-primary group-hover:text-white">
-                        <info.icon className="h-5 w-5 text-primary transition-all duration-300 group-hover:text-white" />
+                        <Icon className="h-5 w-5 text-primary transition-all duration-300 group-hover:text-white" />
                       </div>
                       <div>
                         <h3 className="font-heading text-base font-bold text-dark-green">{info.title}</h3>
                         {info.details.map((detail, i) => (
-                          <p key={i} className="text-sm text-gray-600 mt-0.5">
+                          <p key={i} className="text-sm text-gray-600 font-medium mt-0.5">
                             {info.href ? (
-                              <a href={info.href} className="hover:text-primary font-medium transition-colors">
+                              <a href={info.href} className="hover:text-primary transition-colors">
                                 {detail}
                               </a>
                             ) : (
@@ -214,9 +213,9 @@ export default function ContactPage() {
                           </p>
                         ))}
                       </div>
-                    </CardContent>
-                  </Card>
-                ))}
+                    </div>
+                  );
+                })}
 
                 <a
                   href="https://wa.me/94718435876"
@@ -232,7 +231,7 @@ export default function ContactPage() {
                     <div className="text-xs text-gray-500 font-medium mt-0.5">Quick replies, usually within 5 min</div>
                   </div>
                 </a>
-              </motion.div>
+              </div>
             </div>
 
             <motion.div
