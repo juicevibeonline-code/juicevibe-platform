@@ -5,6 +5,15 @@ import { CreateTableDto } from "./dto/create-table.dto";
 
 @Injectable()
 export class TableService {
+  private getFrontendUrl(): string {
+    const baseUrl =
+      process.env.FRONTEND_URL ||
+      (process.env.NODE_ENV === "production"
+        ? "https://juice-vibe-waskaduwa-web.vercel.app"
+        : "http://localhost:3000");
+    return baseUrl.endsWith("/") ? baseUrl.slice(0, -1) : baseUrl;
+  }
+
   async createTable(input: CreateTableDto) {
     const existing = await prisma.table.findUnique({ where: { number: input.number } });
     if (existing) {
@@ -19,8 +28,7 @@ export class TableService {
       },
     });
 
-    const baseUrl = process.env.FRONTEND_URL || "https://juicevibe.com";
-    const cleanBaseUrl = baseUrl.endsWith("/") ? baseUrl.slice(0, -1) : baseUrl;
+    const cleanBaseUrl = this.getFrontendUrl();
     const qrUrl = `${cleanBaseUrl}/menu?tableId=${table.id}`;
 
     try {
@@ -28,7 +36,11 @@ export class TableService {
       const qrCodeDataUrl = await QRCode.toDataURL(qrUrl, {
         errorCorrectionLevel: "H",
         margin: 1,
-        width: 300,
+        width: 400,
+        color: {
+          dark: "#0F2A1E",
+          light: "#FFFFFF",
+        },
       });
 
       // Update table with actual generated QR code URL
@@ -41,6 +53,30 @@ export class TableService {
       await prisma.table.delete({ where: { id: table.id } });
       throw err;
     }
+  }
+
+  async regenerateQRCodes() {
+    const tables = await prisma.table.findMany();
+    const cleanBaseUrl = this.getFrontendUrl();
+
+    for (const table of tables) {
+      const qrUrl = `${cleanBaseUrl}/menu?tableId=${table.id}`;
+      const qrCodeDataUrl = await QRCode.toDataURL(qrUrl, {
+        errorCorrectionLevel: "H",
+        margin: 1,
+        width: 400,
+        color: {
+          dark: "#0F2A1E",
+          light: "#FFFFFF",
+        },
+      });
+      await prisma.table.update({
+        where: { id: table.id },
+        data: { qrCodeUrl: qrCodeDataUrl },
+      });
+    }
+
+    return this.getTables();
   }
 
   async getTables() {

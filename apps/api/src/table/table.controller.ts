@@ -20,6 +20,16 @@ export class TableController {
     return ApiResponseDto.ok(table, "Table created successfully");
   }
 
+  @Post("regenerate-qr")
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles("admin", "manager")
+  @ApiBearerAuth()
+  @ApiOperation({ summary: "Regenerate all table QR codes with active domain URL" })
+  async regenerateQRCodes() {
+    const tables = await this.tableService.regenerateQRCodes();
+    return ApiResponseDto.ok(tables, "All table QR codes regenerated successfully");
+  }
+
   @Get()
   @ApiOperation({ summary: "Get all tables" })
   async getTables() {

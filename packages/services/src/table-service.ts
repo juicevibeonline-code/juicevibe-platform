@@ -20,4 +20,9 @@ export const tableService = {
   async deleteTable(id: string): Promise<void> {
     await apiClient.delete(`/tables/${id}`);
   },
+
+  async regenerateQRCodes(): Promise<Table[]> {
+    const { data } = await apiClient.post("/tables/regenerate-qr");
+    return data.data;
+  },
 };
