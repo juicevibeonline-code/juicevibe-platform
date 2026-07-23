@@ -94,7 +94,7 @@ export function Lightbox({ images, currentIndex, onClose, onPrev, onNext }: Ligh
             }}
           >
             <Image
-              src={encodeURI(imgSrc)}
+              src={imgSrc}
               alt={current.alt}
               fill
               className="object-contain"

@@ -136,7 +136,7 @@ export function MenuItemCard({ item, index }: MenuItemCardProps) {
           {imgSrc ? (
             <div className="relative w-full h-full z-10 transition-transform duration-500 ease-out group-hover:scale-105">
               <Image
-                src={encodeURI(imgSrc)}
+                src={imgSrc}
                 alt={item.name}
                 fill
                 sizes="(max-width: 768px) 100vw, 350px"

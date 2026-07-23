@@ -9,8 +9,6 @@ async function main() {
   console.log("🌱 Seeding database...");
 
   // ─── Admin User ───────────────────────────────────────────────
-  // bcrypt hash of "Admin@123" with 12 salt rounds — pre-computed
-  // Change via admin panel after first login
   const hashedPassword = "$2a$12$Ql6rP3QJeWvLmRX8kD2aXu5mHKjQzNsOxPYvwAZbTlFcGiE9uRsKi";
   await prisma.user.upsert({
     where: { email: "admin@juicevibe.com" },
@@ -84,7 +82,7 @@ async function main() {
     { name: "Chocolate",      slug: "chocolate-milkshake",      description: "Rich & creamy chocolate milkshake",       price: 300, popular: true,  thumbnail: "/images/MenuItems/Milkshakes-Chocolate - LKR 300.png" },
     { name: "Vanilla",        slug: "vanilla-milkshake",        description: "Classic vanilla bean milkshake",           price: 300,                thumbnail: "/images/MenuItems/Milkshakes-Vanilla - LKR 300.png" },
     { name: "Strawberry",     slug: "strawberry-milkshake",     description: "Fresh strawberry milkshake",               price: 300,                thumbnail: "/images/MenuItems/Milkshakes-Strawberry.png" },
-    { name: "Mango",          slug: "mango-milkshake",          description: "Thick tropical mango milkshake",           price: 300, popular: true,  thumbnail: "/images/MenuItems/Milkshakes-Mango – LKR 300.00.png" },
+    { name: "Mango",          slug: "mango-milkshake",          description: "Thick tropical mango milkshake",           price: 300, popular: true,  thumbnail: "/images/MenuItems/Milkshakes-Mango - LKR 300.00.png" },
     { name: "Passion Fruit",  slug: "passion-fruit-milkshake",  description: "Tropical passion fruit milkshake",         price: 300,                thumbnail: "/images/MenuItems/Milkshakes-Passion Fruit.png" },
     { name: "Banana",         slug: "banana-milkshake",         description: "Fresh banana & milk creamy shake",         price: 300,                thumbnail: "/images/MenuItems/Milkshakes-Banana.png" },
     { name: "Date & Almond",  slug: "date-almond-milkshake",    description: "Healthy energy-boosting date & almond shake", price: 400, popular: true,  thumbnail: "/images/MenuItems/Milkshakes-Date-Almond.png" },
@@ -127,6 +125,12 @@ async function main() {
   const smoothies = await getCategory("smoothies");
   const smoothieItems = [
     {
+      name: "Tropical Smoothie Bowl", slug: "tropical-smoothie-bowl",
+      description: "Dragonfruit, mango, coconut & chia seeds",
+      price: 550, popular: true, featured: true,
+      thumbnail: "/images/MenuItems/tropical_smoothie_bowl.png",
+    },
+    {
       name: "Avocado & Dates",  slug: "avocado-dates-smoothie",
       description: "Avocado, Dates, Milk, Treacle",
       price: 450, popular: true, featured: true,
@@ -148,10 +152,10 @@ async function main() {
   // ─── LASSI ────────────────────────────────────────────────────
   const lassi = await getCategory("lassi");
   const lassiItems = [
-    { name: "Classic",      slug: "classic-lassi",       description: "Traditional sweet creamy yogurt drink",  price: 400,                thumbnail: "/images/MenuItems/LassiClassic – LKR 400.00.png" },
-    { name: "Mango",        slug: "mango-lassi",         description: "Mango pulp blended with fresh yogurt",   price: 400, popular: true,  thumbnail: "/images/MenuItems/Lassi-Mango – LKR 400.00.png" },
-    { name: "Passion Fruit",slug: "passion-fruit-lassi", description: "Passion fruit & yogurt blend",           price: 400,                thumbnail: "/images/MenuItems/Lassi-Passion Fruit – LKR 400.00.png" },
-    { name: "Orange",       slug: "orange-lassi",        description: "Orange yogurt refresher",                price: 400,                thumbnail: "/images/MenuItems/Lassi-Orange – LKR 400.00.png" },
+    { name: "Classic",      slug: "classic-lassi",       description: "Traditional sweet creamy yogurt drink",  price: 400,                thumbnail: "/images/MenuItems/LassiClassic - LKR 400.00.png" },
+    { name: "Mango",        slug: "mango-lassi",         description: "Mango pulp blended with fresh yogurt",   price: 400, popular: true,  thumbnail: "/images/MenuItems/Lassi-Mango - LKR 400.00.png" },
+    { name: "Passion Fruit",slug: "passion-fruit-lassi", description: "Passion fruit & yogurt blend",           price: 400,                thumbnail: "/images/MenuItems/Lassi-Passion Fruit - LKR 400.00.png" },
+    { name: "Orange",       slug: "orange-lassi",        description: "Orange yogurt refresher",                price: 400,                thumbnail: "/images/MenuItems/Lassi-Orange - LKR 400.00.png" },
   ];
   for (const item of lassiItems) {
     await upsertItem({ ...item, categoryId: lassi.id });
@@ -160,11 +164,11 @@ async function main() {
   // ─── TEA ──────────────────────────────────────────────────────
   const tea = await getCategory("tea");
   const teaItems = [
-    { name: "English Breakfast Tea", slug: "english-breakfast-tea", description: "Classic robust English breakfast tea",  price: 100, thumbnail: "/images/MenuItems/Tea-English Breakfast Tea – LKR 100.00.png" },
-    { name: "Green Tea",             slug: "green-tea",             description: "Light & refreshing green tea",          price: 100, thumbnail: "/images/MenuItems/Tea-Green Tea – LKR 100.00.png" },
-    { name: "Ginger Tea",            slug: "ginger-tea",            description: "Spiced warming ginger tea",             price: 100, popular: true, thumbnail: "/images/MenuItems/Ginger Tea – LKR 100.00.png" },
-    { name: "Lemon Tea",             slug: "lemon-tea",             description: "Black tea with fresh lemon zest",       price: 100, thumbnail: "/images/MenuItems/Lemon Tea – LKR 100.00.png" },
-    { name: "Mint Tea",              slug: "mint-tea",              description: "Cooling fresh mint herbal tea",         price: 100, thumbnail: "/images/MenuItems/Mint Tea – LKR 100.00.png" },
+    { name: "English Breakfast Tea", slug: "english-breakfast-tea", description: "Classic robust English breakfast tea",  price: 100, thumbnail: "/images/MenuItems/Tea-English Breakfast Tea - LKR 100.00.png" },
+    { name: "Green Tea",             slug: "green-tea",             description: "Light & refreshing green tea",          price: 100, thumbnail: "/images/MenuItems/Tea-Green Tea - LKR 100.00.png" },
+    { name: "Ginger Tea",            slug: "ginger-tea",            description: "Spiced warming ginger tea",             price: 100, popular: true, thumbnail: "/images/MenuItems/Ginger Tea - LKR 100.00.png" },
+    { name: "Lemon Tea",             slug: "lemon-tea",             description: "Black tea with fresh lemon zest",       price: 100, thumbnail: "/images/MenuItems/Lemon Tea - LKR 100.00.png" },
+    { name: "Mint Tea",              slug: "mint-tea",              description: "Cooling fresh mint herbal tea",         price: 100, thumbnail: "/images/MenuItems/Mint Tea - LKR 100.00.png" },
   ];
   for (const item of teaItems) {
     await upsertItem({ ...item, categoryId: tea.id });
@@ -173,9 +177,9 @@ async function main() {
   // ─── COFFEE ───────────────────────────────────────────────────
   const coffee = await getCategory("coffee");
   const coffeeItems = [
-    { name: "Americano",  slug: "americano",  description: "Bold espresso with hot water",               price: 200, thumbnail: "/images/MenuItems/Americano – LKR 200.00.png" },
-    { name: "Espresso",   slug: "espresso",   description: "Rich double-shot espresso",                  price: 200, thumbnail: "/images/MenuItems/Coffee-Espresso – LKR 200.00.png" },
-    { name: "Cappuccino", slug: "cappuccino", description: "Espresso with velvety frothy milk",          price: 300, popular: true, thumbnail: "/images/MenuItems/Coffee-Cappuccino – LKR 300.00.png" },
+    { name: "Americano",  slug: "americano",  description: "Bold espresso with hot water",               price: 200, thumbnail: "/images/MenuItems/Americano - LKR 200.00.png" },
+    { name: "Espresso",   slug: "espresso",   description: "Rich double-shot espresso",                  price: 200, thumbnail: "/images/MenuItems/Coffee-Espresso - LKR 200.00.png" },
+    { name: "Cappuccino", slug: "cappuccino", description: "Espresso with velvety frothy milk",          price: 300, popular: true, thumbnail: "/images/MenuItems/Coffee-Cappuccino - LKR 300.00.png" },
   ];
   for (const item of coffeeItems) {
     await upsertItem({ ...item, categoryId: coffee.id });
@@ -185,10 +189,16 @@ async function main() {
   const mocktails = await getCategory("mocktails");
   const mocktailItems = [
     {
+      name: "Passion Fruit Mojito", slug: "passion-fruit-mojito",
+      description: "Fresh passionfruit pulp, mint & soda",
+      price: 450, popular: true, featured: true,
+      thumbnail: "/images/MenuItems/passionfruit_mojito_mocktail.png",
+    },
+    {
       name: "Classic Virgin Mojito", slug: "classic-virgin-mojito",
       description: "Mint, lime, soda & sugar — the timeless classic",
       price: 400, popular: true,
-      thumbnail: "/images/MenuItems/Mocktails-Classic Virgin Mojito – LKR 400.00.png",
+      thumbnail: "/images/MenuItems/Mocktails-Classic Virgin Mojito - LKR 400.00.png",
     },
     {
       name: "Flavoured Mojito", slug: "flavoured-mojito",
@@ -209,7 +219,7 @@ async function main() {
       name: "Jaggery & Cashew Dream", slug: "jaggery-cashew-dream",
       description: "Traditional jaggery with premium cashew nuts & ice cream",
       price: 500, popular: true, featured: true,
-      thumbnail: "/images/MenuItems/Jaggery & Cashew Dream – LKR 500.00.jpg",
+      thumbnail: "/images/MenuItems/Jaggery & Cashew Dream - LKR 500.00.jpg",
     },
     { name: "Banana Boat",                slug: "banana-boat",                 description: "Banana split with ice cream & indulgent toppings", price: 500, thumbnail: "/images/MenuItems/IceCream-BananaBoat.png" },
     { name: "Fruit Salad",               slug: "fruit-salad",                 description: "Fresh seasonal tropical fruit salad",              price: 300, thumbnail: "/images/MenuItems/IceCream-FruitSalad.png" },
@@ -254,7 +264,6 @@ async function main() {
     { name: "Arjun Nair",     role: "Tourist",            rating: 4, text: "Discovered this gem during my visit to Bentota. The wood apple juice is something I still crave. Will definitely come back!", isApproved: true },
     { name: "Neha Gupta",     role: "Local Resident",     rating: 5, text: "Juice Vibe has become our family's favourite weekend spot. The kids love the milkshakes and we love the fresh juices!", isApproved: true },
   ];
-  // Only create if none exist yet
   const existingTestimonials = await prisma.testimonial.count();
   if (existingTestimonials === 0) {
     for (const t of testimonials) {
@@ -282,6 +291,29 @@ async function main() {
   ];
   for (const s of settings) {
     await prisma.setting.upsert({ where: { key: s.key }, update: { value: s.value }, create: s });
+  }
+
+  // ─── GALLERY IMAGES ───────────────────────────────────────────
+  const galleryDefs = [
+    { src: "/images/MenuItems/tropical_smoothie_bowl.png", alt: "Tropical Dragonfruit Smoothie Bowl", category: "smoothies", width: 800, height: 600 },
+    { src: "/images/MenuItems/passionfruit_mojito_mocktail.png", alt: "Refreshing Passion Fruit Mojito Mocktail", category: "mocktails", width: 800, height: 600 },
+    { src: "/images/MenuItems/FreshOrange.png", alt: "Freshly Squeezed Orange Juice", category: "fresh-juices", width: 800, height: 600 },
+    { src: "/images/MenuItems/FJAvocado.png", alt: "Creamy Avocado Juice", category: "fresh-juices", width: 800, height: 600 },
+    { src: "/images/MenuItems/Special Smoothies-AandD.png", alt: "Avocado & Dates Special Smoothie", category: "smoothies", width: 800, height: 600 },
+    { src: "/images/MenuItems/Mocktails-Classic Virgin Mojito - LKR 400.00.png", alt: "Classic Virgin Mojito", category: "mocktails", width: 800, height: 600 },
+    { src: "/images/MenuItems/Burgers-ChickenBurger.png", alt: "Gourmet Chicken Burger", category: "burgers", width: 800, height: 600 },
+    { src: "/images/MenuItems/Sandwiches-ChickenHamCheese.png", alt: "Toasted Chicken Ham & Cheese Sandwich", category: "sandwiches", width: 800, height: 600 },
+    { src: "/images/MenuItems/Coffee-Cappuccino - LKR 300.00.png", alt: "Frothy Cappuccino", category: "coffee", width: 800, height: 600 },
+    { src: "/images/MenuItems/Milkshakes-Chocolate - LKR 300.png", alt: "Rich Chocolate Milkshake", category: "milkshakes", width: 800, height: 600 },
+    { src: "/images/MenuItems/Jaggery & Cashew Dream - LKR 500.00.jpg", alt: "Jaggery & Cashew Dream Ice Cream", category: "ice-cream", width: 800, height: 600 },
+    { src: "/images/Opening/Opening.png", alt: "Juice Vibe Waskaduwa Cafe Atmosphere", category: "general", width: 800, height: 600 },
+  ];
+
+  for (const g of galleryDefs) {
+    const existing = await prisma.galleryImage.findFirst({ where: { src: g.src } });
+    if (!existing) {
+      await prisma.galleryImage.create({ data: g });
+    }
   }
 
   console.log("✅ Seed completed successfully!");

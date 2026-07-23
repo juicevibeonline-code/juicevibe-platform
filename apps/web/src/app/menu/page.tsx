@@ -40,7 +40,7 @@ function PopularHighlightCard({ item }: { item: MenuItem }) {
           </span>
           {imgSrc ? (
             <Image
-              src={encodeURI(imgSrc)}
+              src={imgSrc}
               alt={item.name}
               fill
               sizes="(max-width: 768px) 100vw, 300px"

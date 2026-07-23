@@ -32,7 +32,7 @@ export function GalleryCard({ image, onOpen, index }: GalleryCardProps) {
         style={{ aspectRatio: `${image.width || 800}/${image.height || 600}` }}
       >
         <Image
-          src={encodeURI(imgSrc)}
+          src={imgSrc}
           alt={image.alt}
           fill
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"

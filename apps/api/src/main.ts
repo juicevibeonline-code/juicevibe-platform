@@ -9,10 +9,14 @@ import helmet from "helmet";
 import { AppModule } from "./app.module";
 
 import { NestExpressApplication } from "@nestjs/platform-express";
+import { json, urlencoded } from "express";
 
 async function bootstrap() {
   const logger = new Logger("Bootstrap");
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
+
+  app.use(json({ limit: "10mb" }));
+  app.use(urlencoded({ limit: "10mb", extended: true }));
 
   // Only serve uploads from disk when running locally (not on Vercel serverless)
   if (process.env.NODE_ENV !== "production") {

@@ -164,12 +164,12 @@ export function CartDrawer() {
                                   <Trash2 className="w-4 h-4" />
                                 </button>
                               </div>
-                              <span className="text-primary font-black text-sm">{formatPrice(item.price * item.quantity)}</span>
+                              <span className="text-primary font-black text-sm font-mono">{formatPrice(item.price * item.quantity)}</span>
                               <div className="flex items-center bg-gray-50 rounded-full border border-gray-200 w-fit mt-1">
                                 <button onClick={() => updateQuantity(item.cartItemId, item.quantity - 1)} disabled={item.quantity <= 1} className="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-dark-green disabled:opacity-30 transition-colors">
                                   <Minus className="w-3 h-3" />
                                 </button>
-                                <span className="w-6 text-center text-sm font-bold text-dark-green">{item.quantity}</span>
+                                <span className="w-6 text-center text-sm font-bold text-dark-green font-mono">{item.quantity}</span>
                                 <button onClick={() => updateQuantity(item.cartItemId, item.quantity + 1)} className="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-dark-green transition-colors">
                                   <Plus className="w-3 h-3" />
                                 </button>
@@ -184,10 +184,10 @@ export function CartDrawer() {
                   {items.length > 0 && (
                     <div className="p-6 bg-gray-50/80 border-t border-gray-100 shrink-0">
                       <div className="space-y-2 mb-4 text-sm">
-                        <div className="flex justify-between text-gray-500 font-medium"><span>Subtotal</span><span>{formatPrice(subtotal)}</span></div>
-                        <div className="flex justify-between text-gray-500 font-medium"><span>Tax (5%)</span><span>{formatPrice(tax)}</span></div>
+                        <div className="flex justify-between text-gray-500 font-medium"><span>Subtotal</span><span className="font-mono">{formatPrice(subtotal)}</span></div>
+                        <div className="flex justify-between text-gray-500 font-medium"><span>Tax (5%)</span><span className="font-mono">{formatPrice(tax)}</span></div>
                         <div className="flex justify-between text-dark-green text-base font-black pt-2 border-t border-gray-200">
-                          <span>Total</span><span className="text-primary-dark">{formatPrice(total)}</span>
+                          <span>Total</span><span className="text-primary-dark font-mono">{formatPrice(total)}</span>
                         </div>
                       </div>
                       <Button className="w-full h-12 text-base rounded-2xl shadow-md" onClick={() => setStep("checkout")}>
@@ -209,12 +209,12 @@ export function CartDrawer() {
                         {items.map(item => (
                           <div key={item.cartItemId} className="flex justify-between text-sm font-medium text-dark-green">
                             <span>{item.name} × {item.quantity}</span>
-                            <span>{formatPrice(item.price * item.quantity)}</span>
+                            <span className="font-mono">{formatPrice(item.price * item.quantity)}</span>
                           </div>
                         ))}
                       </div>
                       <div className="flex justify-between text-base font-black text-dark-green mt-3 pt-3 border-t border-gray-200">
-                        <span>Total</span><span className="text-primary">{formatPrice(total)}</span>
+                        <span>Total</span><span className="text-primary font-mono">{formatPrice(total)}</span>
                       </div>
                     </div>
 

@@ -1,6 +1,7 @@
 import { Module } from "@nestjs/common";
 import { ThrottlerModule, ThrottlerGuard } from "@nestjs/throttler";
 import { APP_GUARD } from "@nestjs/core";
+import { AppController } from "./app.controller";
 import { AuthModule } from "./auth/auth.module";
 import { MenuModule } from "./menu/menu.module";
 import { OrdersModule } from "./orders/orders.module";
@@ -32,7 +33,7 @@ import { EmployeesModule } from "./employees/employees.module";
     InventoryModule,
     EmployeesModule,
   ],
-
+  controllers: [AppController],
   providers: [
     { provide: APP_GUARD, useClass: ThrottlerGuard },
   ],

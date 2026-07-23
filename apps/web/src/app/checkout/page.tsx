@@ -33,7 +33,7 @@ type FormData = z.infer<typeof schema>;
 
 const paymentMethods = [
   { id: "cash" as const, label: "Cash on Delivery", icon: Banknote, color: "text-emerald-600" },
-  { id: "online" as const, label: "Online Transfer", icon: Smartphone, color: "text-purple-600" },
+  { id: "online" as const, label: "Online Transfer", icon: Smartphone, color: "text-amber-600" },
 ];
 
 // ─── Component ─────────────────────────────────────────────────────────────────

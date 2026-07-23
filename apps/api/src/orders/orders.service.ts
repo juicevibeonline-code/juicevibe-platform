@@ -47,7 +47,7 @@ export class OrdersService {
         throw new BadRequestException(`${menuItem.name} is not available`);
       }
 
-      const itemPrice = menuItem.price;
+      const itemPrice = typeof item.price === "number" && item.price > 0 ? item.price : menuItem.price;
       const itemName = menuItem.name;
       subtotal += itemPrice * item.quantity;
 

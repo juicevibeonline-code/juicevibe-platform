@@ -162,11 +162,12 @@ export default function MenuCatalog() {
 
     try {
       setUploadProgress(true);
-      const result = await galleryService.uploadImage(
-        file,
-        watch("name") || file.name,
-        "menu"
-      );
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("title", watch("name") || file.name);
+      formData.append("category", "menu");
+
+      const result = await galleryService.uploadImage(formData);
       if (result && result.src) {
         setValue("thumbnail", result.src);
       }
