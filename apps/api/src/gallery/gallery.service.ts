@@ -7,11 +7,21 @@ import { randomBytes } from "crypto";
 
 @Injectable()
 export class GalleryService {
+  private isCloudinaryConfigured(): boolean {
+    const hasUrl = !!(process.env.CLOUDINARY_URL && process.env.CLOUDINARY_URL.startsWith("cloudinary://"));
+    const hasKeys = !!(
+      process.env.CLOUDINARY_CLOUD_NAME &&
+      process.env.CLOUDINARY_API_KEY &&
+      process.env.CLOUDINARY_API_SECRET
+    );
+    return hasUrl || hasKeys;
+  }
+
   constructor() {
     if (process.env.CLOUDINARY_URL && !process.env.CLOUDINARY_URL.startsWith("cloudinary://")) {
       delete process.env.CLOUDINARY_URL;
     }
-    // Configure Cloudinary if credentials are provided in env
+    // Configure Cloudinary if discrete credentials are provided
     if (
       process.env.CLOUDINARY_CLOUD_NAME &&
       process.env.CLOUDINARY_API_KEY &&
@@ -50,12 +60,8 @@ export class GalleryService {
     const { file, title, category } = input;
     let src = "";
 
-    // 1. Check if Cloudinary is configured
-    if (
-      process.env.CLOUDINARY_CLOUD_NAME &&
-      process.env.CLOUDINARY_API_KEY &&
-      process.env.CLOUDINARY_API_SECRET
-    ) {
+    // 1. Check if Cloudinary is configured (via CLOUDINARY_URL or discrete keys)
+    if (this.isCloudinaryConfigured()) {
       try {
         const result = await new Promise<any>((resolve, reject) => {
           cloudinary.uploader.upload_stream({ folder: "juice-vibe-gallery" }, (error, res) => {
