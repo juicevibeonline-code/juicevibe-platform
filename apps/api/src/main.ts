@@ -96,9 +96,21 @@ async function bootstrap() {
     ],
   });
 
-  const port = process.env.PORT ? parseInt(String(process.env.PORT), 10) : 4000;
+  let port = process.env.PORT ? parseInt(String(process.env.PORT), 10) : 4000;
   const host = process.env.HOST || (process.env.NODE_ENV === "production" ? "0.0.0.0" : "127.0.0.1");
-  await app.listen(port, host);
+
+  try {
+    await app.listen(port, host);
+  } catch (err: any) {
+    if (err.code === "EACCES" || err.code === "EADDRINUSE") {
+      logger.warn(`Port ${port} is reserved or blocked by host (${err.code}). Falling back to port 4200...`);
+      port = 4200;
+      await app.listen(port, host);
+    } else {
+      throw err;
+    }
+  }
+
   logger.log(`Server running on http://${host}:${port}`);
   logger.log(`API docs available at http://${host}:${port}/api/docs`);
 }
