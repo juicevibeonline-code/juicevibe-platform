@@ -96,10 +96,11 @@ async function bootstrap() {
     ],
   });
 
-  const port = process.env.PORT ?? 4000;
-  await app.listen(port);
-  logger.log(`Server running on port ${port}`);
-  logger.log(`API docs available at http://localhost:${port}/api/docs`);
+  const port = process.env.PORT ? parseInt(String(process.env.PORT), 10) : 4000;
+  const host = process.env.HOST || (process.env.NODE_ENV === "production" ? "0.0.0.0" : "127.0.0.1");
+  await app.listen(port, host);
+  logger.log(`Server running on http://${host}:${port}`);
+  logger.log(`API docs available at http://${host}:${port}/api/docs`);
 }
 
 bootstrap();
