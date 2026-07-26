@@ -8,6 +8,9 @@ import { randomBytes } from "crypto";
 @Injectable()
 export class GalleryService {
   constructor() {
+    if (process.env.CLOUDINARY_URL && !process.env.CLOUDINARY_URL.startsWith("cloudinary://")) {
+      delete process.env.CLOUDINARY_URL;
+    }
     // Configure Cloudinary if credentials are provided in env
     if (
       process.env.CLOUDINARY_CLOUD_NAME &&

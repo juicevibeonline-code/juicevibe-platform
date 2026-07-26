@@ -2,6 +2,10 @@ import * as dotenv from "dotenv";
 import { join } from "path";
 dotenv.config({ path: join(__dirname, "..", "..", "..", ".env") });
 
+if (process.env.CLOUDINARY_URL && !process.env.CLOUDINARY_URL.startsWith("cloudinary://")) {
+  delete process.env.CLOUDINARY_URL;
+}
+
 import { NestFactory } from "@nestjs/core";
 import { ValidationPipe, Logger } from "@nestjs/common";
 import { SwaggerModule, DocumentBuilder } from "@nestjs/swagger";
