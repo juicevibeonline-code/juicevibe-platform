@@ -58,9 +58,10 @@ async function bootstrap() {
       // Allow local development origins (localhost or 127.0.0.1 on any port) dynamically
       const isLocalhost = /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin);
       
-      // Allow any vercel.app or railway.app domain automatically
+      // Allow any vercel.app, netlify.app, or railway.app domain automatically
       if (
         origin.endsWith(".vercel.app") ||
+        origin.endsWith(".netlify.app") ||
         origin.endsWith(".railway.app") ||
         origin.endsWith(".up.railway.app") ||
         allowedOrigins.includes(origin) ||
