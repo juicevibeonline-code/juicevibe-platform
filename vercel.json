@@ -1,4 +1,3 @@
 {
-  "installCommand": "corepack enable && pnpm install",
   "buildCommand": "turbo build"
 }
