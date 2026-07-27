@@ -3,6 +3,7 @@ import "./globals.css";
 import { FloatingCart } from "@/components/cart/FloatingCart";
 import { CartDrawer } from "@/components/cart/CartDrawer";
 
+// Production Build Marker: 2026-07-27-01
 export const metadata: Metadata = {
   title: {
     default: "Juice Vibe - Sip the Good Vibes",
