@@ -58,8 +58,14 @@ async function bootstrap() {
       // Allow local development origins (localhost or 127.0.0.1 on any port) dynamically
       const isLocalhost = /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin);
       
-      // Allow any vercel.app preview URL automatically
-      if (origin.endsWith(".vercel.app") || allowedOrigins.includes(origin) || isLocalhost) {
+      // Allow any vercel.app or railway.app domain automatically
+      if (
+        origin.endsWith(".vercel.app") ||
+        origin.endsWith(".railway.app") ||
+        origin.endsWith(".up.railway.app") ||
+        allowedOrigins.includes(origin) ||
+        isLocalhost
+      ) {
         return callback(null, true);
       }
       callback(new Error(`CORS: ${origin} not allowed`));
@@ -97,7 +103,7 @@ async function bootstrap() {
   });
 
   let port = process.env.PORT ? parseInt(String(process.env.PORT), 10) : 4000;
-  const host = process.env.HOST || (process.env.NODE_ENV === "production" ? "0.0.0.0" : "127.0.0.1");
+  const host = process.env.HOST || "0.0.0.0";
 
   try {
     await app.listen(port, host);
