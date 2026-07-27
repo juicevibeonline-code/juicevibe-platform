@@ -46,9 +46,9 @@ async function bootstrap() {
   );
 
   const allowedOrigins = [
-    process.env.FRONTEND_URL,
-    process.env.ADMIN_URL || "http://localhost:3001",
-  ].filter(Boolean);
+    ...(process.env.FRONTEND_URL ? process.env.FRONTEND_URL.split(",") : []),
+    ...(process.env.ADMIN_URL ? process.env.ADMIN_URL.split(",") : ["http://localhost:3001"]),
+  ].map((url) => url.trim()).filter(Boolean);
 
   app.enableCors({
     origin: (origin, callback) => {
@@ -58,12 +58,14 @@ async function bootstrap() {
       // Allow local development origins (localhost or 127.0.0.1 on any port) dynamically
       const isLocalhost = /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin);
       
-      // Allow any vercel.app, netlify.app, or railway.app domain automatically
+      // Allow any vercel.app, netlify.app, railway.app, or .lk domain automatically
       if (
         origin.endsWith(".vercel.app") ||
         origin.endsWith(".netlify.app") ||
         origin.endsWith(".railway.app") ||
         origin.endsWith(".up.railway.app") ||
+        origin.endsWith("juicevibe.lk") ||
+        origin.endsWith(".lk") ||
         allowedOrigins.includes(origin) ||
         isLocalhost
       ) {
