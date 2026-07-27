@@ -10,6 +10,10 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: "https",
+        hostname: "juice-vibeapi.up.railway.app",
+      },
+      {
+        protocol: "https",
         hostname: "juice-vibe-waskaduwa-api.vercel.app",
       },
       {
