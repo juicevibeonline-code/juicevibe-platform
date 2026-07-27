@@ -8,10 +8,10 @@ export function getApiUrl(): string {
     window.location.hostname !== "localhost" &&
     window.location.hostname !== "127.0.0.1"
   ) {
-    return "https://juice-vibe-waskaduwa-api.vercel.app/api";
+    return "https://juice-vibeapi.up.railway.app/api";
   }
   if (process.env.NODE_ENV === "production") {
-    return "https://juice-vibe-waskaduwa-api.vercel.app/api";
+    return "https://juice-vibeapi.up.railway.app/api";
   }
   return "http://localhost:4000/api";
 }
