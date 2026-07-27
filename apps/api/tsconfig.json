@@ -19,7 +19,8 @@
     "resolveJsonModule": true,
     "paths": {
       "@/*": ["src/*"]
-    }
+    },
+    "types": ["node", "express", "multer", "nodemailer", "passport-jwt", "qrcode", "bcryptjs"]
   },
   "include": ["src/**/*"]
 }
