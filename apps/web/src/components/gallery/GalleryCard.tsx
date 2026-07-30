@@ -13,7 +13,7 @@ interface GalleryCardProps {
   index: number;
 }
 
-const FALLBACK_IMAGE = "/images/MenuItems/FreshOrange.png";
+const FALLBACK_IMAGE = "/images/MenuItems/juice-orange.png";
 
 export function GalleryCard({ image, onOpen, index }: GalleryCardProps) {
   const [imgSrc, setImgSrc] = useState(image.src || FALLBACK_IMAGE);

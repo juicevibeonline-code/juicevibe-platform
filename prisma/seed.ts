@@ -79,13 +79,13 @@ async function main() {
   // ─── MILKSHAKES ───────────────────────────────────────────────
   const milkshakes = await getCategory("milkshakes");
   const milkshakeItems = [
-    { name: "Chocolate",      slug: "chocolate-milkshake",      description: "Rich & creamy chocolate milkshake",       price: 300, popular: true,  thumbnail: "/images/MenuItems/Milkshakes-Chocolate - LKR 300.png" },
-    { name: "Vanilla",        slug: "vanilla-milkshake",        description: "Classic vanilla bean milkshake",           price: 300,                thumbnail: "/images/MenuItems/Milkshakes-Vanilla - LKR 300.png" },
-    { name: "Strawberry",     slug: "strawberry-milkshake",     description: "Fresh strawberry milkshake",               price: 300,                thumbnail: "/images/MenuItems/Milkshakes-Strawberry.png" },
-    { name: "Mango",          slug: "mango-milkshake",          description: "Thick tropical mango milkshake",           price: 300, popular: true,  thumbnail: "/images/MenuItems/Milkshakes-Mango - LKR 300.00.png" },
-    { name: "Passion Fruit",  slug: "passion-fruit-milkshake",  description: "Tropical passion fruit milkshake",         price: 300,                thumbnail: "/images/MenuItems/Milkshakes-Passion Fruit.png" },
-    { name: "Banana",         slug: "banana-milkshake",         description: "Fresh banana & milk creamy shake",         price: 300,                thumbnail: "/images/MenuItems/Milkshakes-Banana.png" },
-    { name: "Date & Almond",  slug: "date-almond-milkshake",    description: "Healthy energy-boosting date & almond shake", price: 400, popular: true,  thumbnail: "/images/MenuItems/Milkshakes-Date-Almond.png" },
+    { name: "Chocolate",      slug: "chocolate-milkshake",      description: "Rich & creamy chocolate milkshake",       price: 300, popular: true,  thumbnail: "/images/MenuItems/milkshake-chocolate.png" },
+    { name: "Vanilla",        slug: "vanilla-milkshake",        description: "Classic vanilla bean milkshake",           price: 300,                thumbnail: "/images/MenuItems/milkshake-vanilla.png" },
+    { name: "Strawberry",     slug: "strawberry-milkshake",     description: "Fresh strawberry milkshake",               price: 300,                thumbnail: "/images/MenuItems/milkshake-strawberry.png" },
+    { name: "Mango",          slug: "mango-milkshake",          description: "Thick tropical mango milkshake",           price: 300, popular: true,  thumbnail: "/images/MenuItems/milkshake-mango.png" },
+    { name: "Passion Fruit",  slug: "passion-fruit-milkshake",  description: "Tropical passion fruit milkshake",         price: 300,                thumbnail: "/images/MenuItems/milkshake-passion-fruit.png" },
+    { name: "Banana",         slug: "banana-milkshake",         description: "Fresh banana & milk creamy shake",         price: 300,                thumbnail: "/images/MenuItems/milkshake-banana.png" },
+    { name: "Date & Almond",  slug: "date-almond-milkshake",    description: "Healthy energy-boosting date & almond shake", price: 400, popular: true,  thumbnail: "/images/MenuItems/milkshake-date-almond.png" },
   ];
   for (const item of milkshakeItems) {
     await upsertItem({ ...item, categoryId: milkshakes.id });
@@ -103,19 +103,19 @@ async function main() {
   // ─── FRESH JUICES ─────────────────────────────────────────────
   const freshJuices = await getCategory("fresh-juices");
   const juiceItems = [
-    { name: "Ambarella",     slug: "ambarella-juice",     description: "Freshly squeezed ambarella juice",          price: 250,                thumbnail: "/images/MenuItems/Ambarella.png" },
-    { name: "Avocado",       slug: "avocado-juice",       description: "Creamy fresh avocado juice",                price: 300,                thumbnail: "/images/MenuItems/FJAvocado.png" },
-    { name: "Coconut",       slug: "coconut-juice",       description: "Fresh tender coconut water",                price: 250,                thumbnail: "/images/MenuItems/FJCoconut.png" },
-    { name: "Grapes",        slug: "grapes-juice",        description: "Fresh pressed grape juice",                 price: 500, popular: true,  thumbnail: "/images/MenuItems/FreshJuicesGrapes.png" },
-    { name: "Lime",          slug: "lime-juice",          description: "Fresh lime juice with a hint of mint",      price: 200,                thumbnail: "/images/MenuItems/FreshJuicesLime.png" },
-    { name: "Mango",         slug: "mango-juice",         description: "Ripe mango pulp blended to perfection",    price: 300, popular: true,  thumbnail: "/images/MenuItems/FreshJuicesMango.png" },
-    { name: "Orange",        slug: "orange-juice",        description: "Freshly squeezed sweet oranges",           price: 400,                thumbnail: "/images/MenuItems/FreshOrange.png" },
-    { name: "Papaya",        slug: "papaya-juice",        description: "Creamy fresh papaya juice",                price: 250,                thumbnail: "/images/MenuItems/FreshJuicesPapaya.png" },
-    { name: "Passion Fruit", slug: "passion-fruit-juice", description: "Exotic passion fruit pulp juice",          price: 250,                thumbnail: "/images/MenuItems/FreshJuicesPassionFruit.jpg" },
-    { name: "Pineapple",     slug: "pineapple-juice",     description: "Sweet & tangy fresh pineapple juice",      price: 250,                thumbnail: "/images/MenuItems/FreshJuicesPineapple.png" },
-    { name: "Soursop",       slug: "soursop-juice",       description: "Fresh soursop juice — a tropical classic", price: 300, popular: true,  thumbnail: "/images/MenuItems/FreshJuicesSoursop.png" },
-    { name: "Watermelon",    slug: "watermelon-juice",    description: "Chilled refreshing watermelon juice",      price: 250,                thumbnail: "/images/MenuItems/FreshJuicesWatermelon.png" },
-    { name: "Wood Apple",    slug: "wood-apple-juice",    description: "Traditional Sri Lankan wood apple juice",  price: 300,                thumbnail: "/images/MenuItems/FreshJuicesWoodApple.png" },
+    { name: "Ambarella",     slug: "ambarella-juice",     description: "Freshly squeezed ambarella juice",          price: 250,                thumbnail: "/images/MenuItems/juice-ambarella.png" },
+    { name: "Avocado",       slug: "avocado-juice",       description: "Creamy fresh avocado juice",                price: 300,                thumbnail: "/images/MenuItems/juice-avocado.png" },
+    { name: "Coconut",       slug: "coconut-juice",       description: "Fresh tender coconut water",                price: 250,                thumbnail: "/images/MenuItems/juice-coconut.png" },
+    { name: "Grapes",        slug: "grapes-juice",        description: "Fresh pressed grape juice",                 price: 500, popular: true,  thumbnail: "/images/MenuItems/juice-grapes.png" },
+    { name: "Lime",          slug: "lime-juice",          description: "Fresh lime juice with a hint of mint",      price: 200,                thumbnail: "/images/MenuItems/juice-lime.png" },
+    { name: "Mango",         slug: "mango-juice",         description: "Ripe mango pulp blended to perfection",    price: 300, popular: true,  thumbnail: "/images/MenuItems/juice-mango.png" },
+    { name: "Orange",        slug: "orange-juice",        description: "Freshly squeezed sweet oranges",           price: 400,                thumbnail: "/images/MenuItems/juice-orange.png" },
+    { name: "Papaya",        slug: "papaya-juice",        description: "Creamy fresh papaya juice",                price: 250,                thumbnail: "/images/MenuItems/juice-papaya.png" },
+    { name: "Passion Fruit", slug: "passion-fruit-juice", description: "Exotic passion fruit pulp juice",          price: 250,                thumbnail: "/images/MenuItems/juice-passion-fruit.jpg" },
+    { name: "Pineapple",     slug: "pineapple-juice",     description: "Sweet & tangy fresh pineapple juice",      price: 250,                thumbnail: "/images/MenuItems/juice-pineapple.png" },
+    { name: "Soursop",       slug: "soursop-juice",       description: "Fresh soursop juice — a tropical classic", price: 300, popular: true,  thumbnail: "/images/MenuItems/juice-soursop.png" },
+    { name: "Watermelon",    slug: "watermelon-juice",    description: "Chilled refreshing watermelon juice",      price: 250,                thumbnail: "/images/MenuItems/juice-watermelon.png" },
+    { name: "Wood Apple",    slug: "wood-apple-juice",    description: "Traditional Sri Lankan wood apple juice",  price: 300,                thumbnail: "/images/MenuItems/juice-wood-apple.png" },
   ];
   for (const item of juiceItems) {
     await upsertItem({ ...item, categoryId: freshJuices.id });
@@ -135,14 +135,14 @@ async function main() {
       description: "Avocado, Dates, Milk, Treacle",
       price: 450, popular: true, featured: true,
       ingredients: ["Avocado", "Dates", "Milk", "Treacle"],
-      thumbnail: "/images/MenuItems/Special Smoothies-AandD.png",
+      thumbnail: "/images/MenuItems/smoothie-avocado-dates.png",
     },
     {
       name: "Wood Apple Zest",  slug: "wood-apple-zest-smoothie",
       description: "Wood Apple, Coconut Milk, Jaggery",
       price: 400,
       ingredients: ["Wood Apple", "Coconut Milk", "Jaggery"],
-      thumbnail: "/images/MenuItems/Special Smoothies-Wood Apple Zest.png",
+      thumbnail: "/images/MenuItems/smoothie-wood-apple-zest.png",
     },
   ];
   for (const item of smoothieItems) {
@@ -152,10 +152,10 @@ async function main() {
   // ─── LASSI ────────────────────────────────────────────────────
   const lassi = await getCategory("lassi");
   const lassiItems = [
-    { name: "Classic",      slug: "classic-lassi",       description: "Traditional sweet creamy yogurt drink",  price: 400,                thumbnail: "/images/MenuItems/LassiClassic - LKR 400.00.png" },
-    { name: "Mango",        slug: "mango-lassi",         description: "Mango pulp blended with fresh yogurt",   price: 400, popular: true,  thumbnail: "/images/MenuItems/Lassi-Mango - LKR 400.00.png" },
-    { name: "Passion Fruit",slug: "passion-fruit-lassi", description: "Passion fruit & yogurt blend",           price: 400,                thumbnail: "/images/MenuItems/Lassi-Passion Fruit - LKR 400.00.png" },
-    { name: "Orange",       slug: "orange-lassi",        description: "Orange yogurt refresher",                price: 400,                thumbnail: "/images/MenuItems/Lassi-Orange - LKR 400.00.png" },
+    { name: "Classic",      slug: "classic-lassi",       description: "Traditional sweet creamy yogurt drink",  price: 400,                thumbnail: "/images/MenuItems/lassi-classic.png" },
+    { name: "Mango",        slug: "mango-lassi",         description: "Mango pulp blended with fresh yogurt",   price: 400, popular: true,  thumbnail: "/images/MenuItems/lassi-mango.png" },
+    { name: "Passion Fruit",slug: "passion-fruit-lassi", description: "Passion fruit & yogurt blend",           price: 400,                thumbnail: "/images/MenuItems/lassi-passion-fruit.png" },
+    { name: "Orange",       slug: "orange-lassi",        description: "Orange yogurt refresher",                price: 400,                thumbnail: "/images/MenuItems/lassi-orange.png" },
   ];
   for (const item of lassiItems) {
     await upsertItem({ ...item, categoryId: lassi.id });
@@ -164,11 +164,11 @@ async function main() {
   // ─── TEA ──────────────────────────────────────────────────────
   const tea = await getCategory("tea");
   const teaItems = [
-    { name: "English Breakfast Tea", slug: "english-breakfast-tea", description: "Classic robust English breakfast tea",  price: 100, thumbnail: "/images/MenuItems/Tea-English Breakfast Tea - LKR 100.00.png" },
-    { name: "Green Tea",             slug: "green-tea",             description: "Light & refreshing green tea",          price: 100, thumbnail: "/images/MenuItems/Tea-Green Tea - LKR 100.00.png" },
-    { name: "Ginger Tea",            slug: "ginger-tea",            description: "Spiced warming ginger tea",             price: 100, popular: true, thumbnail: "/images/MenuItems/Ginger Tea - LKR 100.00.png" },
-    { name: "Lemon Tea",             slug: "lemon-tea",             description: "Black tea with fresh lemon zest",       price: 100, thumbnail: "/images/MenuItems/Lemon Tea - LKR 100.00.png" },
-    { name: "Mint Tea",              slug: "mint-tea",              description: "Cooling fresh mint herbal tea",         price: 100, thumbnail: "/images/MenuItems/Mint Tea - LKR 100.00.png" },
+    { name: "English Breakfast Tea", slug: "english-breakfast-tea", description: "Classic robust English breakfast tea",  price: 100, thumbnail: "/images/MenuItems/tea-english-breakfast.png" },
+    { name: "Green Tea",             slug: "green-tea",             description: "Light & refreshing green tea",          price: 100, thumbnail: "/images/MenuItems/tea-green.png" },
+    { name: "Ginger Tea",            slug: "ginger-tea",            description: "Spiced warming ginger tea",             price: 100, popular: true, thumbnail: "/images/MenuItems/tea-ginger.png" },
+    { name: "Lemon Tea",             slug: "lemon-tea",             description: "Black tea with fresh lemon zest",       price: 100, thumbnail: "/images/MenuItems/tea-lemon.png" },
+    { name: "Mint Tea",              slug: "mint-tea",              description: "Cooling fresh mint herbal tea",         price: 100, thumbnail: "/images/MenuItems/tea-mint.png" },
   ];
   for (const item of teaItems) {
     await upsertItem({ ...item, categoryId: tea.id });
@@ -177,9 +177,9 @@ async function main() {
   // ─── COFFEE ───────────────────────────────────────────────────
   const coffee = await getCategory("coffee");
   const coffeeItems = [
-    { name: "Americano",  slug: "americano",  description: "Bold espresso with hot water",               price: 200, thumbnail: "/images/MenuItems/Americano - LKR 200.00.png" },
-    { name: "Espresso",   slug: "espresso",   description: "Rich double-shot espresso",                  price: 200, thumbnail: "/images/MenuItems/Coffee-Espresso - LKR 200.00.png" },
-    { name: "Cappuccino", slug: "cappuccino", description: "Espresso with velvety frothy milk",          price: 300, popular: true, thumbnail: "/images/MenuItems/Coffee-Cappuccino - LKR 300.00.png" },
+    { name: "Americano",  slug: "americano",  description: "Bold espresso with hot water",               price: 200, thumbnail: "/images/MenuItems/coffee-americano.png" },
+    { name: "Espresso",   slug: "espresso",   description: "Rich double-shot espresso",                  price: 200, thumbnail: "/images/MenuItems/coffee-espresso.png" },
+    { name: "Cappuccino", slug: "cappuccino", description: "Espresso with velvety frothy milk",          price: 300, popular: true, thumbnail: "/images/MenuItems/coffee-cappuccino.png" },
   ];
   for (const item of coffeeItems) {
     await upsertItem({ ...item, categoryId: coffee.id });
@@ -198,14 +198,14 @@ async function main() {
       name: "Classic Virgin Mojito", slug: "classic-virgin-mojito",
       description: "Mint, lime, soda & sugar — the timeless classic",
       price: 400, popular: true,
-      thumbnail: "/images/MenuItems/Mocktails-Classic Virgin Mojito - LKR 400.00.png",
+      thumbnail: "/images/MenuItems/mocktail-classic-virgin-mojito.png",
     },
     {
       name: "Flavoured Mojito", slug: "flavoured-mojito",
       description: "Choose your flavour: Mango · Mandarin · Passion Fruit · Blackcurrant",
       price: 400,
       tags: ["Mango", "Mandarin", "Passion Fruit", "Blackcurrant"],
-      thumbnail: "/images/MenuItems/Mocktails-Flavoured Mojito.png",
+      thumbnail: "/images/MenuItems/mocktail-flavoured-mojito.png",
     },
   ];
   for (const item of mocktailItems) {
@@ -219,17 +219,17 @@ async function main() {
       name: "Jaggery & Cashew Dream", slug: "jaggery-cashew-dream",
       description: "Traditional jaggery with premium cashew nuts & ice cream",
       price: 500, popular: true, featured: true,
-      thumbnail: "/images/MenuItems/Jaggery & Cashew Dream - LKR 500.00.jpg",
+      thumbnail: "/images/MenuItems/icecream-jaggery-cashew-dream.jpg",
     },
-    { name: "Banana Boat",                slug: "banana-boat",                 description: "Banana split with ice cream & indulgent toppings", price: 500, thumbnail: "/images/MenuItems/IceCream-BananaBoat.png" },
-    { name: "Fruit Salad",               slug: "fruit-salad",                 description: "Fresh seasonal tropical fruit salad",              price: 300, thumbnail: "/images/MenuItems/IceCream-FruitSalad.png" },
-    { name: "Fruit Salad with Ice Cream",slug: "fruit-salad-with-ice-cream",  description: "Fresh fruit salad topped with creamy ice cream",   price: 350, thumbnail: "/images/MenuItems/IceCream-FruitSaladWithIceCream.png" },
+    { name: "Banana Boat",                slug: "banana-boat",                 description: "Banana split with ice cream & indulgent toppings", price: 500, thumbnail: "/images/MenuItems/icecream-banana-boat.png" },
+    { name: "Fruit Salad",               slug: "fruit-salad",                 description: "Fresh seasonal tropical fruit salad",              price: 300, thumbnail: "/images/MenuItems/icecream-fruit-salad.png" },
+    { name: "Fruit Salad with Ice Cream",slug: "fruit-salad-with-ice-cream",  description: "Fresh fruit salad topped with creamy ice cream",   price: 350, thumbnail: "/images/MenuItems/icecream-fruit-salad-with-icecream.png" },
     {
       name: "Choice of Ice Cream (3 Scoops)", slug: "ice-cream-3-scoops",
       description: "Mix & match: Vanilla · Chocolate · Strawberry · Fruit & Nut · Mango",
       price: 350,
       tags: ["Vanilla", "Chocolate", "Strawberry", "Fruit & Nut", "Mango"],
-      thumbnail: "/images/MenuItems/IceCream-3Scoops.png",
+      thumbnail: "/images/MenuItems/icecream-3-scoops.png",
     },
   ];
   for (const item of iceCreamItems) {
@@ -239,8 +239,8 @@ async function main() {
   // ─── BURGERS ──────────────────────────────────────────────────
   const burgers = await getCategory("burgers");
   const burgerItems = [
-    { name: "Chicken Burger",            slug: "chicken-burger",      description: "Grilled chicken patty with fresh toppings",    price: 400, popular: true, thumbnail: "/images/MenuItems/Burgers-ChickenBurger.png" },
-    { name: "Vegetable & Cheese Burger", slug: "veg-cheese-burger",   description: "Crispy veggie patty with melted cheese",       price: 300,                thumbnail: "/images/MenuItems/Burgers-VegCheeseBurger.png" },
+    { name: "Chicken Burger",            slug: "chicken-burger",      description: "Grilled chicken patty with fresh toppings",    price: 400, popular: true, thumbnail: "/images/MenuItems/burger-chicken.png" },
+    { name: "Vegetable & Cheese Burger", slug: "veg-cheese-burger",   description: "Crispy veggie patty with melted cheese",       price: 300,                thumbnail: "/images/MenuItems/burger-veg-cheese.png" },
   ];
   for (const item of burgerItems) {
     await upsertItem({ ...item, categoryId: burgers.id });
@@ -249,8 +249,8 @@ async function main() {
   // ─── SANDWICHES ───────────────────────────────────────────────
   const sandwiches = await getCategory("sandwiches");
   const sandwichItems = [
-    { name: "Cheese & Tomato Sandwich",       slug: "cheese-tomato-sandwich",      description: "Grilled cheese with fresh ripe tomato",          price: 250,                thumbnail: "/images/MenuItems/Sandwiches-CheeseTomato.png" },
-    { name: "Chicken Ham & Cheese Sandwich",  slug: "chicken-ham-cheese-sandwich", description: "Chicken ham with melted cheese on toasted bread", price: 300, popular: true,  thumbnail: "/images/MenuItems/Sandwiches-ChickenHamCheese.png" },
+    { name: "Cheese & Tomato Sandwich",       slug: "cheese-tomato-sandwich",      description: "Grilled cheese with fresh ripe tomato",          price: 250,                thumbnail: "/images/MenuItems/sandwich-cheese-tomato.png" },
+    { name: "Chicken Ham & Cheese Sandwich",  slug: "chicken-ham-cheese-sandwich", description: "Chicken ham with melted cheese on toasted bread", price: 300, popular: true,  thumbnail: "/images/MenuItems/sandwich-chicken-ham-cheese.png" },
   ];
   for (const item of sandwichItems) {
     await upsertItem({ ...item, categoryId: sandwiches.id });
@@ -297,15 +297,15 @@ async function main() {
   const galleryDefs = [
     { src: "/images/MenuItems/tropical_smoothie_bowl.png", alt: "Tropical Dragonfruit Smoothie Bowl", category: "smoothies", width: 800, height: 600 },
     { src: "/images/MenuItems/passionfruit_mojito_mocktail.png", alt: "Refreshing Passion Fruit Mojito Mocktail", category: "mocktails", width: 800, height: 600 },
-    { src: "/images/MenuItems/FreshOrange.png", alt: "Freshly Squeezed Orange Juice", category: "fresh-juices", width: 800, height: 600 },
-    { src: "/images/MenuItems/FJAvocado.png", alt: "Creamy Avocado Juice", category: "fresh-juices", width: 800, height: 600 },
-    { src: "/images/MenuItems/Special Smoothies-AandD.png", alt: "Avocado & Dates Special Smoothie", category: "smoothies", width: 800, height: 600 },
-    { src: "/images/MenuItems/Mocktails-Classic Virgin Mojito - LKR 400.00.png", alt: "Classic Virgin Mojito", category: "mocktails", width: 800, height: 600 },
-    { src: "/images/MenuItems/Burgers-ChickenBurger.png", alt: "Gourmet Chicken Burger", category: "burgers", width: 800, height: 600 },
-    { src: "/images/MenuItems/Sandwiches-ChickenHamCheese.png", alt: "Toasted Chicken Ham & Cheese Sandwich", category: "sandwiches", width: 800, height: 600 },
-    { src: "/images/MenuItems/Coffee-Cappuccino - LKR 300.00.png", alt: "Frothy Cappuccino", category: "coffee", width: 800, height: 600 },
-    { src: "/images/MenuItems/Milkshakes-Chocolate - LKR 300.png", alt: "Rich Chocolate Milkshake", category: "milkshakes", width: 800, height: 600 },
-    { src: "/images/MenuItems/Jaggery & Cashew Dream - LKR 500.00.jpg", alt: "Jaggery & Cashew Dream Ice Cream", category: "ice-cream", width: 800, height: 600 },
+    { src: "/images/MenuItems/juice-orange.png", alt: "Freshly Squeezed Orange Juice", category: "fresh-juices", width: 800, height: 600 },
+    { src: "/images/MenuItems/juice-avocado.png", alt: "Creamy Avocado Juice", category: "fresh-juices", width: 800, height: 600 },
+    { src: "/images/MenuItems/smoothie-avocado-dates.png", alt: "Avocado & Dates Special Smoothie", category: "smoothies", width: 800, height: 600 },
+    { src: "/images/MenuItems/mocktail-classic-virgin-mojito.png", alt: "Classic Virgin Mojito", category: "mocktails", width: 800, height: 600 },
+    { src: "/images/MenuItems/burger-chicken.png", alt: "Gourmet Chicken Burger", category: "burgers", width: 800, height: 600 },
+    { src: "/images/MenuItems/sandwich-chicken-ham-cheese.png", alt: "Toasted Chicken Ham & Cheese Sandwich", category: "sandwiches", width: 800, height: 600 },
+    { src: "/images/MenuItems/coffee-cappuccino.png", alt: "Frothy Cappuccino", category: "coffee", width: 800, height: 600 },
+    { src: "/images/MenuItems/milkshake-chocolate.png", alt: "Rich Chocolate Milkshake", category: "milkshakes", width: 800, height: 600 },
+    { src: "/images/MenuItems/icecream-jaggery-cashew-dream.jpg", alt: "Jaggery & Cashew Dream Ice Cream", category: "ice-cream", width: 800, height: 600 },
     { src: "/images/Opening/Opening.png", alt: "Juice Vibe Waskaduwa Cafe Atmosphere", category: "general", width: 800, height: 600 },
   ];
 
