@@ -58,10 +58,10 @@ export function getApiBaseUrl(): string {
     window.location.hostname !== "localhost" &&
     window.location.hostname !== "127.0.0.1"
   ) {
-    return "https://juice-vibeapi.up.railway.app/api";
+    return "https://api.juicevibe.lk/api";
   }
   if (process.env.NODE_ENV === "production") {
-    return "https://juice-vibeapi.up.railway.app/api";
+    return "https://api.juicevibe.lk/api";
   }
   return "http://localhost:4000/api";
 }
@@ -77,10 +77,10 @@ export const apiConfig = {
       window.location.hostname !== "localhost" &&
       window.location.hostname !== "127.0.0.1"
     ) {
-      return "https://juice-vibeapi.up.railway.app";
+      return "https://api.juicevibe.lk";
     }
     if (process.env.NODE_ENV === "production") {
-      return "https://juice-vibeapi.up.railway.app";
+      return "https://api.juicevibe.lk";
     }
     return "http://localhost:4000";
   },
