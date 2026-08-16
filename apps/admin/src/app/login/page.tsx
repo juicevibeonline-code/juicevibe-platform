@@ -57,7 +57,10 @@ export default function LoginPage() {
       }
     } catch (err: any) {
       console.error("Login failure:", err);
-      const detail = err.response?.data?.message || "Invalid credentials or server unavailable.";
+      const serverMsg = err.response?.data?.message;
+      const detail = Array.isArray(serverMsg) 
+        ? serverMsg.join(", ") 
+        : (typeof serverMsg === "string" ? serverMsg : (err.message || "Invalid credentials or server unavailable."));
       setErrorMsg(detail);
     } finally {
       setLoading(false);
