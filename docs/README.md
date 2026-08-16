@@ -22,6 +22,7 @@ This documentation suite has been engineered to enterprise software standards (e
 - [05-deployment-guide.md](05-deployment-guide.md) — Production Vercel & Docker Deployment Guide
 - [06-environment-setup.md](06-environment-setup.md) — Developer & Staging Environment Setup
 - [07-production-checklist.md](07-production-checklist.md) — Pre-flight Go-Live Inspection Checklist
+- [27-production-deployment-checklist.md](27-production-deployment-checklist.md) — **Master Production Deployment TODO Checklist (Phases 01-12)**
 - [08-security-guide.md](08-security-guide.md) — JWT Authentication, CORS, Rate Limiting & Security Controls
 - [13-backup-recovery.md](13-backup-recovery.md) — Point-In-Time Database Backup & Disaster Recovery Plan
 - [14-hosting-guide.md](14-hosting-guide.md) — 3-Tier Production Hosting Cost & Performance Analysis
@@ -44,6 +45,7 @@ This documentation suite has been engineered to enterprise software standards (e
 - [23-acceptance-test-report.md](23-acceptance-test-report.md) — Quality Assurance & Acceptance Test Execution Report
 - [24-production-readiness.md](24-production-readiness.md) — Production Readiness Certificate
 - [25-project-signoff.md](25-project-signoff.md) — Final Project Delivery Sign-Off Certificate
+- [26-domain-registration-letter-register-lk.md](26-domain-registration-letter-register-lk.md) — Authorization Letter for `juicevibe.lk` Domain Registration
 
 ### 📜 System History
 - [CHANGELOG.md](CHANGELOG.md) — Master Release & Version History

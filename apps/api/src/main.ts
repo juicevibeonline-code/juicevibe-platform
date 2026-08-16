@@ -58,13 +58,13 @@ async function bootstrap() {
       // Allow local development origins (localhost or 127.0.0.1 on any port) dynamically
       const isLocalhost = /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin);
       
-      // Allow any vercel.app, netlify.app, railway.app, or .lk domain automatically
+      // Allow any vercel.app, netlify.app, railway.app, or juicevibe.lk domain automatically
       if (
+        origin.includes("juicevibe.lk") ||
         origin.endsWith(".vercel.app") ||
         origin.endsWith(".netlify.app") ||
         origin.endsWith(".railway.app") ||
         origin.endsWith(".up.railway.app") ||
-        origin.endsWith("juicevibe.lk") ||
         origin.endsWith(".lk") ||
         allowedOrigins.includes(origin) ||
         isLocalhost
@@ -75,7 +75,17 @@ async function bootstrap() {
     },
     credentials: true,
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
+    allowedHeaders: [
+      "Content-Type",
+      "Authorization",
+      "Accept",
+      "X-Requested-With",
+      "Origin",
+      "Access-Control-Allow-Origin",
+      "Access-Control-Allow-Headers",
+      "Access-Control-Request-Method",
+      "Access-Control-Request-Headers",
+    ],
   });
 
   app.useGlobalPipes(
