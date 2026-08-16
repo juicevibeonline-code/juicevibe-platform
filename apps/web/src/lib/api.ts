@@ -1,19 +1,7 @@
+import { getApiBaseUrl } from "@juice-vibe/config";
+
 export function getApiUrl(): string {
-  if (process.env.NEXT_PUBLIC_API_URL) {
-    const raw = process.env.NEXT_PUBLIC_API_URL;
-    return raw.endsWith("/api") ? raw : `${raw}/api`;
-  }
-  if (
-    typeof window !== "undefined" &&
-    window.location.hostname !== "localhost" &&
-    window.location.hostname !== "127.0.0.1"
-  ) {
-    return "https://juice-vibeapi.up.railway.app/api";
-  }
-  if (process.env.NODE_ENV === "production") {
-    return "https://juice-vibeapi.up.railway.app/api";
-  }
-  return "http://localhost:4000/api";
+  return getApiBaseUrl();
 }
 
 export interface CreateOrderPayload {

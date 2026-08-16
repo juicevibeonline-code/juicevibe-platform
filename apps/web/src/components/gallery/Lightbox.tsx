@@ -16,7 +16,7 @@ interface LightboxProps {
 
 export function Lightbox({ images, currentIndex, onClose, onPrev, onNext }: LightboxProps) {
   const current = images[currentIndex];
-  const [imgSrc, setImgSrc] = useState(current?.src || "/images/MenuItems/FreshOrange.png");
+  const [imgSrc, setImgSrc] = useState(current?.src || "/images/MenuItems/juice-orange.png");
 
   useEffect(() => {
     if (current?.src) {
@@ -100,7 +100,7 @@ export function Lightbox({ images, currentIndex, onClose, onPrev, onNext }: Ligh
               className="object-contain"
               sizes="100vw"
               priority
-              onError={() => setImgSrc("/images/MenuItems/FreshOrange.png")}
+              onError={() => setImgSrc("/images/MenuItems/juice-orange.png")}
             />
           </div>
           <div className="mt-4 text-center">

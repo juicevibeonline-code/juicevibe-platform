@@ -12,9 +12,9 @@ The **Juice Vibe Monorepo** is deployed across cloud serverless and containerize
 
 | Service | Application | Host / Platform | Live URL | Status | Health Check |
 | :--- | :--- | :--- | :--- | :---: | :---: |
-| **Backend API** | `@juice-vibe/api` | **Railway** (Docker / Node 20) | [`https://juice-vibeapi.up.railway.app/api`](https://juice-vibeapi.up.railway.app/api) | 🟢 `200 OK` | `{"status":"ok"}` |
-| **Web Storefront** | `@juice-vibe/web` | **Netlify** (Next.js 16 / React 19) | [`https://juicevibeonline.netlify.app`](https://juicevibeonline.netlify.app) | 🟢 `200 OK` | Storefront Loaded |
-| **Admin Dashboard** | `@juice-vibe/admin` | **Netlify** (Next.js 16 / React 19) | [`https://juicevibeonline-admin.netlify.app/login`](https://juicevibeonline-admin.netlify.app/login) | 🟢 `200 OK` | Mission Control Loaded |
+| **Backend API** | `@juice-vibe/api` | **Railway** (Docker / Node 20) | [`https://api.juicevibe.lk/api`](https://api.juicevibe.lk/api) *(Fallback: [`https://juice-vibeapi.up.railway.app/api`](https://juice-vibeapi.up.railway.app/api))* | 🟢 `200 OK` | `{"status":"ok"}` |
+| **Web Storefront** | `@juice-vibe/web` | **Vercel** (Next.js 16 / React 19) | [`https://www.juicevibe.lk`](https://www.juicevibe.lk) / [`https://juicevibe.lk`](https://juicevibe.lk) | 🟢 `200 OK` | Storefront Loaded |
+| **Admin Dashboard** | `@juice-vibe/admin` | **Vercel** (Next.js 16 / React 19) | [`https://admin.juicevibe.lk/login`](https://admin.juicevibe.lk/login) | 🟢 `200 OK` | Mission Control Loaded |
 
 ---
 

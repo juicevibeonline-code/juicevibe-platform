@@ -556,7 +556,7 @@ export default function MenuCatalog() {
                   </label>
                   <input
                     type="text"
-                    placeholder="/images/MenuItems/Ambarella.png or https://..."
+                    placeholder="/images/MenuItems/juice-ambarella.png or https://..."
                     className="w-full bg-ink-dark border border-border text-foreground font-mono text-[10px] px-2.5 py-1.5 rounded focus:outline-none focus:border-primary/50"
                     {...register("thumbnail")}
                   />

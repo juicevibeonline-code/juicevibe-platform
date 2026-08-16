@@ -1,4 +1,4 @@
 {
-  "installCommand": "pnpm install",
+  "installCommand": "npx pnpm@9.15.4 install",
   "buildCommand": "turbo build"
 }

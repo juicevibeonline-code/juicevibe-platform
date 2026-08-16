@@ -6,6 +6,10 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: "https",
+        hostname: "api.juicevibe.lk",
+      },
+      {
+        protocol: "https",
         hostname: "res.cloudinary.com",
       },
       {
