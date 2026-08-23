@@ -276,7 +276,7 @@ async function main() {
     { key: "business_name",           value: "Juice Vibe" },
     { key: "business_tagline",        value: "Sip the Good Vibes" },
     { key: "business_phone",          value: "+94718435876" },
-    { key: "business_email",          value: "hello@juicevibe.com" },
+    { key: "business_email",          value: "juicevibeonline@.com" },
     { key: "business_address",        value: "No.89 Bandaragama Road, Waskaduwa, Sri Lanka, 12580" },
     { key: "opening_hours_weekdays",  value: "8:00 AM - 10:00 PM" },
     { key: "opening_hours_saturday",  value: "9:00 AM - 11:00 PM" },

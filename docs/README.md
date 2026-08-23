@@ -30,6 +30,7 @@ This directory contains the essential technical architecture, deployment specifi
 - [status.md](status.md) — System Operational Status & Monitoring
 
 ### 📖 Operating Manuals & Technical Guides
+- [CLIENT_MEETING_AND_HANDOVER_PLAYBOOK.md](CLIENT_MEETING_AND_HANDOVER_PLAYBOOK.md) — 👑 Client Executive Handover & Business Launch Playbook
 - [08-security-guide.md](08-security-guide.md) — JWT Authentication, CORS, Rate Limiting & RBAC Security Controls
 - [09-admin-manual.md](09-admin-manual.md) — Operations Manual for Café Management & Staff
 - [10-client-user-guide.md](10-client-user-guide.md) — Customer Storefront & QR Order User Manual
