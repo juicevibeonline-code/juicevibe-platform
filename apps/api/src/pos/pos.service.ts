@@ -178,6 +178,39 @@ export class PosService {
         });
       }
 
+      // Auto-deplete raw inventory ingredients based on recipes
+      const menuItemIds = input.items.map((i) => i.menuItemId);
+      const recipes = await tx.recipe.findMany({
+        where: { menuItemId: { in: menuItemIds }, isActive: true },
+        include: { ingredients: true },
+      });
+
+      for (const item of input.items) {
+        const recipe = recipes.find((r) => r.menuItemId === item.menuItemId);
+        if (recipe && recipe.ingredients.length > 0) {
+          for (const ing of recipe.ingredients) {
+            const deductQty = item.quantity * ing.quantity * (1 + (ing.wastageFactor || 0));
+            await tx.inventoryItem.update({
+              where: { id: ing.inventoryItemId },
+              data: {
+                quantity: { decrement: deductQty },
+              },
+            });
+
+            await tx.inventoryTransaction.create({
+              data: {
+                inventoryItemId: ing.inventoryItemId,
+                type: "SALE",
+                quantity: -deductQty,
+                referenceId: createdOrder.id,
+                notes: `Auto-depleted for Order #${orderNumber} (${item.quantity}x)`,
+                actorId: cashierId,
+              },
+            });
+          }
+        }
+      }
+
       // Log Audit Event
       await tx.auditLog.create({
         data: {
@@ -193,6 +226,7 @@ export class PosService {
 
       return createdOrder;
     });
+
 
     // 6. Broadcast Real-Time WebSocket Event to KDS and Order Desks
     this.ordersGateway.emitNewOrder(order);

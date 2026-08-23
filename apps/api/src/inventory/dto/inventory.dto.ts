@@ -64,3 +64,65 @@ export class UpdateInventoryDto {
   @IsOptional()
   expiryDate?: string;
 }
+
+export class RecipeIngredientInputDto {
+  @ApiProperty({ example: "inv_123" })
+  @IsString()
+  inventoryItemId: string;
+
+  @ApiProperty({ example: 0.15, description: "Quantity in ingredient's base unit" })
+  @IsNumber()
+  @Min(0.0001)
+  quantity: number;
+
+  @ApiPropertyOptional({ example: 0.05, description: "Wastage factor percentage" })
+  @IsNumber()
+  @IsOptional()
+  @Min(0)
+  wastageFactor?: number;
+}
+
+export class SaveRecipeDto {
+  @ApiProperty({ example: "item_123" })
+  @IsString()
+  menuItemId: string;
+
+  @ApiPropertyOptional({ example: 1.0 })
+  @IsNumber()
+  @IsOptional()
+  @Min(0.1)
+  yieldServings?: number;
+
+  @ApiProperty({ type: [RecipeIngredientInputDto] })
+  ingredients: RecipeIngredientInputDto[];
+}
+
+export class StockMovementDto {
+  @ApiProperty({ example: "inv_123" })
+  @IsString()
+  inventoryItemId: string;
+
+  @ApiProperty({ example: "PURCHASE", enum: ["PURCHASE", "WASTAGE", "ADJUSTMENT", "TRANSFER", "RETURN"] })
+  @IsString()
+  type: string;
+
+  @ApiProperty({ example: 5.0, description: "Quantity to add (positive) or deduct" })
+  @IsNumber()
+  quantity: number;
+
+  @ApiPropertyOptional({ example: 250.0, description: "Unit purchase cost in LKR" })
+  @IsNumber()
+  @IsOptional()
+  unitCost?: number;
+
+  @ApiPropertyOptional({ example: "PO-8942" })
+  @IsString()
+  @IsOptional()
+  referenceId?: string;
+
+  @ApiPropertyOptional({ example: "Supplier batch delivery" })
+  @IsString()
+  @IsOptional()
+  notes?: string;
+}
+

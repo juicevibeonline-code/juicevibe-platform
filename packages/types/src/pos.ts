@@ -50,6 +50,7 @@ export interface AuditLog {
 export interface Recipe {
   id: string;
   menuItemId: string;
+  menuItem?: import("./menu").MenuItem;
   yieldServings: number;
   isActive: boolean;
   ingredients: RecipeIngredient[];
@@ -59,6 +60,7 @@ export interface RecipeIngredient {
   id: string;
   recipeId: string;
   inventoryItemId: string;
+  inventoryItem?: import("./inventory").InventoryItem;
   inventoryItemName?: string;
   quantity: number;
   unit?: string;
@@ -68,6 +70,7 @@ export interface RecipeIngredient {
 export interface InventoryTransaction {
   id: string;
   inventoryItemId: string;
+  inventoryItem?: import("./inventory").InventoryItem;
   type: InventoryTxType;
   quantity: number;
   unitCost?: number;
@@ -76,6 +79,7 @@ export interface InventoryTransaction {
   actorId?: string;
   createdAt: string;
 }
+
 
 export interface CreatePosOrderInput {
   items: {
