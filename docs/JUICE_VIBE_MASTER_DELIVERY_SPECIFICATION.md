@@ -246,9 +246,11 @@ The developer warrants that the delivered codebase operates free of reproducible
 | :--- | ---: | ---: |
 | Complete Monorepo System (Web + Admin + API + DB) | 180,000.00 | 180,000.00 |
 | **Special Project Discount** | | **(150,000.00)** |
-| **FINAL AGREED DEVELOPMENT FEE** | | **LKR 30,000.00** |
-| *Advance Payment Paid* | | *LKR 10,000.00* |
-| **FINAL BALANCE DUE UPON HANDOVER** | | **LKR 20,000.00** |
+| **AGREED DEVELOPMENT FEE** | | **LKR 30,000.00** |
+| **CLOUD DEPLOYMENT & DOMAIN SETUP FEE** | | **LKR 10,000.00** |
+| **TOTAL COMMERCIAL PROJECT VALUE** | | **LKR 40,000.00** |
+| *Advance Payment Paid* | | *(LKR 10,000.00)* |
+| **FINAL BALANCE DUE UPON HANDOVER** | | **LKR 30,000.00** |
 
 ---
 
