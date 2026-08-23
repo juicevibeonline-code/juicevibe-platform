@@ -41,3 +41,8 @@ coverage/
 # Misc
 *.tsbuildinfo
 next-env.d.ts
+
+# Client Handover & Commercial Archive (Local Only)
+docs/NewDocs/
+NewDocs/
+
