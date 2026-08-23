@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, UseGuards, Delete } from "@nestjs/common";
+import { Controller, Get, Post, Patch, Body, Param, UseGuards, Delete } from "@nestjs/common";
 import { ApiTags, ApiBearerAuth, ApiOperation } from "@nestjs/swagger";
 import { TableService } from "./table.service";
 import { CreateTableDto } from "./dto/create-table.dto";
@@ -44,6 +44,16 @@ export class TableController {
     return ApiResponseDto.ok(table);
   }
 
+  @Patch(":id/status")
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles("admin", "manager", "cashier", "kitchen")
+  @ApiBearerAuth()
+  @ApiOperation({ summary: "Update table floor state (available/occupied/bill_requested/paying)" })
+  async updateStatus(@Param("id") id: string, @Body() body: { status: string }) {
+    const table = await this.tableService.updateTableStatus(id, body.status);
+    return ApiResponseDto.ok(table, "Table status updated successfully");
+  }
+
   @Delete(":id")
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles("admin", "manager")
@@ -54,4 +64,5 @@ export class TableController {
     return ApiResponseDto.ok(null, "Table deleted successfully");
   }
 }
+
 

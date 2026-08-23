@@ -3,12 +3,34 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { tableService } from "@juice-vibe/services";
 import { formatDate } from "@juice-vibe/utils";
-import { QrCode, Plus, Trash2, Printer, Loader2, RefreshCw, Smartphone, Utensils, BookOpen, ShoppingBag, ChefHat, Heart } from "lucide-react";
+import { 
+  QrCode, 
+  Plus, 
+  Trash2, 
+  Printer, 
+  Loader2, 
+  RefreshCw, 
+  Smartphone, 
+  Utensils, 
+  BookOpen, 
+  ShoppingBag, 
+  ChefHat, 
+  Heart,
+  LayoutGrid,
+  List,
+  CreditCard,
+  Users,
+  CheckCircle2,
+  Clock
+} from "lucide-react";
 import React, { useState } from "react";
-import { Button, Modal } from "@juice-vibe/ui";
+import { useRouter } from "next/navigation";
+import { Button, Modal, Badge } from "@juice-vibe/ui";
 
 export default function TablesManagement() {
+  const router = useRouter();
   const queryClient = useQueryClient();
+  const [viewMode, setViewMode] = useState<"canvas" | "directory">("canvas");
   const [newTableNumber, setNewTableNumber] = useState<string>("");
   const [isPrintModalOpen, setIsPrintModalOpen] = useState(false);
   const [selectedTable, setSelectedTable] = useState<any>(null);
@@ -18,6 +40,17 @@ export default function TablesManagement() {
     queryKey: ["tables"],
     queryFn: () => tableService.getTables(),
     retry: 1,
+  });
+
+  // Update Status Mutation
+  const updateStatusMutation = useMutation({
+    mutationFn: ({ id, status }: { id: string; status: string }) => tableService.updateTableStatus(id, status),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["tables"] });
+    },
+    onError: (err: any) => {
+      alert(err.response?.data?.message || err.message || "Failed to update table status");
+    },
   });
 
   // Create Table Mutation
@@ -31,6 +64,7 @@ export default function TablesManagement() {
       alert(err.response?.data?.message || err.message || "Failed to create table");
     },
   });
+
 
   // Regenerate All QR Codes Mutation
   const regenerateMutation = useMutation({
@@ -496,7 +530,171 @@ export default function TablesManagement() {
         </Button>
       </div>
 
+      {/* View Mode Switcher & Floor Status Legend */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 bg-card p-2.5 rounded-xl border border-border">
+        <div className="flex gap-2">
+          <button
+            onClick={() => setViewMode("canvas")}
+            className={`px-4 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all ${
+              viewMode === "canvas"
+                ? "bg-primary text-primary-foreground shadow-sm"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            <LayoutGrid className="h-4 w-4" />
+            Floor Plan Canvas
+          </button>
+          <button
+            onClick={() => setViewMode("directory")}
+            className={`px-4 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all ${
+              viewMode === "directory"
+                ? "bg-primary text-primary-foreground shadow-sm"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            <List className="h-4 w-4" />
+            Register Directory
+          </button>
+        </div>
+
+        {/* Legend */}
+        <div className="flex items-center gap-3 text-xs font-mono">
+          <div className="flex items-center gap-1.5">
+            <span className="h-2 w-2 rounded-full bg-emerald-500" />
+            <span className="text-muted-foreground">Available</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <span className="h-2 w-2 rounded-full bg-rose-500" />
+            <span className="text-muted-foreground">Occupied</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <span className="h-2 w-2 rounded-full bg-amber-500" />
+            <span className="text-muted-foreground">Bill Requested</span>
+          </div>
+        </div>
+      </div>
+
+      {/* VIEW 1: INTERACTIVE FLOOR PLAN CANVAS */}
+      {viewMode === "canvas" && (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+          {tables.map((table: any) => {
+            const status = table.status || "available";
+            const isAvailable = status === "available";
+            const isOccupied = status === "occupied";
+            const isBillRequested = status === "bill_requested";
+            const activeOrder = table.orders?.[0];
+
+            return (
+              <div
+                key={table.id}
+                className={`p-5 rounded-2xl border flex flex-col justify-between transition-all bg-card shadow-sm ${
+                  isOccupied
+                    ? "border-rose-500/50 bg-rose-950/10 shadow-rose-950/20"
+                    : isBillRequested
+                    ? "border-amber-500/50 bg-amber-950/10"
+                    : "border-emerald-500/30 hover:border-emerald-500/60"
+                }`}
+              >
+                <div>
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <span className="font-mono text-2xl font-black text-foreground">
+                        #{formattedTableNumber(table.number)}
+                      </span>
+                      <span className="text-xs text-muted-foreground block mt-0.5">
+                        Table #{table.number}
+                      </span>
+                    </div>
+
+                    <Badge
+                      variant="default"
+                      className={`text-[10px] font-bold uppercase py-0.5 px-2 ${
+                        isOccupied
+                          ? "bg-rose-500/20 text-rose-400 border border-rose-500/30"
+                          : isBillRequested
+                          ? "bg-amber-500/20 text-amber-400 border border-amber-500/30"
+                          : "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"
+                      }`}
+                    >
+                      {status.replace("_", " ")}
+                    </Badge>
+                  </div>
+
+                  {activeOrder ? (
+                    <div className="mt-4 p-3 rounded-xl bg-background/60 border border-border/80 space-y-1 text-xs font-mono">
+                      <div className="flex justify-between text-muted-foreground">
+                        <span>Order:</span>
+                        <span className="font-bold text-foreground">#{activeOrder.orderNumber}</span>
+                      </div>
+                      <div className="flex justify-between text-muted-foreground">
+                        <span>Items:</span>
+                        <span>{activeOrder.items?.length || 0} items</span>
+                      </div>
+                      <div className="flex justify-between text-muted-foreground border-t border-border/60 pt-1">
+                        <span>Bill Due:</span>
+                        <span className="font-bold text-primary text-sm">
+                          LKR {activeOrder.total?.toLocaleString()}
+                        </span>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="mt-4 p-3 rounded-xl bg-muted/20 border border-dashed border-border/60 text-center text-xs text-muted-foreground">
+                      Ready for Seating
+                    </div>
+                  )}
+                </div>
+
+                <div className="mt-5 pt-3 border-t border-border/60 flex flex-col gap-2">
+                  <div className="flex gap-2">
+                    <Button
+                      size="sm"
+                      onClick={() => router.push(`/dashboard/pos?tableId=${table.id}`)}
+                      className="flex-1 text-xs bg-primary text-primary-foreground font-bold h-8 gap-1"
+                    >
+                      <CreditCard className="h-3.5 w-3.5" />
+                      Take Order (POS)
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => handleOpenPrintModal(table)}
+                      className="h-8 px-2.5 text-xs"
+                    >
+                      <QrCode className="h-3.5 w-3.5" />
+                    </Button>
+                  </div>
+
+                  {/* Status Toggle Buttons */}
+                  <div className="flex bg-muted/40 p-0.5 rounded-lg border border-border">
+                    {[
+                      { id: "available", label: "Vacant" },
+                      { id: "occupied", label: "Seated" },
+                      { id: "bill_requested", label: "Bill" },
+                    ].map((st) => (
+                      <button
+                        key={st.id}
+                        onClick={() => updateStatusMutation.mutate({ id: table.id, status: st.id })}
+                        className={`flex-1 py-1 text-[10px] font-bold rounded capitalize transition-all ${
+                          status === st.id
+                            ? "bg-foreground text-background shadow-xs"
+                            : "text-muted-foreground hover:text-foreground"
+                        }`}
+                      >
+                        {st.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {/* VIEW 2: REGISTER DIRECTORY */}
+      {viewMode === "directory" && (
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
         {/* Create Table Card */}
         <div className="terminal-card bg-card border border-border p-5 h-fit">
           <h3 className="text-sm font-bold text-foreground font-heading mb-4">Register New Table</h3>
@@ -593,6 +791,7 @@ export default function TablesManagement() {
           )}
         </div>
       </div>
+      )}
 
       {/* Standee Preview & Print Modal */}
       <Modal

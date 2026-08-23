@@ -25,4 +25,10 @@ export const tableService = {
     const { data } = await apiClient.post("/tables/regenerate-qr");
     return data.data;
   },
+
+  async updateTableStatus(id: string, status: string): Promise<Table> {
+    const { data } = await apiClient.patch(`/tables/${id}/status`, { status });
+    return data.data;
+  },
 };
+

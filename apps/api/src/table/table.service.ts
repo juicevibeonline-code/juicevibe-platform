@@ -81,12 +81,46 @@ export class TableService {
 
   async getTables() {
     return prisma.table.findMany({
+      include: {
+        orders: {
+          where: {
+            status: { in: ["pending", "confirmed", "preparing", "ready"] },
+          },
+          include: {
+            items: true,
+          },
+          orderBy: { createdAt: "desc" },
+          take: 1,
+        },
+      },
       orderBy: { number: "asc" },
     });
   }
 
+  async updateTableStatus(id: string, status: string) {
+    await this.getTable(id);
+    return prisma.table.update({
+      where: { id },
+      data: { status: status as any },
+    });
+  }
+
   async getTable(id: string) {
-    const table = await prisma.table.findUnique({ where: { id } });
+    const table = await prisma.table.findUnique({
+      where: { id },
+      include: {
+        orders: {
+          where: {
+            status: { in: ["pending", "confirmed", "preparing", "ready"] },
+          },
+          include: {
+            items: true,
+          },
+          orderBy: { createdAt: "desc" },
+          take: 1,
+        },
+      },
+    });
     if (!table) throw new NotFoundException(`Table with ID ${id} not found`);
     return table;
   }
@@ -96,4 +130,5 @@ export class TableService {
     return prisma.table.delete({ where: { id } });
   }
 }
+
 
