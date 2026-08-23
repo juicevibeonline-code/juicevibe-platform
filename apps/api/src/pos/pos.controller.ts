@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, Query, UseGuards } from "@nestjs/common";
+import { Controller, Get, Post, Patch, Body, Param, Query, UseGuards } from "@nestjs/common";
 import { ApiTags, ApiBearerAuth, ApiOperation } from "@nestjs/swagger";
 import { PosService } from "./pos.service";
 import { ShiftService } from "./shift.service";
@@ -100,4 +100,26 @@ export class PosController {
     const history = await this.shiftService.getShiftHistory(Number(limit) || 10);
     return ApiResponseDto.ok(history);
   }
+
+  @Get("kds-orders")
+  @Roles("admin", "manager", "kitchen")
+  @ApiOperation({ summary: "Get active kitchen orders for KDS display" })
+  async getKdsOrders() {
+    const orders = await this.posService.getKdsOrders();
+    return ApiResponseDto.ok(orders);
+  }
+
+  @Patch("orders/:id/kds-status")
+  @Roles("admin", "manager", "kitchen")
+  @ApiOperation({ summary: "Update kitchen preparation status of an order" })
+  async updateKdsStatus(
+    @CurrentUser("sub") actorId: string,
+    @CurrentUser("role") actorRole: string,
+    @Param("id") id: string,
+    @Body() body: { kitchenStatus: string },
+  ) {
+    const updated = await this.posService.updateKdsStatus(actorId, actorRole, id, body.kitchenStatus);
+    return ApiResponseDto.ok(updated, "Kitchen status updated successfully");
+  }
 }
+

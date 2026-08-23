@@ -10,6 +10,7 @@ import {
   LayoutDashboard,
   ClipboardList,
   CreditCard,
+  ChefHat,
   Utensils,
   Warehouse,
   Settings,
@@ -50,6 +51,12 @@ export function Sidebar({ collapsed, setCollapsed }: SidebarProps) {
       href: "/dashboard/pos",
       icon: CreditCard,
       roles: ["admin", "manager", "cashier"],
+    },
+    {
+      label: "Kitchen Display (KDS)",
+      href: "/dashboard/kitchen",
+      icon: ChefHat,
+      roles: ["admin", "manager", "kitchen"],
     },
     {
       label: "Order Desk",

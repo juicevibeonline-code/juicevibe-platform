@@ -31,4 +31,15 @@ export const posService = {
     const { data } = await apiClient.post(`/pos/orders/${orderId}/resume`);
     return data.data;
   },
+
+  async getKdsOrders(): Promise<Order[]> {
+    const { data } = await apiClient.get("/pos/kds-orders");
+    return data.data || [];
+  },
+
+  async updateKdsStatus(orderId: string, kitchenStatus: string): Promise<Order> {
+    const { data } = await apiClient.patch(`/pos/orders/${orderId}/kds-status`, { kitchenStatus });
+    return data.data;
+  },
 };
+

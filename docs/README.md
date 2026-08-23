@@ -11,6 +11,7 @@
 This directory contains the essential technical architecture, deployment specifications, database schemas, and API documentation for the **Juice Vibe Monorepo**.
 
 ### 🏛️ System & Architecture Specifications
+- [PHASE_2_MASTER_SPECIFICATION.md](PHASE_2_MASTER_SPECIFICATION.md) — 🛡️ Phase 2 Master POS & Restaurant Management System Specification
 - [01-project-overview.md](01-project-overview.md) — Business Overview, Goals, Deliverables & Scope
 - [02-executive-summary.md](02-executive-summary.md) — Executive Assessment & Readiness Summary
 - [03-system-architecture.md](03-system-architecture.md) — Turborepo Monorepo Architecture, State Flow & Tech Stack

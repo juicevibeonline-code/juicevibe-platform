@@ -334,4 +334,57 @@ export class PosService {
       orderBy: { createdAt: "desc" },
     });
   }
+
+  async getKdsOrders() {
+    return prisma.order.findMany({
+      where: {
+        status: { notIn: ["completed", "cancelled"] },
+      },
+      include: {
+        items: true,
+        table: true,
+      },
+      orderBy: { createdAt: "asc" },
+    });
+  }
+
+  async updateKdsStatus(actorId: string, actorRole: string, orderId: string, kitchenStatus: string) {
+    const order = await prisma.order.findUnique({
+      where: { id: orderId },
+    });
+
+    if (!order) throw new NotFoundException("Order not found");
+
+    const orderStatusMap: Record<string, string> = {
+      new: "confirmed",
+      accepted: "confirmed",
+      preparing: "preparing",
+      ready: "ready",
+      completed: "completed",
+    };
+
+    const newOrderStatus = orderStatusMap[kitchenStatus] || order.status;
+
+    const updated = await prisma.order.update({
+      where: { id: orderId },
+      data: {
+        kitchenStatus: kitchenStatus as any,
+        status: newOrderStatus as any,
+        ...(kitchenStatus === "completed" ? { completedAt: new Date() } : {}),
+      },
+      include: {
+        items: true,
+        table: true,
+      },
+    });
+
+    // Broadcast WebSocket update to all listeners
+    if (this.ordersGateway.server) {
+      this.ordersGateway.server.emit("kdsStatusChanged", updated);
+      this.ordersGateway.server.emit("orderUpdated", updated);
+    }
+
+    return updated;
+  }
 }
+
