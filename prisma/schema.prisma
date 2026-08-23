@@ -56,6 +56,43 @@ enum OrderType {
   dine_in
 }
 
+enum OrderSource {
+  CUSTOMER_WEB
+  COUNTER_POS
+  QR_TABLE
+  WAITER_TAB
+  DELIVERY_AGGREGATOR
+}
+
+enum KitchenStatus {
+  new
+  accepted
+  preparing
+  ready
+  completed
+}
+
+enum ShiftStatus {
+  open
+  closed
+}
+
+enum InventoryTxType {
+  PURCHASE
+  SALE
+  WASTAGE
+  ADJUSTMENT
+  TRANSFER
+  RETURN
+}
+
+enum TableState {
+  available
+  occupied
+  bill_requested
+  paying
+}
+
 model User {
   id            String     @id @default(cuid())
   email         String     @unique
@@ -76,6 +113,8 @@ model User {
   reviews       Review[]
   blogs         BlogPost[]
   notifications Notification[]
+  cashierShifts CashierShift[]
+  auditLogs     AuditLog[]
 
   @@index([email])
   @@index([role])
@@ -124,6 +163,7 @@ model MenuItem {
   addOns       AddOn[]
   orderItems   OrderItem[]
   reviews      Review[]
+  recipe       Recipe?
 
   @@index([slug])
   @@index([categoryId])
@@ -184,36 +224,48 @@ model Address {
 }
 
 model Order {
-  id                String        @id @default(cuid())
-  orderNumber       String        @unique
-  customerId        String?
-  customerName      String
-  customerPhone     String
-  customerEmail     String?
-  subtotal          Float
-  tax               Float         @default(0)
-  discount          Float         @default(0)
-  total             Float
-  status            OrderStatus   @default(pending)
-  paymentStatus     PaymentStatus @default(pending)
-  paymentMethod     PaymentMethod
-  type              OrderType     @default(pickup)
-  deliveryAddress   Json?
-  notes             String?
-  couponCode        String?
+  id                 String               @id @default(cuid())
+  orderNumber        String               @unique
+  orderSource        OrderSource          @default(CUSTOMER_WEB)
+  customerId         String?
+  customerName       String
+  customerPhone      String
+  customerEmail      String?
+  subtotal           Float
+  tax                Float                @default(0)
+  discount           Float                @default(0)
+  serviceCharge      Float                @default(0)
+  total              Float
+  status             OrderStatus          @default(pending)
+  paymentStatus      PaymentStatus        @default(pending)
+  kitchenStatus      KitchenStatus        @default(new)
+  paymentMethod      PaymentMethod
+  type               OrderType            @default(pickup)
+  deliveryAddress    Json?
+  notes              String?
+  couponCode         String?
+  voidReason         String?
+  tableId            String?
+  cashierShiftId     String?
+  servedById         String?
   estimatedReadyTime DateTime?
-  completedAt       DateTime?
-  createdAt         DateTime      @default(now())
-  updatedAt         DateTime      @updatedAt
+  completedAt        DateTime?
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime             @updatedAt
 
-  customer          User?         @relation(fields: [customerId], references: [id])
-  items             OrderItem[]
-  tableId           String?
-  table             Table?        @relation(fields: [tableId], references: [id])
+  customer           User?                @relation(fields: [customerId], references: [id])
+  table              Table?               @relation(fields: [tableId], references: [id])
+  cashierShift       CashierShift?        @relation(fields: [cashierShiftId], references: [id])
+  items              OrderItem[]
+  payments           PaymentTransaction[]
+  auditLogs          AuditLog[]
 
   @@index([orderNumber])
+  @@index([orderSource])
   @@index([customerId])
   @@index([status])
+  @@index([kitchenStatus])
+  @@index([cashierShiftId])
   @@index([createdAt])
   @@index([tableId])
 }
@@ -393,16 +445,19 @@ model Employee {
 }
 
 model InventoryItem {
-  id            String   @id @default(cuid())
-  name          String
-  quantity      Float
-  unit          String   @default("kg")
-  minStockLevel Float    @default(0)
-  supplier      String?
-  expiryDate    DateTime?
-  isActive      Boolean  @default(true)
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id                String                 @id @default(cuid())
+  name              String
+  quantity          Float
+  unit              String                 @default("kg")
+  minStockLevel     Float                  @default(0)
+  supplier          String?
+  expiryDate        DateTime?
+  isActive          Boolean                @default(true)
+  createdAt         DateTime               @default(now())
+  updatedAt         DateTime               @updatedAt
+
+  transactions      InventoryTransaction[]
+  recipeIngredients RecipeIngredient[]
 
   @@index([name])
 }
@@ -414,10 +469,132 @@ model Setting {
 }
 
 model Table {
-  id        String   @id @default(cuid())
-  number    Int      @unique
+  id        String     @id @default(cuid())
+  number    Int        @unique
+  capacity  Int        @default(4)
+  status    TableState @default(available)
   qrCodeUrl String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
   orders    Order[]
 }
+
+// ----------------------------------------------------------------------------
+// PHASE 2: PAYMENT & MULTI-TENDER SPLIT TRANSACTIONS
+// ----------------------------------------------------------------------------
+model PaymentTransaction {
+  id             String        @id @default(cuid())
+  orderId        String
+  method         PaymentMethod
+  amount         Float
+  status         PaymentStatus @default(paid)
+  cardLast4      String?
+  transactionRef String?
+  cashTendered   Float?
+  changeGiven    Float?
+  createdAt      DateTime      @default(now())
+
+  order          Order         @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([orderId])
+  @@index([method])
+}
+
+// ----------------------------------------------------------------------------
+// PHASE 2: CASHIER SHIFTS & Z-REPORTS
+// ----------------------------------------------------------------------------
+model CashierShift {
+  id           String      @id @default(cuid())
+  cashierId    String
+  openingFloat Float
+  closingCash  Float?
+  expectedCash Float?
+  variance     Float?
+  status       ShiftStatus @default(open)
+  openedAt     DateTime    @default(now())
+  closedAt     DateTime?
+  notes        String?
+
+  cashier      User        @relation(fields: [cashierId], references: [id])
+  orders       Order[]
+
+  @@index([cashierId])
+  @@index([status])
+}
+
+// ----------------------------------------------------------------------------
+// PHASE 2: RECIPES & ATOMIC INGREDIENT DEPLETION
+// ----------------------------------------------------------------------------
+model Recipe {
+  id            String             @id @default(cuid())
+  menuItemId    String             @unique
+  yieldServings Float              @default(1.0)
+  isActive      Boolean            @default(true)
+  createdAt     DateTime           @default(now())
+  updatedAt     DateTime           @updatedAt
+
+  menuItem      MenuItem           @relation(fields: [menuItemId], references: [id], onDelete: Cascade)
+  ingredients   RecipeIngredient[]
+}
+
+model RecipeIngredient {
+  id              String        @id @default(cuid())
+  recipeId        String
+  inventoryItemId String
+  quantity        Float
+  wastageFactor   Float         @default(0.0)
+
+  recipe          Recipe        @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+  inventoryItem   InventoryItem @relation(fields: [inventoryItemId], references: [id])
+
+  @@index([recipeId])
+  @@index([inventoryItemId])
+}
+
+// ----------------------------------------------------------------------------
+// PHASE 2: INVENTORY LEDGER & STOCK MOVEMENTS
+// ----------------------------------------------------------------------------
+model InventoryTransaction {
+  id              String          @id @default(cuid())
+  inventoryItemId String
+  type            InventoryTxType
+  quantity        Float
+  unitCost        Float?
+  referenceId     String?
+  notes           String?
+  actorId         String?
+  createdAt       DateTime        @default(now())
+
+  inventoryItem   InventoryItem   @relation(fields: [inventoryItemId], references: [id])
+
+  @@index([inventoryItemId])
+  @@index([type])
+  @@index([createdAt])
+}
+
+// ----------------------------------------------------------------------------
+// PHASE 2: IMMUTABLE AUDIT LOGGING
+// ----------------------------------------------------------------------------
+model AuditLog {
+  id         String   @id @default(cuid())
+  actorId    String
+  actorRole  String
+  action     String
+  entity     String
+  entityId   String
+  beforeData Json?
+  afterData  Json?
+  ipAddress  String?
+  orderId    String?
+  createdAt  DateTime @default(now())
+
+  actor      User     @relation(fields: [actorId], references: [id])
+  order      Order?   @relation(fields: [orderId], references: [id])
+
+  @@index([actorId])
+  @@index([action])
+  @@index([entity, entityId])
+  @@index([createdAt])
+}
+

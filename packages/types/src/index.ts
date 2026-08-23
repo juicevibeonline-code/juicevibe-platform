@@ -11,5 +11,6 @@ export * from "./api";
 export * from "./table";
 export * from "./inventory";
 export * from "./employee";
+export * from "./pos";
 
 

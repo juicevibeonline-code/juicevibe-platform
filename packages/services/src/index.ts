@@ -16,6 +16,8 @@ export { analyticsService, type DashboardStats, type RevenueChartData, type TopS
 export { tableService } from "./table-service";
 export { inventoryService } from "./inventory-service";
 export { employeeService } from "./employee-service";
+export { posService } from "./pos-service";
+export { shiftService } from "./shift-service";
 
 
 

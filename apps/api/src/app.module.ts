@@ -15,6 +15,7 @@ import { SettingsModule } from "./settings/settings.module";
 import { TableModule } from "./table/table.module";
 import { InventoryModule } from "./inventory/inventory.module";
 import { EmployeesModule } from "./employees/employees.module";
+import { PosModule } from "./pos/pos.module";
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { EmployeesModule } from "./employees/employees.module";
     TableModule,
     InventoryModule,
     EmployeesModule,
+    PosModule,
   ],
   controllers: [AppController],
   providers: [

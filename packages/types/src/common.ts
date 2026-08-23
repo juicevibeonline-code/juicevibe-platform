@@ -5,6 +5,12 @@ export type OrderStatus = "pending" | "confirmed" | "preparing" | "ready" | "com
 export type PaymentStatus = "pending" | "paid" | "refunded" | "failed";
 export type PaymentMethod = "cash" | "card" | "online";
 
+export type OrderSource = "CUSTOMER_WEB" | "COUNTER_POS" | "QR_TABLE" | "WAITER_TAB" | "DELIVERY_AGGREGATOR";
+export type KitchenStatus = "new" | "accepted" | "preparing" | "ready" | "completed";
+export type ShiftStatus = "open" | "closed";
+export type InventoryTxType = "PURCHASE" | "SALE" | "WASTAGE" | "ADJUSTMENT" | "TRANSFER" | "RETURN";
+export type TableState = "available" | "occupied" | "bill_requested" | "paying";
+
 export interface ApiResponse<T> {
   success: boolean;
   data?: T;

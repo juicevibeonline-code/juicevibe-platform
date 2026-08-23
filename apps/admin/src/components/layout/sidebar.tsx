@@ -9,6 +9,7 @@ import { motion } from "framer-motion";
 import {
   LayoutDashboard,
   ClipboardList,
+  CreditCard,
   Utensils,
   Warehouse,
   Settings,
@@ -43,6 +44,12 @@ export function Sidebar({ collapsed, setCollapsed }: SidebarProps) {
       href: "/dashboard",
       icon: LayoutDashboard,
       roles: ["admin", "manager"],
+    },
+    {
+      label: "Point of Sale (POS)",
+      href: "/dashboard/pos",
+      icon: CreditCard,
+      roles: ["admin", "manager", "cashier"],
     },
     {
       label: "Order Desk",
