@@ -31,14 +31,14 @@ Before dialling or sitting down with the client, verify these 5 items on your de
 - [ ] **Tab 2:** Admin Mission Control open: `https://admin.juicevibe.lk` (Logged in as admin)
 - [ ] **Tab 3:** API Swagger Docs open: `https://api.juicevibe.lk/api/docs`
 - [ ] **Bank Details Ready:**
-  - **Bank:** Commercial Bank of Ceylon
-  - **Account Number:** `8010156942`
-  - **Branch:** Bentota Branch
-  - **Account Name:** Dulanjaya Lakruwan
+  - **Account Name:** A. K. Dulanjaya Lakruwan
+  - **Account Number:** `6424499`
+  - **Bank / Branch:** Bank of Ceylon (BOC) / Matugama Branch
 - [ ] **Commercial Numbers Memorized:**
-  - **Total Phase 1 Cost:** LKR 100,000.00
-  - **Paid to Date:** LKR 70,000.00
+  - **Total Phase 1 Cost:** LKR 40,000.00 (Agreed Dev LKR 30k + Deployment LKR 10k)
+  - **Paid to Date:** LKR 10,000.00
   - **Final Balance Due:** **LKR 30,000.00**
+
 
 ---
 
@@ -127,11 +127,14 @@ STAGE 5 (35–45 min) ──► Launch Strategy, 30-Day Warranty & Phase 2 Growt
 
 #### 💰 Transparent Commercial Breakdown:
 > *"අපේ Phase 1 commercial structure එක මෙහෙමයි:*
-> - *Phase 1 Full Platform Development & Production Deployment: **LKR 100,000.00***
-> - *Agreed Advance Paid: **LKR 70,000.00***
+> - *Agreed Base Software Development Fee: **LKR 30,000.00***
+> - *Production Deployment, Domain & Cloud Setup Fee: **LKR 10,000.00***
+> - *Total Commercial Value: **LKR 40,000.00***
+> - *Less: Advance Commitment Deposit Paid: **(LKR 10,000.00)***
 > - *Remaining Final Settlement Balance: **LKR 30,000.00***
 >
-> *මේ balance payment එක complete වුනාම, formal ownership transfer එක, admin credential package එක, සහ 30-day complimentary warranty period එක officially start වෙනවා."*
+> *මේ balance payment එක complete වුනාම, formal ownership transfer එක, admin credential master package එක, සහ 30-day complimentary warranty period එක officially start වෙනවා."*
+
 
 *(Share the Commercial Bank details clearly on screen/WhatsApp).*
 
