@@ -79,68 +79,75 @@ async function main() {
   // ─── MILKSHAKES ───────────────────────────────────────────────
   const milkshakes = await getCategory("milkshakes");
   const milkshakeItems = [
-    { name: "Chocolate",      slug: "chocolate-milkshake",      description: "Rich & creamy chocolate milkshake",       price: 300, popular: true,  thumbnail: "/images/MenuItems/milkshake-chocolate.png" },
-    { name: "Vanilla",        slug: "vanilla-milkshake",        description: "Classic vanilla bean milkshake",           price: 300,                thumbnail: "/images/MenuItems/milkshake-vanilla.png" },
-    { name: "Strawberry",     slug: "strawberry-milkshake",     description: "Fresh strawberry milkshake",               price: 300,                thumbnail: "/images/MenuItems/milkshake-strawberry.png" },
-    { name: "Mango",          slug: "mango-milkshake",          description: "Thick tropical mango milkshake",           price: 300, popular: true,  thumbnail: "/images/MenuItems/milkshake-mango.png" },
-    { name: "Passion Fruit",  slug: "passion-fruit-milkshake",  description: "Tropical passion fruit milkshake",         price: 300,                thumbnail: "/images/MenuItems/milkshake-passion-fruit.png" },
-    { name: "Banana",         slug: "banana-milkshake",         description: "Fresh banana & milk creamy shake",         price: 300,                thumbnail: "/images/MenuItems/milkshake-banana.png" },
-    { name: "Date & Almond",  slug: "date-almond-milkshake",    description: "Healthy energy-boosting date & almond shake", price: 400, popular: true,  thumbnail: "/images/MenuItems/milkshake-date-almond.png" },
+    { name: "Chocolate",      slug: "chocolate-milkshake",      description: "Rich & creamy chocolate milkshake",               price: 350, popular: true,  thumbnail: "/images/MenuItems/milkshake-chocolate.png" },
+    { name: "Vanilla",        slug: "vanilla-milkshake",        description: "Classic vanilla bean milkshake",                   price: 350,                thumbnail: "/images/MenuItems/milkshake-vanilla.png" },
+    { name: "Strawberry",     slug: "strawberry-milkshake",     description: "Fresh strawberry milkshake",                       price: 350,                thumbnail: "/images/MenuItems/milkshake-strawberry.png" },
+    { name: "Mango",          slug: "mango-milkshake",          description: "Thick tropical mango milkshake",                   price: 350, popular: true,  thumbnail: "/images/MenuItems/milkshake-mango.png" },
+    { name: "Passion Fruit",  slug: "passion-fruit-milkshake",  description: "Tropical passion fruit milkshake",                 price: 350,                thumbnail: "/images/MenuItems/milkshake-passion-fruit.png" },
+    { name: "Banana",         slug: "banana-milkshake",         description: "Fresh banana & milk creamy shake",                 price: 350,                thumbnail: "/images/MenuItems/milkshake-banana.png" },
+    { name: "Mixed Fruit",    slug: "mixed-fruit-milkshake",    description: "Delicious blend of seasonal fruits and cold milk", price: 350, popular: true,  thumbnail: "/images/MenuItems/milkshake-strawberry.png" },
+    { name: "Date & Almond",  slug: "date-almond-milkshake",    description: "Healthy energy-boosting date & almond shake",      price: 400, popular: true,  thumbnail: "/images/MenuItems/milkshake-date-almond.png" },
+    { name: "Falooda",        slug: "falooda-milkshake",        description: "Traditional sweet falooda shake with basil seeds", price: 400, popular: true,  thumbnail: "/images/MenuItems/milkshake-strawberry.png" },
   ];
   for (const item of milkshakeItems) {
     await upsertItem({ ...item, categoryId: milkshakes.id });
   }
 
-  // Add BOBA add-on to all milkshakes
+  // Add BOBA add-on to all milkshakes (Rs. 150)
   const allMilkshakes = await prisma.menuItem.findMany({ where: { categoryId: milkshakes.id } });
   for (const shake of allMilkshakes) {
     const existing = await prisma.addOn.findFirst({ where: { menuItemId: shake.id, name: "Add BOBA" } });
-    if (!existing) {
-      await prisma.addOn.create({ data: { name: "Add BOBA", price: 100, category: "extras", menuItemId: shake.id } });
+    if (existing) {
+      await prisma.addOn.update({ where: { id: existing.id }, data: { price: 150 } });
+    } else {
+      await prisma.addOn.create({ data: { name: "Add BOBA", price: 150, category: "extras", menuItemId: shake.id } });
     }
   }
 
   // ─── FRESH JUICES ─────────────────────────────────────────────
   const freshJuices = await getCategory("fresh-juices");
   const juiceItems = [
-    { name: "Ambarella",     slug: "ambarella-juice",     description: "Freshly squeezed ambarella juice",          price: 250,                thumbnail: "/images/MenuItems/juice-ambarella.png" },
-    { name: "Avocado",       slug: "avocado-juice",       description: "Creamy fresh avocado juice",                price: 300,                thumbnail: "/images/MenuItems/juice-avocado.png" },
-    { name: "Coconut",       slug: "coconut-juice",       description: "Fresh tender coconut water",                price: 250,                thumbnail: "/images/MenuItems/juice-coconut.png" },
-    { name: "Grapes",        slug: "grapes-juice",        description: "Fresh pressed grape juice",                 price: 500, popular: true,  thumbnail: "/images/MenuItems/juice-grapes.png" },
-    { name: "Lime",          slug: "lime-juice",          description: "Fresh lime juice with a hint of mint",      price: 200,                thumbnail: "/images/MenuItems/juice-lime.png" },
-    { name: "Mango",         slug: "mango-juice",         description: "Ripe mango pulp blended to perfection",    price: 300, popular: true,  thumbnail: "/images/MenuItems/juice-mango.png" },
-    { name: "Orange",        slug: "orange-juice",        description: "Freshly squeezed sweet oranges",           price: 400,                thumbnail: "/images/MenuItems/juice-orange.png" },
-    { name: "Papaya",        slug: "papaya-juice",        description: "Creamy fresh papaya juice",                price: 250,                thumbnail: "/images/MenuItems/juice-papaya.png" },
-    { name: "Passion Fruit", slug: "passion-fruit-juice", description: "Exotic passion fruit pulp juice",          price: 250,                thumbnail: "/images/MenuItems/juice-passion-fruit.jpg" },
-    { name: "Pineapple",     slug: "pineapple-juice",     description: "Sweet & tangy fresh pineapple juice",      price: 250,                thumbnail: "/images/MenuItems/juice-pineapple.png" },
-    { name: "Soursop",       slug: "soursop-juice",       description: "Fresh soursop juice — a tropical classic", price: 300, popular: true,  thumbnail: "/images/MenuItems/juice-soursop.png" },
-    { name: "Watermelon",    slug: "watermelon-juice",    description: "Chilled refreshing watermelon juice",      price: 250,                thumbnail: "/images/MenuItems/juice-watermelon.png" },
-    { name: "Wood Apple",    slug: "wood-apple-juice",    description: "Traditional Sri Lankan wood apple juice",  price: 300,                thumbnail: "/images/MenuItems/juice-wood-apple.png" },
+    { name: "Avocado",       slug: "avocado-juice",       description: "Creamy fresh avocado juice",                     price: 300, popular: true,  thumbnail: "/images/MenuItems/juice-avocado.png" },
+    { name: "Lime",          slug: "lime-juice",          description: "Fresh zesty lime juice with a hint of mint",     price: 250,                thumbnail: "/images/MenuItems/juice-lime.png" },
+    { name: "Mango",         slug: "mango-juice",         description: "Ripe sweet mango pulp blended to perfection",     price: 300, popular: true,  thumbnail: "/images/MenuItems/juice-mango.png" },
+    { name: "Mixed Fruit",   slug: "mixed-fruit-juice",   description: "Freshly pressed mix of tropical fruits",          price: 350, popular: true,  thumbnail: "/images/MenuItems/juice-orange.png" },
+    { name: "Orange",        slug: "orange-juice",        description: "Freshly squeezed sweet citrus oranges",          price: 400,                thumbnail: "/images/MenuItems/juice-orange.png" },
+    { name: "Papaya",        slug: "papaya-juice",        description: "Creamy wholesome fresh papaya juice",             price: 250,                thumbnail: "/images/MenuItems/juice-papaya.png" },
+    { name: "Passion Fruit", slug: "passion-fruit-juice", description: "Exotic tropical passion fruit pulp juice",        price: 300,                thumbnail: "/images/MenuItems/juice-passion-fruit.jpg" },
+    { name: "Pineapple",     slug: "pineapple-juice",     description: "Sweet & tangy freshly squeezed pineapple juice",  price: 300,                thumbnail: "/images/MenuItems/juice-pineapple.png" },
+    { name: "Soursop",       slug: "soursop-juice",       description: "Fresh soursop juice — rich tropical classic",     price: 300, popular: true,  thumbnail: "/images/MenuItems/juice-soursop.png" },
+    { name: "Watermelon",    slug: "watermelon-juice",    description: "Chilled deeply refreshing watermelon juice",     price: 250,                thumbnail: "/images/MenuItems/juice-watermelon.png" },
+    { name: "Wood Apple",    slug: "wood-apple-juice",    description: "Traditional Sri Lankan authentic wood apple juice", price: 300,             thumbnail: "/images/MenuItems/juice-wood-apple.png" },
   ];
   for (const item of juiceItems) {
     await upsertItem({ ...item, categoryId: freshJuices.id });
+  }
+
+  // Add Ice Cream add-on to all fresh juices (Rs. 50)
+  const allJuices = await prisma.menuItem.findMany({ where: { categoryId: freshJuices.id } });
+  for (const juice of allJuices) {
+    const existing = await prisma.addOn.findFirst({ where: { menuItemId: juice.id, name: "Add Ice Cream" } });
+    if (existing) {
+      await prisma.addOn.update({ where: { id: existing.id }, data: { price: 50 } });
+    } else {
+      await prisma.addOn.create({ data: { name: "Add Ice Cream", price: 50, category: "extras", menuItemId: juice.id } });
+    }
   }
 
   // ─── SPECIAL SMOOTHIES ────────────────────────────────────────
   const smoothies = await getCategory("smoothies");
   const smoothieItems = [
     {
-      name: "Tropical Smoothie Bowl", slug: "tropical-smoothie-bowl",
-      description: "Dragonfruit, mango, coconut & chia seeds",
-      price: 550, popular: true, featured: true,
-      thumbnail: "/images/MenuItems/tropical_smoothie_bowl.png",
-    },
-    {
       name: "Avocado & Dates",  slug: "avocado-dates-smoothie",
       description: "Avocado, Dates, Milk, Treacle",
-      price: 450, popular: true, featured: true,
+      price: 500, popular: true, featured: true,
       ingredients: ["Avocado", "Dates", "Milk", "Treacle"],
       thumbnail: "/images/MenuItems/smoothie-avocado-dates.png",
     },
     {
       name: "Wood Apple Zest",  slug: "wood-apple-zest-smoothie",
       description: "Wood Apple, Coconut Milk, Jaggery",
-      price: 400,
+      price: 500, popular: true, featured: true,
       ingredients: ["Wood Apple", "Coconut Milk", "Jaggery"],
       thumbnail: "/images/MenuItems/smoothie-wood-apple-zest.png",
     },
@@ -152,10 +159,10 @@ async function main() {
   // ─── LASSI ────────────────────────────────────────────────────
   const lassi = await getCategory("lassi");
   const lassiItems = [
-    { name: "Classic",      slug: "classic-lassi",       description: "Traditional sweet creamy yogurt drink",  price: 400,                thumbnail: "/images/MenuItems/lassi-classic.png" },
-    { name: "Mango",        slug: "mango-lassi",         description: "Mango pulp blended with fresh yogurt",   price: 400, popular: true,  thumbnail: "/images/MenuItems/lassi-mango.png" },
-    { name: "Passion Fruit",slug: "passion-fruit-lassi", description: "Passion fruit & yogurt blend",           price: 400,                thumbnail: "/images/MenuItems/lassi-passion-fruit.png" },
-    { name: "Orange",       slug: "orange-lassi",        description: "Orange yogurt refresher",                price: 400,                thumbnail: "/images/MenuItems/lassi-orange.png" },
+    { name: "Classic",       slug: "classic-lassi",       description: "Traditional sweet creamy yogurt drink",  price: 400,                thumbnail: "/images/MenuItems/lassi-classic.png" },
+    { name: "Mango",         slug: "mango-lassi",         description: "Mango pulp blended with fresh yogurt",   price: 400, popular: true,  thumbnail: "/images/MenuItems/lassi-mango.png" },
+    { name: "Passion Fruit", slug: "passion-fruit-lassi", description: "Passion fruit & yogurt blend",           price: 400,                thumbnail: "/images/MenuItems/lassi-passion-fruit.png" },
+    { name: "Orange",        slug: "orange-lassi",        description: "Orange yogurt refresher",                price: 400,                thumbnail: "/images/MenuItems/lassi-orange.png" },
   ];
   for (const item of lassiItems) {
     await upsertItem({ ...item, categoryId: lassi.id });
@@ -164,11 +171,11 @@ async function main() {
   // ─── TEA ──────────────────────────────────────────────────────
   const tea = await getCategory("tea");
   const teaItems = [
-    { name: "English Breakfast Tea", slug: "english-breakfast-tea", description: "Classic robust English breakfast tea",  price: 100, thumbnail: "/images/MenuItems/tea-english-breakfast.png" },
-    { name: "Green Tea",             slug: "green-tea",             description: "Light & refreshing green tea",          price: 100, thumbnail: "/images/MenuItems/tea-green.png" },
-    { name: "Ginger Tea",            slug: "ginger-tea",            description: "Spiced warming ginger tea",             price: 100, popular: true, thumbnail: "/images/MenuItems/tea-ginger.png" },
-    { name: "Lemon Tea",             slug: "lemon-tea",             description: "Black tea with fresh lemon zest",       price: 100, thumbnail: "/images/MenuItems/tea-lemon.png" },
-    { name: "Mint Tea",              slug: "mint-tea",              description: "Cooling fresh mint herbal tea",         price: 100, thumbnail: "/images/MenuItems/tea-mint.png" },
+    { name: "English Breakfast", slug: "english-breakfast-tea", description: "Classic robust English breakfast tea",  price: 100, thumbnail: "/images/MenuItems/tea-english-breakfast.png" },
+    { name: "Green Tea",         slug: "green-tea",             description: "Light & refreshing green tea",          price: 100, thumbnail: "/images/MenuItems/tea-green.png" },
+    { name: "Ginger Tea",        slug: "ginger-tea",            description: "Spiced warming ginger tea",             price: 100, popular: true, thumbnail: "/images/MenuItems/tea-ginger.png" },
+    { name: "Lemon Tea",         slug: "lemon-tea",             description: "Ceylon black tea with fresh lemon",     price: 100, thumbnail: "/images/MenuItems/tea-lemon.png" },
+    { name: "Mint Tea",          slug: "mint-tea",              description: "Cooling fresh mint herbal tea",         price: 100, thumbnail: "/images/MenuItems/tea-mint.png" },
   ];
   for (const item of teaItems) {
     await upsertItem({ ...item, categoryId: tea.id });
@@ -189,21 +196,15 @@ async function main() {
   const mocktails = await getCategory("mocktails");
   const mocktailItems = [
     {
-      name: "Passion Fruit Mojito", slug: "passion-fruit-mojito",
-      description: "Fresh passionfruit pulp, mint & soda",
-      price: 450, popular: true, featured: true,
-      thumbnail: "/images/MenuItems/passionfruit_mojito_mocktail.png",
-    },
-    {
       name: "Classic Virgin Mojito", slug: "classic-virgin-mojito",
       description: "Mint, lime, soda & sugar — the timeless classic",
-      price: 400, popular: true,
+      price: 400, popular: true, featured: true,
       thumbnail: "/images/MenuItems/mocktail-classic-virgin-mojito.png",
     },
     {
       name: "Flavoured Mojito", slug: "flavoured-mojito",
       description: "Choose your flavour: Mango · Mandarin · Passion Fruit · Blackcurrant",
-      price: 400,
+      price: 400, popular: true,
       tags: ["Mango", "Mandarin", "Passion Fruit", "Blackcurrant"],
       thumbnail: "/images/MenuItems/mocktail-flavoured-mojito.png",
     },
@@ -221,9 +222,9 @@ async function main() {
       price: 500, popular: true, featured: true,
       thumbnail: "/images/MenuItems/icecream-jaggery-cashew-dream.jpg",
     },
-    { name: "Banana Boat",                slug: "banana-boat",                 description: "Banana split with ice cream & indulgent toppings", price: 500, thumbnail: "/images/MenuItems/icecream-banana-boat.png" },
-    { name: "Fruit Salad",               slug: "fruit-salad",                 description: "Fresh seasonal tropical fruit salad",              price: 300, thumbnail: "/images/MenuItems/icecream-fruit-salad.png" },
-    { name: "Fruit Salad with Ice Cream",slug: "fruit-salad-with-ice-cream",  description: "Fresh fruit salad topped with creamy ice cream",   price: 350, thumbnail: "/images/MenuItems/icecream-fruit-salad-with-icecream.png" },
+    { name: "Banana Boat",                 slug: "banana-boat",                 description: "Banana split with ice cream & indulgent toppings", price: 500, thumbnail: "/images/MenuItems/icecream-banana-boat.png" },
+    { name: "Fruit Salad",                slug: "fruit-salad",                 description: "Fresh seasonal tropical fruit salad",              price: 350, thumbnail: "/images/MenuItems/icecream-fruit-salad.png" },
+    { name: "Fruit Salad with Ice Cream", slug: "fruit-salad-with-ice-cream",  description: "Fresh fruit salad topped with creamy ice cream",   price: 400, popular: true, thumbnail: "/images/MenuItems/icecream-fruit-salad-with-icecream.png" },
     {
       name: "Choice of Ice Cream (3 Scoops)", slug: "ice-cream-3-scoops",
       description: "Mix & match: Vanilla · Chocolate · Strawberry · Fruit & Nut · Mango",
@@ -240,7 +241,7 @@ async function main() {
   const burgers = await getCategory("burgers");
   const burgerItems = [
     { name: "Chicken Burger",            slug: "chicken-burger",      description: "Grilled chicken patty with fresh toppings",    price: 400, popular: true, thumbnail: "/images/MenuItems/burger-chicken.png" },
-    { name: "Vegetable & Cheese Burger", slug: "veg-cheese-burger",   description: "Crispy veggie patty with melted cheese",       price: 300,                thumbnail: "/images/MenuItems/burger-veg-cheese.png" },
+    { name: "Vegetable and Cheese Burger", slug: "veg-cheese-burger", description: "Crispy veggie patty with melted cheese",       price: 350,                thumbnail: "/images/MenuItems/burger-veg-cheese.png" },
   ];
   for (const item of burgerItems) {
     await upsertItem({ ...item, categoryId: burgers.id });
@@ -249,8 +250,8 @@ async function main() {
   // ─── SANDWICHES ───────────────────────────────────────────────
   const sandwiches = await getCategory("sandwiches");
   const sandwichItems = [
-    { name: "Cheese & Tomato Sandwich",       slug: "cheese-tomato-sandwich",      description: "Grilled cheese with fresh ripe tomato",          price: 250,                thumbnail: "/images/MenuItems/sandwich-cheese-tomato.png" },
-    { name: "Chicken Ham & Cheese Sandwich",  slug: "chicken-ham-cheese-sandwich", description: "Chicken ham with melted cheese on toasted bread", price: 300, popular: true,  thumbnail: "/images/MenuItems/sandwich-chicken-ham-cheese.png" },
+    { name: "Cheese and Tomato Sandwich",      slug: "cheese-tomato-sandwich",      description: "Grilled cheese with fresh ripe tomato",          price: 300,                thumbnail: "/images/MenuItems/sandwich-cheese-tomato.png" },
+    { name: "Chicken Ham and Cheese",          slug: "chicken-ham-cheese-sandwich", description: "Chicken ham with melted cheese on toasted bread", price: 350, popular: true,  thumbnail: "/images/MenuItems/sandwich-chicken-ham-cheese.png" },
   ];
   for (const item of sandwichItems) {
     await upsertItem({ ...item, categoryId: sandwiches.id });
@@ -276,7 +277,7 @@ async function main() {
     { key: "business_name",           value: "Juice Vibe" },
     { key: "business_tagline",        value: "Sip the Good Vibes" },
     { key: "business_phone",          value: "+94718435876" },
-    { key: "business_email",          value: "hello@juicevibe.com" },
+    { key: "business_email",          value: "juicevibeonline@gmail.com" },
     { key: "business_address",        value: "No.89 Bandaragama Road, Waskaduwa, Sri Lanka, 12580" },
     { key: "opening_hours_weekdays",  value: "8:00 AM - 10:00 PM" },
     { key: "opening_hours_saturday",  value: "9:00 AM - 11:00 PM" },

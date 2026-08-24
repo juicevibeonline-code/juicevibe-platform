@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuthStore } from "@juice-vibe/services";
@@ -93,19 +94,29 @@ export function Sidebar({ collapsed, setCollapsed }: SidebarProps) {
       {/* Workspace Switcher */}
       <div className="h-16 flex items-center px-4 border-b border-border gap-3 justify-between overflow-hidden">
         {!collapsed && (
-          <div className="flex items-center gap-2">
-            <div className="h-8 w-8 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center text-primary">
-              <Leaf className="h-4 w-4" />
+          <div className="flex items-center gap-2.5">
+            <div className="relative h-8 w-8 rounded-lg overflow-hidden border border-primary/20 bg-[#0F2A1E] shrink-0">
+              <Image
+                src="/images/Logo.jpeg"
+                alt="Juice Vibe"
+                fill
+                className="object-cover"
+              />
             </div>
-            <div className="flex flex-col">
-              <span className="text-xs font-bold text-foreground leading-tight">Juice Vibe Bentota</span>
+            <div className="flex flex-col min-w-0">
+              <span className="text-xs font-bold text-foreground leading-tight truncate">Juice Vibe Bentota</span>
               <span className="text-[9px] font-mono text-muted-foreground uppercase tracking-wider">Workspace #1</span>
             </div>
           </div>
         )}
         {collapsed && (
-          <div className="mx-auto h-8 w-8 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center text-primary">
-            <Leaf className="h-4 w-4" />
+          <div className="mx-auto relative h-8 w-8 rounded-lg overflow-hidden border border-primary/20 bg-[#0F2A1E] shrink-0">
+            <Image
+              src="/images/Logo.jpeg"
+              alt="Juice Vibe"
+              fill
+              className="object-cover"
+            />
           </div>
         )}
         
