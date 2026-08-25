@@ -173,11 +173,18 @@ export class CreateMenuItemDto {
   @IsString()
   name: string;
 
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  slug?: string;
+
   @ApiProperty()
   @IsString()
   description: string;
 
   @ApiProperty()
+  @IsNumber()
+  @Min(0)
   price: number;
 
   @ApiProperty()
@@ -186,34 +193,55 @@ export class CreateMenuItemDto {
 
   @ApiPropertyOptional()
   @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
   images?: string[];
 
   @ApiPropertyOptional()
   @IsOptional()
+  @IsString()
+  thumbnail?: string;
+
+  @ApiPropertyOptional({ enum: ["in_stock", "out_of_stock", "coming_soon"] })
+  @IsOptional()
+  @IsString()
+  availability?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsNumber()
   calories?: number;
 
   @ApiPropertyOptional()
   @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
   ingredients?: string[];
 
   @ApiPropertyOptional()
   @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
   tags?: string[];
 
   @ApiPropertyOptional()
   @IsOptional()
+  @IsBoolean()
   isPopular?: boolean;
 
   @ApiPropertyOptional()
   @IsOptional()
+  @IsBoolean()
   isFeatured?: boolean;
 
   @ApiPropertyOptional()
   @IsOptional()
+  @IsArray()
   variants?: { name: string; priceAdjustment: number; isDefault: boolean }[];
 
   @ApiPropertyOptional()
   @IsOptional()
+  @IsArray()
   addOns?: { name: string; price: number; category: string; isAvailable: boolean }[];
 }
 
@@ -238,7 +266,46 @@ export class CreateCategoryDto {
 
   @ApiPropertyOptional()
   @IsOptional()
+  @IsNumber()
   order?: number;
+}
+
+export class CreateCouponDto {
+  @ApiProperty()
+  @IsString()
+  code: string;
+
+  @ApiProperty({ enum: ["percentage", "fixed"] })
+  @IsString()
+  type: "percentage" | "fixed";
+
+  @ApiProperty()
+  @IsNumber()
+  @Min(0)
+  value: number;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
+  minOrderAmount?: number;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
+  maxDiscount?: number;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsNumber()
+  @Min(1)
+  usageLimit?: number;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  expiresAt?: string;
 }
 
 export class CreateTestimonialDto {
@@ -257,6 +324,7 @@ export class CreateTestimonialDto {
   avatar?: string;
 
   @ApiProperty()
+  @IsNumber()
   rating: number;
 
   @ApiProperty()
