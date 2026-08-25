@@ -27,6 +27,7 @@ import {
   CreditCard,
   Smartphone,
   BadgeCheck,
+  Loader2
 } from "lucide-react";
 import { cn } from "@juice-vibe/utils";
 import { useOrdersSocket } from "@/hooks/use-orders-socket";
@@ -427,8 +428,12 @@ export default function OrderDesk() {
                         {status !== "completed" && (
                           <button
                             onClick={() => handleStatusTransition(order.id, order.status)}
-                            className="flex-1 inline-flex items-center justify-center gap-1 py-1.5 px-2 bg-primary/10 hover:bg-primary/20 border border-primary/20 text-primary text-[9px] font-mono font-semibold rounded uppercase tracking-wider cursor-pointer"
+                            disabled={updateStatusMutation.isPending && (updateStatusMutation.variables as any)?.id === order.id}
+                            className="flex-1 inline-flex items-center justify-center gap-1 py-1.5 px-2 bg-primary/10 hover:bg-primary/20 border border-primary/20 text-primary text-[9px] font-mono font-semibold rounded uppercase tracking-wider cursor-pointer disabled:opacity-50 transition-all active:scale-[0.98]"
                           >
+                            {updateStatusMutation.isPending && (updateStatusMutation.variables as any)?.id === order.id ? (
+                              <Loader2 className="h-2.5 w-2.5 animate-spin text-primary" />
+                            ) : null}
                             <span>Advance</span>
                             <ChevronRight className="h-2.5 w-2.5" />
                           </button>
@@ -437,19 +442,28 @@ export default function OrderDesk() {
                         {order.paymentMethod === "online" && order.paymentStatus !== "paid" && (
                           <button
                             onClick={() => updatePaymentMutation.mutate({ id: order.id, status: "paid" })}
-                            disabled={updatePaymentMutation.isPending}
-                            className="flex-1 inline-flex items-center justify-center gap-1 py-1.5 px-2 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-500 text-[9px] font-mono font-semibold rounded uppercase tracking-wider cursor-pointer disabled:opacity-50"
+                            disabled={updatePaymentMutation.isPending && (updatePaymentMutation.variables as any)?.id === order.id}
+                            className="flex-1 inline-flex items-center justify-center gap-1 py-1.5 px-2 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-500 text-[9px] font-mono font-semibold rounded uppercase tracking-wider cursor-pointer disabled:opacity-50 transition-all active:scale-[0.98]"
                           >
-                            <BadgeCheck className="h-2.5 w-2.5" />
+                            {updatePaymentMutation.isPending && (updatePaymentMutation.variables as any)?.id === order.id ? (
+                              <Loader2 className="h-2.5 w-2.5 animate-spin text-amber-500" />
+                            ) : (
+                              <BadgeCheck className="h-2.5 w-2.5" />
+                            )}
                             <span>Mark Paid</span>
                           </button>
                         )}
                         {status === "pending" && (
                           <button
                             onClick={() => handleCancelOrder(order.id)}
-                            className="p-1 px-2 border border-pink/30 hover:bg-pink/15 text-pink text-[9px] font-mono font-semibold rounded uppercase tracking-wider cursor-pointer"
+                            disabled={updateStatusMutation.isPending && (updateStatusMutation.variables as any)?.id === order.id}
+                            className="p-1 px-2 border border-pink/30 hover:bg-pink/15 text-pink text-[9px] font-mono font-semibold rounded uppercase tracking-wider cursor-pointer disabled:opacity-50 transition-all active:scale-[0.98]"
                           >
-                            Cancel
+                            {updateStatusMutation.isPending && (updateStatusMutation.variables as any)?.id === order.id && (updateStatusMutation.variables as any)?.status === "cancelled" ? (
+                              <Loader2 className="h-2.5 w-2.5 animate-spin text-pink" />
+                            ) : (
+                              "Cancel"
+                            )}
                           </button>
                         )}
                       </div>
@@ -483,91 +497,99 @@ export default function OrderDesk() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-border/30">
-                {filteredOrders.map((order) => (
-                  <tr key={order.id} className="hover:bg-ink-dark/20 transition-colors">
-                    <td className="py-3.5 px-4 font-bold text-foreground">{order.orderNumber}</td>
-                    <td className="py-3.5 px-4">
-                      <div className="flex flex-col">
-                        <span className="font-semibold text-foreground font-sans">{order.customerName}</span>
-                        <span className="text-[10px] text-muted-foreground">{order.customerPhone}</span>
-                      </div>
-                    </td>
-                    <td className="py-3.5 px-4 max-w-xs">
-                      <div className="flex flex-col space-y-1 font-mono text-[10px] text-muted-foreground">
-                        {order.items?.map((item) => (
-                          <div key={item.id} className="flex flex-col leading-tight border-b border-border/10 pb-1 last:border-b-0 last:pb-0">
-                            <div className="flex items-start justify-between text-foreground">
-                              <span className="font-sans font-medium">
-                                {item.name}
-                                {item.variant && <span className="text-[9px] text-muted-foreground block mt-0.5">({item.variant})</span>}
-                              </span>
-                              <span className="font-numeral font-bold shrink-0 ml-2">x{item.quantity}</span>
+                {filteredOrders.map((order) => {
+                  const isTransitioning = updateStatusMutation.isPending && (updateStatusMutation.variables as any)?.id === order.id;
+                  return (
+                    <tr key={order.id} className="hover:bg-ink-dark/20 transition-colors">
+                      <td className="py-3.5 px-4 font-bold text-foreground">{order.orderNumber}</td>
+                      <td className="py-3.5 px-4">
+                        <div className="flex flex-col">
+                          <span className="font-semibold text-foreground font-sans">{order.customerName}</span>
+                          <span className="text-[10px] text-muted-foreground">{order.customerPhone}</span>
+                        </div>
+                      </td>
+                      <td className="py-3.5 px-4 max-w-xs">
+                        <div className="flex flex-col space-y-1 font-mono text-[10px] text-muted-foreground">
+                          {order.items?.map((item) => (
+                            <div key={item.id} className="flex flex-col leading-tight border-b border-border/10 pb-1 last:border-b-0 last:pb-0">
+                              <div className="flex items-start justify-between text-foreground">
+                                <span className="font-sans font-medium">
+                                  {item.name}
+                                  {item.variant && <span className="text-[9px] text-muted-foreground block mt-0.5">({item.variant})</span>}
+                                </span>
+                                <span className="font-numeral font-bold shrink-0 ml-2">x{item.quantity}</span>
+                              </div>
+                              {item.addOns && (item.addOns as any).length > 0 && (
+                                <div className="text-[9px] text-primary/70 mt-0.5">
+                                  + {(item.addOns as any).map((a: any) => a.name).join(", ")}
+                                </div>
+                              )}
+                              {item.notes && (
+                                <div className="text-[9px] text-orange italic mt-0.5">
+                                  Note: {item.notes}
+                                </div>
+                              )}
                             </div>
-                            {item.addOns && (item.addOns as any).length > 0 && (
-                              <div className="text-[9px] text-primary/70 mt-0.5">
-                                + {(item.addOns as any).map((a: any) => a.name).join(", ")}
-                              </div>
-                            )}
-                            {item.notes && (
-                              <div className="text-[9px] text-orange italic mt-0.5">
-                                Note: {item.notes}
-                              </div>
-                            )}
-                          </div>
-                        ))}
-                        {order.notes && (
-                          <div className="mt-1 text-[9px] text-orange bg-orange/5 p-1 rounded border border-orange/10">
-                            <span className="font-bold">Note:</span> {order.notes}
-                          </div>
-                        )}
-                      </div>
-                    </td>
-                    <td className="py-3.5 px-4">
-                      <span className="uppercase text-[9px] tracking-wider text-muted-foreground border border-border px-1.5 py-0.5 rounded">
-                        {order.type}
-                      </span>
-                    </td>
-                    <td className="py-3.5 px-4">
-                      <span
-                        className={cn(
-                          "text-[9px] uppercase tracking-widest px-2 py-0.5 rounded font-bold",
-                          order.status === "pending" && "bg-orange-500/10 text-orange-400 border border-orange-500/20",
-                          order.status === "confirmed" && "bg-primary/10 text-primary border border-primary/20",
-                          order.status === "preparing" && "bg-primary/10 text-primary border border-primary/20",
-                          order.status === "ready" && "bg-primary/20 text-primary-light border border-primary/30",
-                          order.status === "completed" && "bg-ink-dark text-muted-foreground border border-border",
-                          order.status === "cancelled" && "bg-pink/10 text-pink border border-pink/20"
-                        )}
-                      >
-                        {order.status}
-                      </span>
-                    </td>
-                    <td className="py-3.5 px-4 font-numeral text-primary font-semibold">{formatPrice(order.total)}</td>
-                    <td className="py-3.5 px-4 text-[10px] text-muted-foreground">
-                      {formatDate(order.createdAt)}
-                    </td>
-                    <td className="py-3.5 px-4 text-right">
-                      <div className="flex items-center justify-end gap-2">
-                        {order.status !== "completed" && order.status !== "cancelled" && (
-                          <button
-                            onClick={() => handleStatusTransition(order.id, order.status)}
-                            className="inline-flex items-center gap-1 py-1 px-2.5 bg-primary/10 hover:bg-primary/20 border border-primary/20 text-primary text-[10px] rounded uppercase font-semibold cursor-pointer"
-                          >
-                            Advance
-                          </button>
-                        )}
-                        {order.status === "pending" && (
-                          <button
-                            onClick={() => handleCancelOrder(order.id)}
-                            className="inline-flex items-center gap-1 py-1 px-2 border border-pink/30 hover:bg-pink/15 text-pink text-[10px] rounded uppercase font-semibold cursor-pointer"
-                          >
-                            Cancel
-                          </button>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-                ))}
+                          ))}
+                          {order.notes && (
+                            <div className="mt-1 text-[9px] text-orange bg-orange/5 p-1 rounded border border-orange/10">
+                              <span className="font-bold">Note:</span> {order.notes}
+                            </div>
+                          )}
+                        </div>
+                      </td>
+                      <td className="py-3.5 px-4">
+                        <span className="uppercase text-[9px] tracking-wider text-muted-foreground border border-border px-1.5 py-0.5 rounded">
+                          {order.type}
+                        </span>
+                      </td>
+                      <td className="py-3.5 px-4">
+                        <span
+                          className={cn(
+                            "text-[9px] uppercase tracking-widest px-2 py-0.5 rounded font-bold",
+                            order.status === "pending" && "bg-orange-500/10 text-orange-400 border border-orange-500/20",
+                            order.status === "confirmed" && "bg-primary/10 text-primary border border-primary/20",
+                            order.status === "preparing" && "bg-primary/10 text-primary border border-primary/20",
+                            order.status === "ready" && "bg-primary/20 text-primary-light border border-primary/30",
+                            order.status === "completed" && "bg-ink-dark text-muted-foreground border border-border",
+                            order.status === "cancelled" && "bg-pink/10 text-pink border border-pink/20"
+                          )}
+                        >
+                          {order.status}
+                        </span>
+                      </td>
+                      <td className="py-3.5 px-4 font-numeral text-primary font-semibold">{formatPrice(order.total)}</td>
+                      <td className="py-3.5 px-4 text-[10px] text-muted-foreground">
+                        {formatDate(order.createdAt)}
+                      </td>
+                      <td className="py-3.5 px-4 text-right">
+                        <div className="flex items-center justify-end gap-2">
+                          {order.status !== "completed" && order.status !== "cancelled" && (
+                            <button
+                              onClick={() => handleStatusTransition(order.id, order.status)}
+                              disabled={isTransitioning}
+                              className="inline-flex items-center gap-1 py-1 px-2.5 bg-primary/10 hover:bg-primary/20 border border-primary/20 text-primary text-[10px] rounded uppercase font-semibold cursor-pointer disabled:opacity-50 transition-all active:scale-[0.98]"
+                            >
+                              {isTransitioning ? (
+                                <Loader2 className="h-3 w-3 animate-spin text-primary" />
+                              ) : null}
+                              <span>Advance</span>
+                            </button>
+                          )}
+                          {order.status === "pending" && (
+                            <button
+                              onClick={() => handleCancelOrder(order.id)}
+                              disabled={isTransitioning}
+                              className="inline-flex items-center gap-1 py-1 px-2 border border-pink/30 hover:bg-pink/15 text-pink text-[10px] rounded uppercase font-semibold cursor-pointer disabled:opacity-50 transition-all active:scale-[0.98]"
+                            >
+                              Cancel
+                            </button>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>

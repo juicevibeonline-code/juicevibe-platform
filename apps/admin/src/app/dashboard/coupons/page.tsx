@@ -204,14 +204,14 @@ export default function CouponsManagement() {
             <Button
               type="submit"
               disabled={createCouponMutation.isPending}
-              className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-mono text-xs uppercase tracking-wider h-10 animate-glow"
+              className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-mono text-xs uppercase tracking-wider h-10 shadow-lg shadow-primary/20 transition-all active:scale-[0.98]"
             >
               {createCouponMutation.isPending ? (
-                <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />
+                <Loader2 className="mr-2 h-4 w-4 animate-spin text-ink-dark" />
               ) : (
-                <Plus className="mr-2 h-3.5 w-3.5" />
+                <Plus className="mr-2 h-4 w-4" />
               )}
-              Create Coupon
+              <span>{createCouponMutation.isPending ? "Deploying Coupon..." : "Create Coupon"}</span>
             </Button>
           </form>
         </div>
@@ -219,8 +219,9 @@ export default function CouponsManagement() {
         {/* Coupons Directory */}
         <div className="lg:col-span-2 space-y-4">
           {isLoading ? (
-            <div className="text-center py-20 font-mono text-xs text-muted-foreground uppercase">
-              Fetching promotional indices...
+            <div className="flex flex-col items-center justify-center py-24 font-mono text-xs text-muted-foreground uppercase tracking-widest gap-3">
+              <Loader2 className="h-7 w-7 text-primary animate-spin" />
+              <span>Fetching promotional indices...</span>
             </div>
           ) : coupons.length === 0 ? (
             <div className="terminal-card p-12 text-center border border-border bg-card">
@@ -248,6 +249,7 @@ export default function CouponsManagement() {
                       const isExpired = coupon.expiresAt && new Date(coupon.expiresAt) < new Date();
                       const limitReached = coupon.usedCount >= coupon.usageLimit;
                       const active = coupon.isActive && !isExpired && !limitReached;
+                      const isDeleting = deleteCouponMutation.isPending && (deleteCouponMutation.variables as string) === coupon.id;
 
                       return (
                         <tr key={coupon.id} className="hover:bg-ink-dark/20 transition-colors">
@@ -297,9 +299,14 @@ export default function CouponsManagement() {
                               variant="ghost"
                               size="sm"
                               onClick={() => handleDelete(coupon.id, coupon.code)}
-                              className="h-8 px-2 text-pink hover:bg-pink/10 hover:text-pink font-mono text-[10px]"
+                              disabled={isDeleting}
+                              className="h-8 px-2 text-pink hover:bg-pink/10 hover:text-pink font-mono text-[10px] disabled:opacity-50"
                             >
-                              <Trash2 className="h-3.5 w-3.5" />
+                              {isDeleting ? (
+                                <Loader2 className="h-3.5 w-3.5 animate-spin text-pink" />
+                              ) : (
+                                <Trash2 className="h-3.5 w-3.5" />
+                              )}
                             </Button>
                           </td>
                         </tr>

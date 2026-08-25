@@ -178,80 +178,89 @@ export default function StaffRoster() {
         </div>
       </div>
 
-      {/* Roster list */}
+      {/* Staff Roster Grid */}
       {isLoading ? (
-        <div className="text-center py-20 font-mono text-xs text-muted-foreground uppercase">
-          Querying staff directories...
+        <div className="flex flex-col items-center justify-center py-24 font-mono text-xs text-muted-foreground uppercase tracking-widest gap-3">
+          <Loader2 className="h-7 w-7 text-primary animate-spin" />
+          <span>Compiling staff roster indices...</span>
         </div>
       ) : filtered.length === 0 ? (
         <div className="terminal-card p-12 text-center border border-border bg-card">
           <ChefHat className="h-8 w-8 text-muted-foreground mx-auto mb-3" />
-          <h3 className="text-sm font-bold text-foreground font-heading">No Staff Found</h3>
+          <h3 className="text-sm font-bold text-foreground font-heading">No Staff Members Registered</h3>
           <p className="text-xs text-muted-foreground font-mono mt-1">
-            Register new employee credentials above.
+            Create staff accounts to assign Kitchen, Cashier, or Admin access roles.
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {filtered.map((emp: any) => (
-            <div 
-              key={emp.id}
-              className="terminal-card bg-card border border-border p-5 relative hover:border-primary/40 transition-colors flex flex-col justify-between"
-            >
-              <div className="space-y-3.5">
-                <div className="flex items-start justify-between gap-3">
-                  <div className="flex items-center gap-3">
-                    <div className="h-10 w-10 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center font-bold text-primary text-sm uppercase shrink-0">
-                      {emp.user.name.slice(0, 2)}
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+          {filtered.map((emp: any) => {
+            const isDeleting = deleteMutation.isPending && (deleteMutation.variables as string) === emp.id;
+            return (
+              <div 
+                key={emp.id}
+                className="terminal-card border border-border bg-card p-5 relative flex flex-col justify-between hover:border-primary/40 transition-colors"
+              >
+                <div className="space-y-3.5">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex items-center gap-3">
+                      <div className="h-10 w-10 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center font-bold text-primary text-sm uppercase shrink-0">
+                        {emp.user.name.slice(0, 2)}
+                      </div>
+                      <div>
+                        <h3 className="text-sm font-bold text-foreground font-heading leading-tight">
+                          {emp.user.name}
+                        </h3>
+                        <span className="text-[10px] font-mono text-muted-foreground block mt-1">ID: {emp.employeeId}</span>
+                      </div>
                     </div>
-                    <div>
-                      <h3 className="text-sm font-bold text-foreground font-heading leading-tight">
-                        {emp.user.name}
-                      </h3>
-                      <span className="text-[10px] font-mono text-muted-foreground block mt-1">ID: {emp.employeeId}</span>
-                    </div>
-                  </div>
 
-                  <span className="text-[9px] font-mono font-bold uppercase tracking-widest px-2 py-0.5 rounded bg-ink-dark border border-border text-primary">
-                    {emp.user.role}
-                  </span>
-                </div>
-
-                {/* Roster Details */}
-                <div className="grid grid-cols-2 gap-4 font-mono text-[10px] border-t border-border/40 pt-3">
-                  <div>
-                    <span className="text-muted-foreground uppercase block text-[9px] mb-0.5">Position</span>
-                    <span className="text-foreground font-sans font-semibold text-xs">{emp.position}</span>
-                  </div>
-                  <div>
-                    <span className="text-muted-foreground uppercase block text-[9px] mb-0.5">Salary bounds</span>
-                    <span className="text-foreground font-semibold">
-                      {emp.salary ? `LKR ${emp.salary.toLocaleString()}` : "Not Disclosed"}
+                    <span className="text-[9px] font-mono font-bold uppercase tracking-widest px-2 py-0.5 rounded bg-ink-dark border border-border text-primary">
+                      {emp.user.role}
                     </span>
                   </div>
-                </div>
-              </div>
 
-              {/* Bottom Row / Status / Actions */}
-              <div className="flex items-center justify-between border-t border-border/40 pt-3 mt-4 text-[10px] font-mono">
-                <span className="text-muted-foreground">Enrolled: {formatDate(emp.hireDate)}</span>
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => handleOpenEdit(emp)}
-                    className="p-1 border border-border hover:border-primary/40 text-muted-foreground hover:text-foreground rounded cursor-pointer"
-                  >
-                    <Edit3 className="h-3.5 w-3.5" />
-                  </button>
-                  <button
-                    onClick={() => handleDelete(emp.id, emp.user.name)}
-                    className="p-1 border border-border hover:border-pink/40 text-muted-foreground hover:text-pink rounded cursor-pointer"
-                  >
-                    <Trash2 className="h-3.5 w-3.5" />
-                  </button>
+                  {/* Roster Details */}
+                  <div className="grid grid-cols-2 gap-4 font-mono text-[10px] border-t border-border/40 pt-3">
+                    <div>
+                      <span className="text-muted-foreground uppercase block text-[9px] mb-0.5">Position</span>
+                      <span className="text-foreground font-sans font-semibold text-xs">{emp.position}</span>
+                    </div>
+                    <div>
+                      <span className="text-muted-foreground uppercase block text-[9px] mb-0.5">Salary bounds</span>
+                      <span className="text-foreground font-semibold">
+                        {emp.salary ? `LKR ${emp.salary.toLocaleString()}` : "Not Disclosed"}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Bottom Row / Status / Actions */}
+                <div className="flex items-center justify-between border-t border-border/40 pt-3 mt-4 text-[10px] font-mono">
+                  <span className="text-muted-foreground">Enrolled: {formatDate(emp.hireDate)}</span>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => handleOpenEdit(emp)}
+                      className="p-1 border border-border hover:border-primary/40 text-muted-foreground hover:text-foreground rounded cursor-pointer transition-colors"
+                    >
+                      <Edit3 className="h-3.5 w-3.5" />
+                    </button>
+                    <button
+                      onClick={() => handleDelete(emp.id, emp.user.name)}
+                      disabled={isDeleting}
+                      className="p-1 border border-border hover:border-pink/40 text-muted-foreground hover:text-pink rounded cursor-pointer transition-colors disabled:opacity-50"
+                    >
+                      {isDeleting ? (
+                        <Loader2 className="h-3.5 w-3.5 animate-spin text-pink" />
+                      ) : (
+                        <Trash2 className="h-3.5 w-3.5" />
+                      )}
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
 
@@ -289,7 +298,7 @@ export default function StaffRoster() {
                   <label className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">Full Name</label>
                   <input
                     type="text"
-                    placeholder="e.g. Kasun Perera"
+                    placeholder="Kasun Perera"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     className="w-full bg-ink-dark border border-border text-foreground font-mono text-xs px-3 py-2 rounded-lg focus:outline-none focus:border-primary/50"
@@ -298,31 +307,30 @@ export default function StaffRoster() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1">
-                  <label className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">Email Address</label>
-                  <input
-                    type="email"
-                    placeholder="kasun@juicevibe.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="w-full bg-ink-dark border border-border text-foreground font-mono text-xs px-3 py-2 rounded-lg focus:outline-none focus:border-primary/50"
-                    required
-                  />
-                </div>
-                <div className="space-y-1">
-                  <label className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">
-                    {editingEmployee ? "New Password (Optional)" : "Security Password"}
-                  </label>
-                  <input
-                    type="password"
-                    placeholder="••••••••"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="w-full bg-ink-dark border border-border text-foreground font-mono text-xs px-3 py-2 rounded-lg focus:outline-none focus:border-primary/50"
-                    required={!editingEmployee}
-                  />
-                </div>
+              <div className="space-y-1">
+                <label className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">Corporate Email Address</label>
+                <input
+                  type="email"
+                  placeholder="kasun@juicevibe.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full bg-ink-dark border border-border text-foreground font-mono text-xs px-3 py-2 rounded-lg focus:outline-none focus:border-primary/50"
+                  required
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">
+                  {editingEmployee ? "Reset Password (Optional)" : "Security Password"}
+                </label>
+                <input
+                  type="password"
+                  placeholder={editingEmployee ? "••••••••" : "Enter temporary password"}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full bg-ink-dark border border-border text-foreground font-mono text-xs px-3 py-2 rounded-lg focus:outline-none focus:border-primary/50"
+                  required={!editingEmployee}
+                />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
@@ -385,13 +393,20 @@ export default function StaffRoster() {
                 <button
                   type="submit"
                   disabled={createMutation.isPending || updateMutation.isPending}
-                  className="px-4 py-2 bg-primary hover:bg-primary-dark text-ink-dark text-xs font-mono font-bold rounded-lg uppercase tracking-wider cursor-pointer flex items-center justify-center min-w-[120px]"
+                  className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-primary hover:bg-primary-dark disabled:opacity-60 disabled:cursor-not-allowed text-ink-dark text-xs font-mono font-bold rounded-lg uppercase tracking-wider cursor-pointer shadow-lg shadow-primary/20 transition-all active:scale-[0.98] min-w-[130px]"
                 >
-                  {createMutation.isPending || updateMutation.isPending ? (
-                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                  ) : (
-                    "Save Member"
+                  {(createMutation.isPending || updateMutation.isPending) && (
+                    <Loader2 className="h-4 w-4 animate-spin text-ink-dark shrink-0" />
                   )}
+                  <span>
+                    {createMutation.isPending
+                      ? "Registering Staff..."
+                      : updateMutation.isPending
+                      ? "Updating Staff..."
+                      : editingEmployee
+                      ? "Save Changes"
+                      : "Save Member"}
+                  </span>
                 </button>
               </div>
             </form>

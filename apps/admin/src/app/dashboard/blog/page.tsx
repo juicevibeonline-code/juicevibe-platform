@@ -170,97 +170,106 @@ export default function BlogManagement() {
       </div>
 
       {isLoading ? (
-        <div className="text-center py-20 font-mono text-xs text-muted-foreground uppercase">
-          Querying blog post indices...
+        <div className="flex flex-col items-center justify-center py-24 font-mono text-xs text-muted-foreground uppercase tracking-widest gap-3">
+          <Loader2 className="h-7 w-7 text-primary animate-spin" />
+          <span>Compiling editorial publication indices...</span>
         </div>
       ) : posts.length === 0 ? (
         <div className="terminal-card p-12 text-center border border-border bg-card">
           <BookOpen className="h-8 w-8 text-muted-foreground mx-auto mb-3" />
-          <h3 className="text-sm font-bold text-foreground font-heading">No Blog Posts</h3>
+          <h3 className="text-sm font-bold text-foreground font-heading">No Blog Articles Published</h3>
           <p className="text-xs text-muted-foreground font-mono mt-1">
-            Write your first cafe article using the creation panel.
+            Write and publish health & tropical recipe stories to engage guests.
           </p>
         </div>
       ) : (
         <div className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-            {posts.map((post: any) => (
-              <div
-                key={post.id}
-                className="terminal-card bg-card border border-border p-5 hover:border-primary/40 transition-colors flex flex-col justify-between"
-              >
-                <div className="space-y-3">
-                  {post.coverImage && (
-                    <div className="h-40 w-full rounded-lg overflow-hidden border border-border/40 mb-3 bg-ink-dark">
-                      <img src={post.coverImage} alt={post.title} className="h-full w-full object-cover" />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {posts.map((post: any) => {
+              const isDeleting = deleteMutation.isPending && (deleteMutation.variables as string) === post.id;
+              const isPublishing = publishMutation.isPending && (publishMutation.variables as string) === post.id;
+
+              return (
+                <div 
+                  key={post.id} 
+                  className="terminal-card bg-card border border-border p-5 relative hover:border-primary/40 transition-colors flex flex-col justify-between"
+                >
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="text-[9px] font-mono font-bold uppercase tracking-widest px-2 py-0.5 rounded bg-ink-dark border border-border text-primary">
+                        {post.category}
+                      </span>
+                      <button
+                        onClick={() => publishMutation.mutate(post.id)}
+                        disabled={isPublishing}
+                        className={cn(
+                          "inline-flex items-center gap-1.5 px-2 py-0.5 text-[9px] font-bold uppercase tracking-widest rounded border font-mono select-none cursor-pointer transition-colors disabled:opacity-50",
+                          post.isPublished
+                            ? "bg-primary/15 border-primary/30 text-primary hover:bg-pink/10 hover:text-pink hover:border-pink/20"
+                            : "bg-ink-dark border-border text-muted-foreground hover:bg-primary/20 hover:text-primary hover:border-primary/30"
+                        )}
+                      >
+                        {isPublishing ? (
+                          <Loader2 className="h-3 w-3 animate-spin text-current" />
+                        ) : post.isPublished ? (
+                          <>
+                            <Eye className="h-3 w-3" />
+                            <span>Published</span>
+                          </>
+                        ) : (
+                          <>
+                            <EyeOff className="h-3 w-3" />
+                            <span>Draft</span>
+                          </>
+                        )}
+                      </button>
                     </div>
-                  )}
-                  <div className="flex items-center justify-between gap-2">
-                    <span className="text-[9px] font-mono font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-ink-dark border border-border/60 text-primary">
-                      {post.category}
+
+                    <h3 className="text-sm font-bold text-foreground font-heading line-clamp-1" title={post.title}>
+                      {post.title}
+                    </h3>
+                    <p className="text-xs text-muted-foreground font-sans line-clamp-2 leading-relaxed">
+                      {post.excerpt}
+                    </p>
+                    
+                    {post.tags && post.tags.length > 0 && (
+                      <div className="flex flex-wrap gap-1.5 pt-1.5">
+                        {post.tags.map((tag: string) => (
+                          <span key={tag} className="text-[9px] font-mono text-muted-foreground/80 bg-ink-dark/50 px-1.5 py-0.2 rounded border border-border/20">
+                            #{tag}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="flex items-center justify-between border-t border-border/40 pt-3.5 mt-4 text-[10px] font-mono">
+                    <span className="text-muted-foreground/80">
+                      Created: <span className="font-numeral">{formatDate(post.createdAt)}</span>
                     </span>
-                    <button
-                      onClick={() => publishMutation.mutate(post.id)}
-                      className={cn(
-                        "inline-flex items-center gap-1.5 px-2 py-0.5 text-[9px] font-bold uppercase tracking-widest rounded border font-mono select-none cursor-pointer transition-colors",
-                        post.isPublished
-                          ? "bg-primary/15 border-primary/30 text-primary hover:bg-pink/10 hover:text-pink hover:border-pink/20"
-                          : "bg-ink-dark border-border text-muted-foreground hover:bg-primary/20 hover:text-primary hover:border-primary/30"
-                      )}
-                    >
-                      {post.isPublished ? (
-                        <>
-                          <Eye className="h-3 w-3" />
-                          <span>Published</span>
-                        </>
-                      ) : (
-                        <>
-                          <EyeOff className="h-3 w-3" />
-                          <span>Draft</span>
-                        </>
-                      )}
-                    </button>
-                  </div>
-
-                  <h3 className="text-sm font-bold text-foreground font-heading line-clamp-1" title={post.title}>
-                    {post.title}
-                  </h3>
-                  <p className="text-xs text-muted-foreground font-sans line-clamp-2 leading-relaxed">
-                    {post.excerpt}
-                  </p>
-                  
-                  {post.tags && post.tags.length > 0 && (
-                    <div className="flex flex-wrap gap-1.5 pt-1.5">
-                      {post.tags.map((tag: string) => (
-                        <span key={tag} className="text-[9px] font-mono text-muted-foreground/80 bg-ink-dark/50 px-1.5 py-0.2 rounded border border-border/20">
-                          #{tag}
-                        </span>
-                      ))}
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => handleOpenEdit(post)}
+                        className="p-1 border border-border hover:border-primary/40 text-muted-foreground hover:text-foreground rounded cursor-pointer transition-colors"
+                      >
+                        <Edit3 className="h-3.5 w-3.5" />
+                      </button>
+                      <button
+                        onClick={() => handleDelete(post.id, post.title)}
+                        disabled={isDeleting}
+                        className="p-1 border border-border hover:border-pink/40 text-muted-foreground hover:text-pink rounded cursor-pointer transition-colors disabled:opacity-50"
+                      >
+                        {isDeleting ? (
+                          <Loader2 className="h-3.5 w-3.5 animate-spin text-pink" />
+                        ) : (
+                          <Trash2 className="h-3.5 w-3.5" />
+                        )}
+                      </button>
                     </div>
-                  )}
-                </div>
-
-                <div className="flex items-center justify-between border-t border-border/40 pt-3.5 mt-4 text-[10px] font-mono">
-                  <span className="text-muted-foreground/80">
-                    Created: <span className="font-numeral">{formatDate(post.createdAt)}</span>
-                  </span>
-                  <div className="flex items-center gap-2">
-                    <button
-                      onClick={() => handleOpenEdit(post)}
-                      className="p-1 border border-border hover:border-primary/40 text-muted-foreground hover:text-foreground rounded cursor-pointer"
-                    >
-                      <Edit3 className="h-3.5 w-3.5" />
-                    </button>
-                    <button
-                      onClick={() => handleDelete(post.id, post.title)}
-                      className="p-1 border border-border hover:border-pink/40 text-muted-foreground hover:text-pink rounded cursor-pointer"
-                    >
-                      <Trash2 className="h-3.5 w-3.5" />
-                    </button>
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
 
           {/* Pagination */}
@@ -294,13 +303,13 @@ export default function BlogManagement() {
         </div>
       )}
 
-      {/* CREATE/EDIT OVERLAY MODAL */}
+      {/* CREATE & EDIT OVERLAY MODAL */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
-          <div className="w-full max-w-2xl bg-card border border-border rounded-xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+          <div className="w-full max-w-2xl bg-card border border-border rounded-xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col">
             <div className="h-14 flex items-center justify-between px-5 border-b border-border bg-ink-dark/30 shrink-0">
               <h2 className="text-sm font-bold text-foreground font-heading uppercase tracking-wider">
-                {editingPost ? `Edit Article // ${editingPost.title}` : "Write Blog Article"}
+                {editingPost ? `Edit Article // ${editingPost.title}` : "Author New Blog Article"}
               </h2>
               <button
                 onClick={() => setIsModalOpen(false)}
@@ -310,43 +319,31 @@ export default function BlogManagement() {
               </button>
             </div>
 
-            <form onSubmit={handleSubmit} className="p-5 space-y-4 overflow-y-auto flex-1 scrollbar-hide">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-1">
-                  <label className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">Article Title *</label>
-                  <input
-                    type="text"
-                    placeholder="e.g. Avocado Pit Power"
-                    value={title}
-                    onChange={(e) => handleTitleChange(e.target.value)}
-                    className="w-full bg-ink-dark border border-border text-foreground font-mono text-xs px-3 py-2.5 rounded-lg focus:outline-none focus:border-primary/50"
-                    required
-                  />
-                </div>
-                <div className="space-y-1">
-                  <label className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">URL Slug *</label>
-                  <input
-                    type="text"
-                    placeholder="avocado-pit-power"
-                    value={slug}
-                    onChange={(e) => setSlug(e.target.value)}
-                    className="w-full bg-ink-dark border border-border text-foreground font-mono text-xs px-3 py-2.5 rounded-lg focus:outline-none focus:border-primary/50 lowercase"
-                    required
-                  />
-                </div>
+            <form onSubmit={handleSubmit} className="p-5 space-y-4 overflow-y-auto flex-1 flex flex-col scrollbar-hide">
+              <div className="space-y-1">
+                <label className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">Article Title *</label>
+                <input
+                  type="text"
+                  placeholder="e.g. 5 Cold-Pressed Elixirs for Tropical Vitality"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  className="w-full bg-ink-dark border border-border text-foreground font-mono text-xs px-3 py-2.5 rounded-lg focus:outline-none focus:border-primary/50"
+                  required
+                />
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1">
-                  <label className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">Category Group</label>
+                  <label className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">Category Map</label>
                   <select
                     value={category}
                     onChange={(e) => setCategory(e.target.value)}
                     className="w-full bg-ink-dark border border-border text-foreground font-mono text-xs px-3 py-2.5 rounded-lg focus:outline-none focus:border-primary/50"
                   >
-                    <option value="general">General Nutrition</option>
-                    <option value="recipes">Recipes</option>
-                    <option value="wellness">Wellness Tips</option>
+                    <option value="general">General Lifestyle</option>
+                    <option value="health">Health & Nutrition</option>
+                    <option value="recipes">Raw Recipes & Mixology</option>
+                    <option value="sustainability">Eco & Sustainability</option>
                     <option value="promotions">Cafe Promotions</option>
                   </select>
                 </div>
@@ -407,13 +404,20 @@ export default function BlogManagement() {
                 <button
                   type="submit"
                   disabled={createMutation.isPending || updateMutation.isPending}
-                  className="px-4 py-2 bg-primary hover:bg-primary-dark text-ink-dark text-xs font-mono font-bold rounded-lg uppercase tracking-wider cursor-pointer flex items-center justify-center min-w-[120px]"
+                  className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-primary hover:bg-primary-dark disabled:opacity-60 disabled:cursor-not-allowed text-ink-dark text-xs font-mono font-bold rounded-lg uppercase tracking-wider cursor-pointer shadow-lg shadow-primary/20 transition-all active:scale-[0.98] min-w-[130px]"
                 >
-                  {createMutation.isPending || updateMutation.isPending ? (
-                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                  ) : (
-                    "Save Article"
+                  {(createMutation.isPending || updateMutation.isPending) && (
+                    <Loader2 className="h-4 w-4 animate-spin text-ink-dark shrink-0" />
                   )}
+                  <span>
+                    {createMutation.isPending
+                      ? "Publishing Article..."
+                      : updateMutation.isPending
+                      ? "Updating Article..."
+                      : editingPost
+                      ? "Save Changes"
+                      : "Save Article"}
+                  </span>
                 </button>
               </div>
             </form>

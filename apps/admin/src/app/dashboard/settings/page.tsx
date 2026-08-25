@@ -13,7 +13,8 @@ import {
   MapPin, 
   Clock, 
   CreditCard,
-  ShieldCheck
+  ShieldCheck,
+  Loader2
 } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { Badge } from "@juice-vibe/ui";
@@ -38,8 +39,8 @@ export default function SystemSettings() {
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [passwordSuccess, setPasswordSuccess] = useState<string | null>(null);
   const [passwordError, setPasswordError] = useState<string | null>(null);
+  const [passwordSuccess, setPasswordSuccess] = useState<string | null>(null);
   const [passwordUpdating, setPasswordUpdating] = useState(false);
 
   const handlePasswordChange = async (e: React.FormEvent) => {
@@ -51,13 +52,14 @@ export default function SystemSettings() {
       setPasswordError("New passwords do not match");
       return;
     }
+
     if (newPassword.length < 6) {
-      setPasswordError("Password must be at least 6 characters long");
+      setPasswordError("New password must be at least 6 characters");
       return;
     }
 
-    setPasswordUpdating(true);
     try {
+      setPasswordUpdating(true);
       await authService.changePassword(oldPassword, newPassword);
       setPasswordSuccess("Password updated successfully");
       setOldPassword("");
@@ -70,14 +72,6 @@ export default function SystemSettings() {
     }
   };
 
-
-  // Fetch Settings
-  const { data: settings = {}, isLoading, refetch } = useQuery<Record<string, string>>({
-    queryKey: ["systemSettings"],
-    queryFn: () => settingsService.getSettings(),
-    retry: 1,
-  });
-
   const {
     register,
     handleSubmit,
@@ -85,184 +79,178 @@ export default function SystemSettings() {
     formState: { errors },
   } = useForm<SettingsFormSchema>({
     resolver: zodResolver(settingsFormSchema),
-    defaultValues: {
-      business_name: "Juice Vibe",
-      business_tagline: "Sip the Good Vibes",
-      business_phone: "+94718435876",
-      business_email: "hello@juicevibe.com",
-      business_address: "Galle Road, Bentota, Sri Lanka",
-      opening_hours_weekdays: "8:00 AM - 10:00 PM",
-      tax_rate: 5,
-      delivery_fee: 150,
-      free_delivery_min: 1000,
-    },
   });
 
-  // Load backend values into form once fetched
+  const { data: settingsData, isLoading } = useQuery({
+    queryKey: ["adminSettings"],
+    queryFn: () => settingsService.getSettings(),
+    retry: 1,
+  });
+
   useEffect(() => {
-    if (Object.keys(settings).length > 0) {
+    if (settingsData) {
       reset({
-        business_name: settings.business_name || "Juice Vibe",
-        business_tagline: settings.business_tagline || "Sip the Good Vibes",
-        business_phone: settings.business_phone || "+94718435876",
-        business_email: settings.business_email || "hello@juicevibe.com",
-        business_address: settings.business_address || "Galle Road, Bentota, Sri Lanka",
-        opening_hours_weekdays: settings.opening_hours_weekdays || "8:00 AM - 10:00 PM",
-        tax_rate: Number(settings.tax_rate || 5),
-        delivery_fee: Number(settings.delivery_fee || 150),
-        free_delivery_min: Number(settings.free_delivery_min || 1000),
+        business_name: settingsData.business_name || "Juice Vibe",
+        business_tagline: settingsData.business_tagline || "Fresh Cold Pressed Juices",
+        business_phone: settingsData.business_phone || "+94 11 234 5678",
+        business_email: settingsData.business_email || "hello@juicevibe.lk",
+        business_address: settingsData.business_address || "No. 42 Galle Road, Colombo 03",
+        opening_hours_weekdays: settingsData.opening_hours_weekdays || "07:00 AM - 10:00 PM",
+        tax_rate: Number(settingsData.tax_rate) || 0,
+        delivery_fee: Number(settingsData.delivery_fee) || 250,
+        free_delivery_min: Number(settingsData.free_delivery_min) || 3000,
       });
     }
-  }, [settings, reset]);
+  }, [settingsData, reset]);
 
-  // Update Settings mutation
   const updateSettingsMutation = useMutation({
-    mutationFn: (input: Record<string, string>) => settingsService.updateSettings(input),
+    mutationFn: (values: SettingsFormSchema) => settingsService.updateSettings(values as any),
     onSuccess: () => {
-      setSuccessMsg("Settings updated successfully in global DB parameters.");
-      refetch();
-      setTimeout(() => setSuccessMsg(null), 3000);
+      setSuccessMsg("System configuration variables successfully deployed.");
+      setTimeout(() => setSuccessMsg(null), 4000);
+    },
+    onError: (err: any) => {
+      alert(err.response?.data?.message || err.message || "Settings update failed");
     },
   });
 
   const onSubmit = (data: SettingsFormSchema) => {
-    // Convert to Record<string, string> expected by service layer
-    const values: Record<string, string> = {
-      business_name: data.business_name,
-      business_tagline: data.business_tagline || "",
-      business_phone: data.business_phone,
-      business_email: data.business_email,
-      business_address: data.business_address,
-      opening_hours_weekdays: data.opening_hours_weekdays || "",
-      tax_rate: String(data.tax_rate),
-      delivery_fee: String(data.delivery_fee),
-      free_delivery_min: String(data.free_delivery_min),
-    };
-    updateSettingsMutation.mutate(values);
+    updateSettingsMutation.mutate(data);
   };
 
   return (
     <div className="space-y-6">
-      {/* Header controls */}
+      {/* Header Panel */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-border pb-4">
         <div>
           <h1 className="text-xl font-bold tracking-tight text-foreground font-heading">
-            System Settings
+            System & Brand Environment
           </h1>
           <p className="text-xs text-muted-foreground font-mono mt-1">
-            GLOBAL DB VARIABLES OVERRIDES & API CONSTANTS CONFIG
+            RUNTIME PLATFORM PARAMETERS, COMMERCE BOUNDS & OPERATIONAL CONSTANTS
           </p>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <Badge variant="primary" className="font-mono text-[10px]">
+            NODE RUNTIME: PRODUCTION
+          </Badge>
         </div>
       </div>
 
+      {successMsg && (
+        <div className="rounded-lg border border-primary/30 bg-primary/10 p-3 text-xs text-primary font-mono animate-in fade-in">
+          {successMsg}
+        </div>
+      )}
+
       {isLoading ? (
-        <div className="text-center py-20 font-mono text-xs text-muted-foreground uppercase">
-          Fetching system config indices parameters...
+        <div className="flex flex-col items-center justify-center py-24 font-mono text-xs text-muted-foreground uppercase tracking-widest gap-3">
+          <Loader2 className="h-7 w-7 text-primary animate-spin" />
+          <span>Synchronizing environmental variables...</span>
         </div>
       ) : (
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 max-w-4xl">
-          {successMsg && (
-            <div className="flex items-center gap-2 rounded-lg border border-primary/30 bg-primary/10 p-3 text-xs text-primary font-mono">
-              <ShieldCheck className="h-4 w-4 shrink-0" />
-              <span>{successMsg}</span>
-            </div>
-          )}
-
-          {/* Section 1: Business Profile details */}
+          {/* Section 1: Business Profile */}
           <div className="terminal-card bg-card border border-border p-6 space-y-4">
             <h2 className="text-xs font-bold text-foreground uppercase tracking-widest font-mono flex items-center gap-2">
-              <Sliders className="h-4 w-4 text-primary" />
-              <span>Business Profile Parameters</span>
+              <MapPin className="h-4 w-4 text-primary" />
+              <span>Identity & Physical Footprint</span>
             </h2>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-1">
-                <label className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">Store Name</label>
+                <label className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">Business Brand Name</label>
                 <input
                   type="text"
                   className="w-full bg-ink-dark border border-border text-foreground font-mono text-xs px-3 py-2 rounded-lg focus:outline-none focus:border-primary/50"
                   {...register("business_name")}
                 />
-                {errors.business_name && <p className="text-[10px] font-mono text-pink">{errors.business_name.message}</p>}
+                {errors.business_name && <span className="text-[10px] text-pink font-mono">{errors.business_name.message}</span>}
               </div>
 
               <div className="space-y-1">
-                <label className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">Tagline Accent</label>
+                <label className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">Brand Tagline</label>
                 <input
                   type="text"
                   className="w-full bg-ink-dark border border-border text-foreground font-mono text-xs px-3 py-2 rounded-lg focus:outline-none focus:border-primary/50"
                   {...register("business_tagline")}
                 />
               </div>
+            </div>
 
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-1">
-                <label className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">Public Phone ID</label>
+                <label className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">Support Telephone</label>
                 <input
                   type="text"
-                  className="w-full bg-ink-dark border border-border text-foreground font-mono text-xs px-3 py-2 rounded-lg focus:outline-none focus:border-primary/50 font-numeral"
+                  className="w-full bg-ink-dark border border-border text-foreground font-mono text-xs px-3 py-2 rounded-lg focus:outline-none focus:border-primary/50"
                   {...register("business_phone")}
                 />
-                {errors.business_phone && <p className="text-[10px] font-mono text-pink">{errors.business_phone.message}</p>}
+                {errors.business_phone && <span className="text-[10px] text-pink font-mono">{errors.business_phone.message}</span>}
               </div>
 
               <div className="space-y-1">
-                <label className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">Operations Contact Email</label>
+                <label className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">Public Email Address</label>
                 <input
                   type="email"
                   className="w-full bg-ink-dark border border-border text-foreground font-mono text-xs px-3 py-2 rounded-lg focus:outline-none focus:border-primary/50"
                   {...register("business_email")}
                 />
-                {errors.business_email && <p className="text-[10px] font-mono text-pink">{errors.business_email.message}</p>}
+                {errors.business_email && <span className="text-[10px] text-pink font-mono">{errors.business_email.message}</span>}
               </div>
             </div>
 
             <div className="space-y-1">
-              <label className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">Physical Address Location</label>
+              <label className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">HQ / Outlet Physical Address</label>
               <input
                 type="text"
                 className="w-full bg-ink-dark border border-border text-foreground font-mono text-xs px-3 py-2 rounded-lg focus:outline-none focus:border-primary/50"
                 {...register("business_address")}
               />
-              {errors.business_address && <p className="text-[10px] font-mono text-pink">{errors.business_address.message}</p>}
+              {errors.business_address && <span className="text-[10px] text-pink font-mono">{errors.business_address.message}</span>}
             </div>
           </div>
 
-          {/* Section 2: Fiscal parameters */}
+          {/* Section 2: Commerce Bounds */}
           <div className="terminal-card bg-card border border-border p-6 space-y-4">
             <h2 className="text-xs font-bold text-foreground uppercase tracking-widest font-mono flex items-center gap-2">
               <CreditCard className="h-4 w-4 text-primary" />
-              <span>Fiscal & Delivery parameters</span>
+              <span>Financial & Fulfillment Limits</span>
             </h2>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 font-mono text-xs">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="space-y-1">
-                <label className="text-[10px] uppercase tracking-wider text-muted-foreground">General Tax Rate (%)</label>
+                <label className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">System VAT / Tax Rate (%)</label>
                 <input
                   type="number"
-                  className="w-full bg-ink-dark border border-border text-foreground px-3 py-2 rounded-lg focus:outline-none focus:border-primary/50 font-numeral"
+                  step="0.01"
+                  className="w-full bg-ink-dark border border-border text-foreground font-mono text-xs px-3 py-2 rounded-lg focus:outline-none focus:border-primary/50 font-numeral"
                   {...register("tax_rate", { valueAsNumber: true })}
                 />
-                {errors.tax_rate && <p className="text-[10px] text-pink">{errors.tax_rate.message}</p>}
+                {errors.tax_rate && <span className="text-[10px] text-pink font-mono">{errors.tax_rate.message}</span>}
               </div>
 
               <div className="space-y-1">
-                <label className="text-[10px] uppercase tracking-wider text-muted-foreground">Flat Delivery Fee (LKR)</label>
+                <label className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">Base Delivery Fee (LKR)</label>
                 <input
                   type="number"
-                  className="w-full bg-ink-dark border border-border text-foreground px-3 py-2 rounded-lg focus:outline-none focus:border-primary/50 font-numeral"
+                  step="1"
+                  className="w-full bg-ink-dark border border-border text-foreground font-mono text-xs px-3 py-2 rounded-lg focus:outline-none focus:border-primary/50 font-numeral"
                   {...register("delivery_fee", { valueAsNumber: true })}
                 />
-                {errors.delivery_fee && <p className="text-[10px] text-pink">{errors.delivery_fee.message}</p>}
+                {errors.delivery_fee && <span className="text-[10px] text-pink font-mono">{errors.delivery_fee.message}</span>}
               </div>
 
               <div className="space-y-1">
-                <label className="text-[10px] uppercase tracking-wider text-muted-foreground">Free Delivery Minimum (LKR)</label>
+                <label className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">Free Delivery Minimum (LKR)</label>
                 <input
                   type="number"
-                  className="w-full bg-ink-dark border border-border text-foreground px-3 py-2 rounded-lg focus:outline-none focus:border-primary/50 font-numeral"
+                  step="1"
+                  className="w-full bg-ink-dark border border-border text-foreground font-mono text-xs px-3 py-2 rounded-lg focus:outline-none focus:border-primary/50 font-numeral"
                   {...register("free_delivery_min", { valueAsNumber: true })}
                 />
-                {errors.free_delivery_min && <p className="text-[10px] text-pink">{errors.free_delivery_min.message}</p>}
+                {errors.free_delivery_min && <span className="text-[10px] text-pink font-mono">{errors.free_delivery_min.message}</span>}
               </div>
             </div>
           </div>
@@ -288,10 +276,14 @@ export default function SystemSettings() {
             <button
               type="submit"
               disabled={updateSettingsMutation.isPending}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-primary hover:bg-primary-dark text-ink-dark text-xs font-mono font-bold rounded-lg uppercase tracking-wider cursor-pointer"
+              className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-primary hover:bg-primary-dark disabled:opacity-60 disabled:cursor-not-allowed text-ink-dark text-xs font-mono font-bold rounded-lg uppercase tracking-wider cursor-pointer shadow-lg shadow-primary/20 transition-all active:scale-[0.98] min-w-[150px]"
             >
-              <Save className="h-4 w-4" />
-              <span>{updateSettingsMutation.isPending ? "Updating DB..." : "Commit Variables"}</span>
+              {updateSettingsMutation.isPending ? (
+                <Loader2 className="h-4 w-4 animate-spin text-ink-dark shrink-0" />
+              ) : (
+                <Save className="h-4 w-4 shrink-0" />
+              )}
+              <span>{updateSettingsMutation.isPending ? "Committing Settings..." : "Commit Variables"}</span>
             </button>
           </div>
         </form>
@@ -356,9 +348,12 @@ export default function SystemSettings() {
             <button
               type="submit"
               disabled={passwordUpdating}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-pink hover:bg-pink/90 text-white text-xs font-mono font-bold rounded-lg uppercase tracking-wider cursor-pointer"
+              className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-pink hover:bg-pink/90 disabled:opacity-60 disabled:cursor-not-allowed text-white text-xs font-mono font-bold rounded-lg uppercase tracking-wider cursor-pointer shadow-lg shadow-pink/20 transition-all active:scale-[0.98] min-w-[150px]"
             >
-              <span>{passwordUpdating ? "Updating..." : "Update Password"}</span>
+              {passwordUpdating && (
+                <Loader2 className="h-4 w-4 animate-spin text-white shrink-0" />
+              )}
+              <span>{passwordUpdating ? "Updating Password..." : "Update Password"}</span>
             </button>
           </div>
         </form>
