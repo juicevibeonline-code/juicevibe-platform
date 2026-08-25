@@ -3,7 +3,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { testimonialService } from "@juice-vibe/services";
 import { formatDate } from "@juice-vibe/utils";
-import { Heart, Star, Trash2, Award } from "lucide-react";
+import { Heart, Star, Trash2, Award, Loader2 } from "lucide-react";
 import React, { useState } from "react";
 import { Button } from "@juice-vibe/ui";
 import { cn } from "@juice-vibe/utils";
@@ -54,7 +54,7 @@ export default function TestimonialsManagement() {
   };
 
   const handleDelete = (id: string, name: string) => {
-    if (confirm(`Are you sure you want to permanently delete the testimonial submitted by ${name}?`)) {
+    if (confirm(`Permanently remove testimonial from ${name}?`)) {
       deleteMutation.mutate(id);
     }
   };
@@ -77,8 +77,9 @@ export default function TestimonialsManagement() {
       </div>
 
       {isLoading ? (
-        <div className="text-center py-20 font-mono text-xs text-muted-foreground uppercase">
-          Querying testimonial directories...
+        <div className="flex flex-col items-center justify-center py-24 font-mono text-xs text-muted-foreground uppercase tracking-widest gap-3">
+          <Loader2 className="h-7 w-7 text-primary animate-spin" />
+          <span>Compiling feedback review indices...</span>
         </div>
       ) : testimonials.length === 0 ? (
         <div className="terminal-card p-12 text-center border border-border bg-card">
@@ -104,74 +105,93 @@ export default function TestimonialsManagement() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border/40">
-                  {testimonials.map((t: any) => (
-                    <tr key={t.id} className="hover:bg-ink-dark/20 transition-colors">
-                      <td className="py-3.5 px-4">
-                        <div className="flex items-center gap-3">
-                          <div className="h-8 w-8 rounded-full bg-primary/10 border border-primary/20 text-primary flex items-center justify-center font-bold text-xs uppercase shrink-0">
-                            {t.avatar ? (
-                              <img src={t.avatar} alt={t.name} className="h-full w-full rounded-full object-cover" />
+                  {testimonials.map((t: any) => {
+                    const isDeleting = deleteMutation.isPending && (deleteMutation.variables as string) === t.id;
+                    const isUpdating = updateMutation.isPending && (updateMutation.variables as any)?.id === t.id;
+
+                    return (
+                      <tr key={t.id} className="hover:bg-ink-dark/20 transition-colors">
+                        <td className="py-3.5 px-4">
+                          <div className="flex items-center gap-3">
+                            <div className="h-8 w-8 rounded-full bg-primary/10 border border-primary/20 text-primary flex items-center justify-center font-bold text-xs uppercase shrink-0">
+                              {t.avatar ? (
+                                <img src={t.avatar} alt={t.name} className="h-full w-full rounded-full object-cover" />
+                              ) : (
+                                t.name.slice(0, 2)
+                              )}
+                            </div>
+                            <div>
+                              <span className="font-semibold text-foreground font-sans block">{t.name}</span>
+                              {t.role && (
+                                <span className="text-[9px] text-muted-foreground block font-sans">{t.role}</span>
+                              )}
+                            </div>
+                          </div>
+                        </td>
+                        <td className="py-3.5 px-4 font-sans text-muted-foreground max-w-xs text-xs truncate" title={t.text}>
+                          {t.text}
+                        </td>
+                        <td className="py-3.5 px-4">
+                          <div className="flex items-center gap-1 font-numeral text-yellow">
+                            <Star className="h-3.5 w-3.5 fill-yellow text-yellow shrink-0" />
+                            <span className="font-bold text-foreground text-xs">{t.rating}</span>
+                            <span className="text-muted-foreground/60 text-[10px]">/ 5</span>
+                          </div>
+                        </td>
+                        <td className="py-3.5 px-4">
+                          <button
+                            onClick={() => handleToggleApprove(t.id, !t.isApproved)}
+                            disabled={isUpdating}
+                            className={cn(
+                              "inline-flex items-center gap-1.5 px-2.5 py-1 text-[9px] font-bold uppercase tracking-widest rounded border font-mono select-none cursor-pointer transition-colors disabled:opacity-50",
+                              t.isApproved
+                                ? "bg-primary/15 border-primary/30 text-primary hover:bg-pink/10 hover:text-pink hover:border-pink/20"
+                                : "bg-ink-dark border-border text-muted-foreground hover:bg-primary/20 hover:text-primary hover:border-primary/30"
+                            )}
+                          >
+                            {isUpdating ? (
+                              <Loader2 className="h-3 w-3 animate-spin text-current" />
+                            ) : null}
+                            <span>{t.isApproved ? "Approved" : "Pending"}</span>
+                          </button>
+                        </td>
+                        <td className="py-3.5 px-4">
+                          <button
+                            onClick={() => handleToggleFeature(t.id, !t.isFeatured)}
+                            disabled={isUpdating}
+                            className={cn(
+                              "inline-flex items-center gap-1 px-2.5 py-1 text-[9px] font-bold uppercase tracking-widest rounded border font-mono select-none cursor-pointer transition-colors disabled:opacity-50",
+                              t.isFeatured
+                                ? "bg-yellow/15 border-yellow/30 text-yellow hover:bg-ink-dark hover:text-muted-foreground hover:border-border"
+                                : "bg-ink-dark border-border text-muted-foreground hover:bg-yellow/10 hover:text-yellow hover:border-yellow/20"
+                            )}
+                          >
+                            {isUpdating ? (
+                              <Loader2 className="h-3 w-3 animate-spin text-current" />
                             ) : (
-                              t.name.slice(0, 2)
+                              <Award className="h-3 w-3 shrink-0" />
                             )}
-                          </div>
-                          <div>
-                            <span className="font-semibold text-foreground font-sans block">{t.name}</span>
-                            {t.role && (
-                              <span className="text-[9px] text-muted-foreground block font-sans">{t.role}</span>
+                            <span>{t.isFeatured ? "Featured" : "Standard"}</span>
+                          </button>
+                        </td>
+                        <td className="py-3.5 px-4 text-right">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleDelete(t.id, t.name)}
+                            disabled={isDeleting}
+                            className="h-8 px-2 text-pink hover:bg-pink/10 hover:text-pink font-mono text-[10px] disabled:opacity-50"
+                          >
+                            {isDeleting ? (
+                              <Loader2 className="h-3.5 w-3.5 animate-spin text-pink" />
+                            ) : (
+                              <Trash2 className="h-3.5 w-3.5" />
                             )}
-                          </div>
-                        </div>
-                      </td>
-                      <td className="py-3.5 px-4 font-sans text-muted-foreground max-w-xs text-xs truncate" title={t.text}>
-                        {t.text}
-                      </td>
-                      <td className="py-3.5 px-4">
-                        <div className="flex items-center gap-1 font-numeral text-yellow">
-                          <Star className="h-3.5 w-3.5 fill-yellow text-yellow shrink-0" />
-                          <span className="font-bold text-foreground text-xs">{t.rating}</span>
-                          <span className="text-muted-foreground/60 text-[10px]">/ 5</span>
-                        </div>
-                      </td>
-                      <td className="py-3.5 px-4">
-                        <button
-                          onClick={() => handleToggleApprove(t.id, !t.isApproved)}
-                          className={cn(
-                            "px-2 py-0.5 text-[9px] font-bold uppercase tracking-widest rounded border font-mono select-none cursor-pointer transition-colors",
-                            t.isApproved
-                              ? "bg-primary/15 border-primary/30 text-primary hover:bg-pink/10 hover:text-pink hover:border-pink/20"
-                              : "bg-ink-dark border-border text-muted-foreground hover:bg-primary/20 hover:text-primary hover:border-primary/30"
-                          )}
-                        >
-                          {t.isApproved ? "Approved" : "Pending"}
-                        </button>
-                      </td>
-                      <td className="py-3.5 px-4">
-                        <button
-                          onClick={() => handleToggleFeature(t.id, !t.isFeatured)}
-                          className={cn(
-                            "inline-flex items-center gap-1 px-2 py-0.5 text-[9px] font-bold uppercase tracking-widest rounded border font-mono select-none cursor-pointer transition-colors",
-                            t.isFeatured
-                              ? "bg-yellow/15 border-yellow/30 text-yellow hover:bg-ink-dark hover:text-muted-foreground hover:border-border"
-                              : "bg-ink-dark border-border text-muted-foreground hover:bg-yellow/10 hover:text-yellow hover:border-yellow/20"
-                          )}
-                        >
-                          <Award className="h-3 w-3 shrink-0" />
-                          <span>{t.isFeatured ? "Featured" : "Standard"}</span>
-                        </button>
-                      </td>
-                      <td className="py-3.5 px-4 text-right">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleDelete(t.id, t.name)}
-                          className="h-8 px-2 text-pink hover:bg-pink/10 hover:text-pink font-mono text-[10px]"
-                        >
-                          <Trash2 className="h-3.5 w-3.5" />
-                        </Button>
-                      </td>
-                    </tr>
-                  ))}
+                          </Button>
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>

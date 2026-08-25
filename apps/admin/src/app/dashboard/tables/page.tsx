@@ -485,14 +485,14 @@ export default function TablesManagement() {
           variant="outline"
           onClick={() => regenerateMutation.mutate()}
           disabled={regenerateMutation.isPending}
-          className="border-border hover:bg-ink-dark text-xs font-mono uppercase h-9"
+          className="border-border hover:bg-ink-dark text-xs font-mono uppercase h-9 shadow-sm"
         >
           {regenerateMutation.isPending ? (
-            <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />
+            <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin text-primary" />
           ) : (
             <RefreshCw className="mr-2 h-3.5 w-3.5 text-primary" />
           )}
-          Regenerate Production QR Codes
+          <span>{regenerateMutation.isPending ? "Regenerating QRs..." : "Regenerate Production QR Codes"}</span>
         </Button>
       </div>
 
@@ -519,14 +519,14 @@ export default function TablesManagement() {
             <Button
               type="submit"
               disabled={createTableMutation.isPending}
-              className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-mono text-xs uppercase tracking-wider h-10"
+              className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-mono text-xs uppercase tracking-wider h-10 shadow-lg shadow-primary/20 transition-all active:scale-[0.98]"
             >
               {createTableMutation.isPending ? (
-                <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />
+                <Loader2 className="mr-2 h-4 w-4 animate-spin text-ink-dark" />
               ) : (
-                <Plus className="mr-2 h-3.5 w-3.5" />
+                <Plus className="mr-2 h-4 w-4" />
               )}
-              Register Table
+              <span>{createTableMutation.isPending ? "Registering Table..." : "Register Table"}</span>
             </Button>
           </form>
         </div>
@@ -534,8 +534,9 @@ export default function TablesManagement() {
         {/* Tables Directory */}
         <div className="lg:col-span-2 space-y-4">
           {isLoading ? (
-            <div className="text-center py-20 font-mono text-xs text-muted-foreground uppercase">
-              Fetching table register indices...
+            <div className="flex flex-col items-center justify-center py-24 font-mono text-xs text-muted-foreground uppercase tracking-widest gap-3">
+              <Loader2 className="h-7 w-7 text-primary animate-spin" />
+              <span>Fetching table register indices...</span>
             </div>
           ) : tables.length === 0 ? (
             <div className="terminal-card p-12 text-center border border-border bg-card">
@@ -558,34 +559,42 @@ export default function TablesManagement() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-border/40">
-                    {tables.map((table: any) => (
-                      <tr key={table.id} className="hover:bg-ink-dark/20 transition-colors">
-                        <td className="py-3.5 px-4 font-mono text-muted-foreground select-all text-[11px]">{table.id}</td>
-                        <td className="py-3.5 px-4 font-bold text-primary text-sm font-mono">
-                          Table {formattedTableNumber(table.number)}
-                        </td>
-                        <td className="py-3.5 px-4 text-muted-foreground text-[11px]">{formatDate(table.createdAt)}</td>
-                        <td className="py-3.5 px-4 text-right space-x-2">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleOpenPrintModal(table)}
-                            className="h-8 px-2.5 border-border hover:bg-ink-dark hover:text-primary font-mono text-[10px]"
-                          >
-                            <QrCode className="h-3.5 w-3.5 mr-1.5" />
-                            View Standee
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleDelete(table.id, table.number)}
-                            className="h-8 px-2 text-pink hover:bg-pink/10 hover:text-pink font-mono text-[10px]"
-                          >
-                            <Trash2 className="h-3.5 w-3.5" />
-                          </Button>
-                        </td>
-                      </tr>
-                    ))}
+                    {tables.map((table: any) => {
+                      const isDeleting = deleteTableMutation.isPending && (deleteTableMutation.variables as string) === table.id;
+                      return (
+                        <tr key={table.id} className="hover:bg-ink-dark/20 transition-colors">
+                          <td className="py-3.5 px-4 font-mono text-muted-foreground select-all text-[11px]">{table.id}</td>
+                          <td className="py-3.5 px-4 font-bold text-primary text-sm font-mono">
+                            Table {formattedTableNumber(table.number)}
+                          </td>
+                          <td className="py-3.5 px-4 text-muted-foreground text-[11px]">{formatDate(table.createdAt)}</td>
+                          <td className="py-3.5 px-4 text-right space-x-2">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleOpenPrintModal(table)}
+                              className="h-8 px-2.5 border-border hover:bg-ink-dark hover:text-primary font-mono text-[10px]"
+                            >
+                              <QrCode className="h-3.5 w-3.5 mr-1.5" />
+                              View Standee
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleDelete(table.id, table.number)}
+                              disabled={isDeleting}
+                              className="h-8 px-2 text-pink hover:bg-pink/10 hover:text-pink font-mono text-[10px] disabled:opacity-50"
+                            >
+                              {isDeleting ? (
+                                <Loader2 className="h-3.5 w-3.5 animate-spin text-pink" />
+                              ) : (
+                                <Trash2 className="h-3.5 w-3.5" />
+                              )}
+                            </Button>
+                          </td>
+                        </tr>
+                      );
+                    })}
                   </tbody>
                 </table>
               </div>

@@ -3,7 +3,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { contactService } from "@juice-vibe/services";
 import { formatDate } from "@juice-vibe/utils";
-import { Mail, Trash2 } from "lucide-react";
+import { Mail, Trash2, Loader2 } from "lucide-react";
 import React, { useState } from "react";
 import { Button } from "@juice-vibe/ui";
 
@@ -33,7 +33,7 @@ export default function SubscribersManagement() {
   });
 
   const handleDelete = (id: string, email: string) => {
-    if (confirm(`Are you sure you want to remove subscriber ${email}?`)) {
+    if (confirm(`Permanently remove subscriber ${email}?`)) {
       unsubscribeMutation.mutate(id);
     }
   };
@@ -54,8 +54,9 @@ export default function SubscribersManagement() {
 
       <div className="space-y-4">
         {isLoading ? (
-          <div className="text-center py-20 font-mono text-xs text-muted-foreground uppercase">
-            Querying subscriber registry...
+          <div className="flex flex-col items-center justify-center py-24 font-mono text-xs text-muted-foreground uppercase tracking-widest gap-3">
+            <Loader2 className="h-7 w-7 text-primary animate-spin" />
+            <span>Compiling subscriber audience indices...</span>
           </div>
         ) : subscribersList.length === 0 ? (
           <div className="terminal-card p-12 text-center border border-border bg-card">
@@ -78,35 +79,43 @@ export default function SubscribersManagement() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border/40">
-                  {subscribersList.map((sub: any) => (
-                    <tr key={sub.id} className="hover:bg-ink-dark/20 transition-colors">
-                      <td className="py-3.5 px-4 font-bold text-foreground text-sm font-mono select-all">
-                        {sub.email}
-                      </td>
-                      <td className="py-3.5 px-4 text-muted-foreground text-[11px]">
-                        {formatDate(sub.createdAt)}
-                      </td>
-                      <td className="py-3.5 px-4">
-                        <span className={`text-[8px] font-mono font-bold uppercase tracking-widest px-2 py-0.5 rounded border ${
-                          sub.isActive 
-                            ? "text-primary bg-primary/5 border-primary/20" 
-                            : "text-muted-foreground bg-ink-dark border-border"
-                        }`}>
-                          {sub.isActive ? "Active" : "Inactive"}
-                        </span>
-                      </td>
-                      <td className="py-3.5 px-4 text-right">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleDelete(sub.id, sub.email)}
-                          className="h-8 px-2 text-pink hover:bg-pink/10 hover:text-pink font-mono text-[10px]"
-                        >
-                          <Trash2 className="h-3.5 w-3.5" />
-                        </Button>
-                      </td>
-                    </tr>
-                  ))}
+                  {subscribersList.map((sub: any) => {
+                    const isDeleting = unsubscribeMutation.isPending && (unsubscribeMutation.variables as string) === sub.id;
+                    return (
+                      <tr key={sub.id} className="hover:bg-ink-dark/20 transition-colors">
+                        <td className="py-3.5 px-4 font-bold text-foreground text-sm font-mono select-all">
+                          {sub.email}
+                        </td>
+                        <td className="py-3.5 px-4 text-muted-foreground text-[11px]">
+                          {formatDate(sub.createdAt)}
+                        </td>
+                        <td className="py-3.5 px-4">
+                          <span className={`text-[8px] font-mono font-bold uppercase tracking-widest px-2 py-0.5 rounded border ${
+                            sub.isActive 
+                              ? "text-primary bg-primary/5 border-primary/20" 
+                              : "text-muted-foreground bg-ink-dark border-border"
+                          }`}>
+                            {sub.isActive ? "Active" : "Inactive"}
+                          </span>
+                        </td>
+                        <td className="py-3.5 px-4 text-right">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleDelete(sub.id, sub.email)}
+                            disabled={isDeleting}
+                            className="h-8 px-2 text-pink hover:bg-pink/10 hover:text-pink font-mono text-[10px] disabled:opacity-50"
+                          >
+                            {isDeleting ? (
+                              <Loader2 className="h-3.5 w-3.5 animate-spin text-pink" />
+                            ) : (
+                              <Trash2 className="h-3.5 w-3.5" />
+                            )}
+                          </Button>
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
