@@ -140,13 +140,15 @@ export default function MenuCatalog() {
   };
 
   const onSubmit = (data: MenuItemSchema) => {
+    const { ingredientsStr, tagsStr, ...rest } = data;
     const formattedData = {
-      ...data,
-      ingredients: data.ingredientsStr ? data.ingredientsStr.split(",").map(i => i.trim()) : [],
-      tags: data.tagsStr ? data.tagsStr.split(",").map(t => t.trim()) : [],
+      ...rest,
+      ingredients: ingredientsStr ? ingredientsStr.split(",").map(i => i.trim()).filter(Boolean) : [],
+      tags: tagsStr ? tagsStr.split(",").map(t => t.trim()).filter(Boolean) : [],
       price: Number(data.price),
       calories: data.calories ? Number(data.calories) : undefined,
       thumbnail: data.thumbnail || undefined,
+      images: data.thumbnail ? [data.thumbnail] : [],
     };
 
     if (editingItem) {

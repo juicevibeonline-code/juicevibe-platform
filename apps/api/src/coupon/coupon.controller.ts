@@ -2,7 +2,7 @@ import { Controller, Get, Post, Delete, Body, Param, Query, UseGuards } from "@n
 import { ApiTags, ApiBearerAuth, ApiOperation } from "@nestjs/swagger";
 import { CouponService } from "./coupon.service";
 import { JwtAuthGuard, RolesGuard, Roles } from "../common/guards";
-import { ApiResponseDto } from "../common/dto";
+import { ApiResponseDto, CreateCouponDto } from "../common/dto";
 
 @ApiTags("Coupons")
 @Controller("coupons")
@@ -31,7 +31,7 @@ export class CouponController {
   @Roles("admin")
   @ApiBearerAuth()
   @ApiOperation({ summary: "Create a coupon" })
-  async createCoupon(@Body() body: any) {
+  async createCoupon(@Body() body: CreateCouponDto) {
     const coupon = await this.couponService.createCoupon(body);
     return ApiResponseDto.ok(coupon, "Coupon created");
   }
