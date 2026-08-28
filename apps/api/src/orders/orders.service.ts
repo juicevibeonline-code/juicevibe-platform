@@ -100,8 +100,8 @@ export class OrdersService {
         });
       }
 
-      const tax = subtotal * 0.05; // 5% tax
-      const total = subtotal + tax - discount;
+      const tax = 0;
+      const total = subtotal - discount;
 
       const order = await tx.order.create({
         data: {
