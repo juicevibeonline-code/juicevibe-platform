@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { Star, Plus, CheckCircle } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { formatPrice } from "@/lib/utils";
 import { useCartStore } from "@/store/cart";
 import type { MenuItem } from "@juice-vibe/types";
@@ -85,6 +85,78 @@ const categoryThemes: Record<
   },
 };
 
+const slugImageMap: Record<string, string> = {
+  // Milkshakes
+  "chocolate-milkshake": "/images/MenuItems/milkshake-chocolate.png",
+  "vanilla-milkshake": "/images/MenuItems/milkshake-vanilla.png",
+  "strawberry-milkshake": "/images/MenuItems/milkshake-strawberry.png",
+  "mango-milkshake": "/images/MenuItems/milkshake-mango.png",
+  "passion-fruit-milkshake": "/images/MenuItems/milkshake-passion-fruit.png",
+  "banana-milkshake": "/images/MenuItems/milkshake-banana.png",
+  "mixed-fruit-milkshake": "/images/MenuItems/milkshake-mixed-fruit.jpg",
+  "date-almond-milkshake": "/images/MenuItems/milkshake-date-almond.png",
+  "falooda-milkshake": "/images/MenuItems/milkshake-falooda.jpg",
+
+  // Fresh Juices
+  "avocado-juice": "/images/MenuItems/juice-avocado.png",
+  "lime-juice": "/images/MenuItems/juice-lime.png",
+  "mango-juice": "/images/MenuItems/juice-mango.png",
+  "mixed-fruit-juice": "/images/MenuItems/juice-mixed-fruit.jpg",
+  "orange-juice": "/images/MenuItems/juice-orange.png",
+  "papaya-juice": "/images/MenuItems/juice-papaya.png",
+  "passion-fruit-juice": "/images/MenuItems/juice-passion-fruit.jpg",
+  "pineapple-juice": "/images/MenuItems/juice-pineapple.png",
+  "soursop-juice": "/images/MenuItems/juice-soursop.png",
+  "watermelon-juice": "/images/MenuItems/juice-watermelon.png",
+  "wood-apple-juice": "/images/MenuItems/juice-wood-apple.png",
+  "ambarella-juice": "/images/MenuItems/juice-ambarella.png",
+  "coconut-juice": "/images/MenuItems/juice-coconut.png",
+  "grapes-juice": "/images/MenuItems/juice-grapes.png",
+
+  // Smoothies
+  "avocado-dates-smoothie": "/images/MenuItems/smoothie-avocado-dates.png",
+  "wood-apple-zest-smoothie": "/images/MenuItems/smoothie-wood-apple-zest.png",
+  "tropical-smoothie-bowl": "/images/MenuItems/tropical_smoothie_bowl.png",
+
+  // Lassi
+  "classic-lassi": "/images/MenuItems/lassi-classic.png",
+  "mango-lassi": "/images/MenuItems/lassi-mango.png",
+  "passion-fruit-lassi": "/images/MenuItems/lassi-passion-fruit.png",
+  "orange-lassi": "/images/MenuItems/lassi-orange.png",
+
+  // Tea
+  "english-breakfast-tea": "/images/MenuItems/tea-english-breakfast.png",
+  "green-tea": "/images/MenuItems/tea-green.png",
+  "ginger-tea": "/images/MenuItems/tea-ginger.png",
+  "lemon-tea": "/images/MenuItems/tea-lemon.png",
+  "mint-tea": "/images/MenuItems/tea-mint.png",
+
+  // Coffee
+  "americano": "/images/MenuItems/coffee-americano.png",
+  "espresso": "/images/MenuItems/coffee-espresso.png",
+  "cappuccino": "/images/MenuItems/coffee-cappuccino.png",
+
+  // Mocktails
+  "classic-virgin-mojito": "/images/MenuItems/mocktail-classic-virgin-mojito.png",
+  "flavoured-mojito": "/images/MenuItems/mocktail-flavoured-mojito.png",
+  "passion-fruit-mojito": "/images/MenuItems/passionfruit_mojito_mocktail.png",
+
+  // Fruits & Ice Cream
+  "jaggery-cashew-dream": "/images/MenuItems/icecream-jaggery-cashew-dream.jpg",
+  "banana-boat": "/images/MenuItems/icecream-banana-boat.png",
+  "fruit-salad": "/images/MenuItems/icecream-fruit-salad.png",
+  "fruit-salad-with-ice-cream": "/images/MenuItems/icecream-fruit-salad-with-icecream.png",
+  "ice-cream-3-scoops": "/images/MenuItems/icecream-3-scoops.png",
+
+  // Burgers
+  "chicken-burger": "/images/MenuItems/burger-chicken.png",
+  "veg-cheese-burger": "/images/MenuItems/burger-veg-cheese.png",
+
+  // Sandwiches
+  "cheese-tomato-sandwich": "/images/MenuItems/sandwich-cheese-tomato.png",
+  "chicken-ham-cheese-sandwich": "/images/MenuItems/sandwich-chicken-ham-cheese.png",
+};
+
 export function MenuItemCard({ item, index }: MenuItemCardProps) {
   const addItem = useCartStore((state) => state.addItem);
   const [isAdded, setIsAdded] = useState(false);
@@ -103,8 +175,14 @@ export function MenuItemCard({ item, index }: MenuItemCardProps) {
     setTimeout(() => setIsAdded(false), 1500);
   };
 
-  const itemImage = item.thumbnail || (item.images && item.images[0]) || (item as any).image;
-  const [imgSrc, setImgSrc] = useState<string | null>(itemImage || null);
+  const itemImage = item.thumbnail || (item.images && item.images[0]) || (item as any).image || slugImageMap[item.slug];
+  const [imgSrc, setImgSrc] = useState<string | null>(itemImage || slugImageMap[item.slug] || null);
+
+  // Keep imgSrc updated when props or tab changes
+  useEffect(() => {
+    setImgSrc(item.thumbnail || (item.images && item.images[0]) || (item as any).image || slugImageMap[item.slug] || null);
+  }, [item.thumbnail, item.images, item.slug]);
+
   const isPng = imgSrc?.toLowerCase().endsWith(".png");
 
   return (
@@ -118,15 +196,15 @@ export function MenuItemCard({ item, index }: MenuItemCardProps) {
       <div className="group relative flex flex-col justify-between h-full rounded-2xl bg-white dark:bg-zinc-900 border border-slate-100/80 dark:border-zinc-800/80 shadow-[0_4px_20px_rgba(0,0,0,0.015)] hover:shadow-[0_12px_28px_rgba(34,197,94,0.06)] hover:border-primary/20 dark:hover:border-primary/20 transition-all duration-500 p-4 overflow-hidden">
         
         {/* Full-width Image Section */}
-        <div className="relative w-full aspect-[4/3] rounded-xl overflow-hidden bg-slate-50/60 dark:bg-zinc-800/60 border border-slate-100/50 dark:border-zinc-800/20 flex items-center justify-center mb-4">
+        <div className="relative w-full aspect-[4/3] rounded-xl overflow-hidden bg-gradient-to-b from-slate-50/90 to-slate-100/50 dark:from-zinc-800/80 dark:to-zinc-900/60 border border-slate-100/60 dark:border-zinc-800/40 flex items-center justify-center mb-4">
           
           {/* Overlay Badges */}
           <div className="absolute top-2.5 left-2.5 right-2.5 z-20 flex items-center justify-between pointer-events-none">
-            <span className={cn("px-2.5 py-0.75 rounded-full text-[8px] font-extrabold uppercase tracking-widest shadow-sm border", theme.badgeBg)}>
+            <span className={cn("px-2.5 py-0.75 rounded-full text-[8px] font-extrabold uppercase tracking-widest shadow-sm border backdrop-blur-md", theme.badgeBg)}>
               {theme.tag}
             </span>
             {item.isPopular && (
-              <span className="inline-flex items-center gap-0.5 px-2.5 py-0.75 rounded-full bg-amber-500 text-white text-[8px] font-extrabold uppercase tracking-widest shadow-sm">
+              <span className="inline-flex items-center gap-0.5 px-2.5 py-0.75 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 text-white text-[8px] font-extrabold uppercase tracking-widest shadow-sm">
                 <Star className="h-2 w-2 fill-current" />
                 Popular
               </span>
@@ -142,7 +220,7 @@ export function MenuItemCard({ item, index }: MenuItemCardProps) {
                 sizes="(max-width: 768px) 100vw, 350px"
                 className={cn(
                   "transition-all duration-500",
-                  isPng ? "object-contain p-4" : "object-cover"
+                  isPng ? "object-contain p-3 drop-shadow-[0_8px_16px_rgba(0,0,0,0.08)]" : "object-cover"
                 )}
                 onError={() => setImgSrc(null)}
               />

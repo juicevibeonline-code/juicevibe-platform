@@ -85,9 +85,9 @@ async function main() {
     { name: "Mango",          slug: "mango-milkshake",          description: "Thick tropical mango milkshake",                   price: 350, popular: true,  thumbnail: "/images/MenuItems/milkshake-mango.png" },
     { name: "Passion Fruit",  slug: "passion-fruit-milkshake",  description: "Tropical passion fruit milkshake",                 price: 350,                thumbnail: "/images/MenuItems/milkshake-passion-fruit.png" },
     { name: "Banana",         slug: "banana-milkshake",         description: "Fresh banana & milk creamy shake",                 price: 350,                thumbnail: "/images/MenuItems/milkshake-banana.png" },
-    { name: "Mixed Fruit",    slug: "mixed-fruit-milkshake",    description: "Delicious blend of seasonal fruits and cold milk", price: 350, popular: true,  thumbnail: "/images/MenuItems/milkshake-strawberry.png" },
+    { name: "Mixed Fruit",    slug: "mixed-fruit-milkshake",    description: "Delicious blend of seasonal fruits and cold milk", price: 350, popular: true,  thumbnail: "/images/MenuItems/milkshake-mixed-fruit.jpg" },
     { name: "Date & Almond",  slug: "date-almond-milkshake",    description: "Healthy energy-boosting date & almond shake",      price: 400, popular: true,  thumbnail: "/images/MenuItems/milkshake-date-almond.png" },
-    { name: "Falooda",        slug: "falooda-milkshake",        description: "Traditional sweet falooda shake with basil seeds", price: 400, popular: true,  thumbnail: "/images/MenuItems/milkshake-strawberry.png" },
+    { name: "Falooda",        slug: "falooda-milkshake",        description: "Traditional sweet falooda shake with basil seeds", price: 400, popular: true,  thumbnail: "/images/MenuItems/milkshake-falooda.jpg" },
   ];
   for (const item of milkshakeItems) {
     await upsertItem({ ...item, categoryId: milkshakes.id });
@@ -110,7 +110,7 @@ async function main() {
     { name: "Avocado",       slug: "avocado-juice",       description: "Creamy fresh avocado juice",                     price: 300, popular: true,  thumbnail: "/images/MenuItems/juice-avocado.png" },
     { name: "Lime",          slug: "lime-juice",          description: "Fresh zesty lime juice with a hint of mint",     price: 250,                thumbnail: "/images/MenuItems/juice-lime.png" },
     { name: "Mango",         slug: "mango-juice",         description: "Ripe sweet mango pulp blended to perfection",     price: 300, popular: true,  thumbnail: "/images/MenuItems/juice-mango.png" },
-    { name: "Mixed Fruit",   slug: "mixed-fruit-juice",   description: "Freshly pressed mix of tropical fruits",          price: 350, popular: true,  thumbnail: "/images/MenuItems/juice-orange.png" },
+    { name: "Mixed Fruit",   slug: "mixed-fruit-juice",   description: "Freshly pressed mix of tropical fruits",          price: 350, popular: true,  thumbnail: "/images/MenuItems/juice-mixed-fruit.jpg" },
     { name: "Orange",        slug: "orange-juice",        description: "Freshly squeezed sweet citrus oranges",          price: 400,                thumbnail: "/images/MenuItems/juice-orange.png" },
     { name: "Papaya",        slug: "papaya-juice",        description: "Creamy wholesome fresh papaya juice",             price: 250,                thumbnail: "/images/MenuItems/juice-papaya.png" },
     { name: "Passion Fruit", slug: "passion-fruit-juice", description: "Exotic tropical passion fruit pulp juice",        price: 300,                thumbnail: "/images/MenuItems/juice-passion-fruit.jpg" },

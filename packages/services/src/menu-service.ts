@@ -58,15 +58,15 @@ export const FALLBACK_MENU_ITEMS: MenuItem[] = [
   createFallbackItem("m-4", "Mango Milkshake", "mango-milkshake", "Thick tropical mango milkshake", 350, "milkshakes", "/images/MenuItems/milkshake-mango.png", { isPopular: true }),
   createFallbackItem("m-5", "Passion Fruit Milkshake", "passion-fruit-milkshake", "Tropical passion fruit milkshake", 350, "milkshakes", "/images/MenuItems/milkshake-passion-fruit.png"),
   createFallbackItem("m-6", "Banana Milkshake", "banana-milkshake", "Fresh banana & milk creamy shake", 350, "milkshakes", "/images/MenuItems/milkshake-banana.png"),
-  createFallbackItem("m-7", "Mixed Fruit Milkshake", "mixed-fruit-milkshake", "Delicious blend of seasonal fruits and cold milk", 350, "milkshakes", "/images/MenuItems/milkshake-strawberry.png", { isPopular: true }),
+  createFallbackItem("m-7", "Mixed Fruit Milkshake", "mixed-fruit-milkshake", "Delicious blend of seasonal fruits and cold milk", 350, "milkshakes", "/images/MenuItems/milkshake-mixed-fruit.jpg", { isPopular: true }),
   createFallbackItem("m-8", "Date & Almond Milkshake", "date-almond-milkshake", "Healthy energy-boosting date & almond shake", 400, "milkshakes", "/images/MenuItems/milkshake-date-almond.png", { isPopular: true }),
-  createFallbackItem("m-9", "Falooda Milkshake", "falooda-milkshake", "Traditional sweet falooda shake with basil seeds", 400, "milkshakes", "/images/MenuItems/milkshake-strawberry.png", { isPopular: true }),
+  createFallbackItem("m-9", "Falooda Milkshake", "falooda-milkshake", "Traditional sweet falooda shake with basil seeds", 400, "milkshakes", "/images/MenuItems/milkshake-falooda.jpg", { isPopular: true }),
 
   // Fresh Juices (Official: Rs. 250 - 400)
   createFallbackItem("j-1", "Avocado Juice", "avocado-juice", "Creamy fresh avocado juice", 300, "fresh-juices", "/images/MenuItems/juice-avocado.png", { isPopular: true }),
   createFallbackItem("j-2", "Lime Juice", "lime-juice", "Fresh zesty lime juice with a hint of mint", 250, "fresh-juices", "/images/MenuItems/juice-lime.png"),
   createFallbackItem("j-3", "Mango Juice", "mango-juice", "Ripe sweet mango pulp blended to perfection", 300, "fresh-juices", "/images/MenuItems/juice-mango.png", { isPopular: true }),
-  createFallbackItem("j-4", "Mixed Fruit Juice", "mixed-fruit-juice", "Freshly pressed mix of tropical fruits", 350, "fresh-juices", "/images/MenuItems/juice-orange.png", { isPopular: true }),
+  createFallbackItem("j-4", "Mixed Fruit Juice", "mixed-fruit-juice", "Freshly pressed mix of tropical fruits", 350, "fresh-juices", "/images/MenuItems/juice-mixed-fruit.jpg", { isPopular: true }),
   createFallbackItem("j-5", "Orange Juice", "orange-juice", "Freshly squeezed sweet citrus oranges", 400, "fresh-juices", "/images/MenuItems/juice-orange.png"),
   createFallbackItem("j-6", "Papaya Juice", "papaya-juice", "Creamy wholesome fresh papaya juice", 250, "fresh-juices", "/images/MenuItems/juice-papaya.png"),
   createFallbackItem("j-7", "Passion Fruit Juice", "passion-fruit-juice", "Exotic tropical passion fruit pulp juice", 300, "fresh-juices", "/images/MenuItems/juice-passion-fruit.jpg"),

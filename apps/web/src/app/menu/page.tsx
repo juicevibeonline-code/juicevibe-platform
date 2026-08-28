@@ -34,8 +34,8 @@ function PopularHighlightCard({ item }: { item: MenuItem }) {
   return (
     <div className="group relative flex flex-col justify-between rounded-3xl border border-white/80 bg-white/80 backdrop-blur-xl p-4 shadow-sm hover:shadow-xl hover:bg-white transition-all duration-500 text-left overflow-hidden">
       <div>
-        <div className="relative w-full aspect-[4/3] rounded-2xl overflow-hidden bg-slate-100/60 mb-3 border border-slate-100 flex items-center justify-center">
-          <span className="absolute top-2 left-2 z-20 inline-flex items-center gap-0.5 rounded-full bg-amber-500 text-white px-2.5 py-0.75 text-[9px] font-black uppercase tracking-wider shadow-sm">
+        <div className="relative w-full aspect-[4/3] rounded-2xl overflow-hidden bg-gradient-to-b from-slate-50/90 to-slate-100/50 mb-3 border border-slate-100 flex items-center justify-center">
+          <span className="absolute top-2 left-2 z-20 inline-flex items-center gap-0.5 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 text-white px-2.5 py-0.75 text-[9px] font-black uppercase tracking-wider shadow-sm">
             <Star className="h-2.5 w-2.5 fill-current" /> Popular
           </span>
           {imgSrc ? (
@@ -44,7 +44,10 @@ function PopularHighlightCard({ item }: { item: MenuItem }) {
               alt={item.name}
               fill
               sizes="(max-width: 768px) 100vw, 300px"
-              className="object-cover transition-transform duration-500 group-hover:scale-105"
+              className={cn(
+                "transition-transform duration-500 group-hover:scale-105",
+                imgSrc.toLowerCase().endsWith(".png") ? "object-contain p-3 drop-shadow-[0_8px_16px_rgba(0,0,0,0.08)]" : "object-cover"
+              )}
               onError={() => setImgSrc(null)}
             />
           ) : (
