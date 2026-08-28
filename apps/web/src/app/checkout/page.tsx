@@ -51,8 +51,7 @@ export default function CheckoutPage() {
   const [discountVal, setDiscountVal] = useState(0);
 
   const { subtotal, count } = getTotals();
-  const tax = subtotal * 0.05;
-  const total = Math.max(0, subtotal + tax - discountVal);
+  const total = Math.max(0, subtotal - discountVal);
 
   const isDineIn = Boolean(tableId);
 
@@ -500,10 +499,6 @@ export default function CheckoutPage() {
                     <div className="flex justify-between text-gray-500">
                       <span>Subtotal ({count} items)</span>
                       <span>LKR {subtotal.toLocaleString()}</span>
-                    </div>
-                    <div className="flex justify-between text-gray-500">
-                      <span>Tax (5%)</span>
-                      <span>LKR {tax.toFixed(0)}</span>
                     </div>
                     {discountVal > 0 && (
                       <div className="flex justify-between text-emerald-600 font-semibold font-mono text-xs">

@@ -41,8 +41,7 @@ export function CartDrawer() {
   });
 
   const { subtotal, count } = getTotals();
-  const tax = subtotal * 0.05; // API uses 5%
-  const total = subtotal + tax;
+  const total = subtotal;
 
   useEffect(() => { setMounted(true); }, []);
 
@@ -184,8 +183,7 @@ export function CartDrawer() {
                   {items.length > 0 && (
                     <div className="p-6 bg-gray-50/80 border-t border-gray-100 shrink-0">
                       <div className="space-y-2 mb-4 text-sm">
-                        <div className="flex justify-between text-gray-500 font-medium"><span>Subtotal</span><span className="font-mono">{formatPrice(subtotal)}</span></div>
-                        <div className="flex justify-between text-gray-500 font-medium"><span>Tax (5%)</span><span className="font-mono">{formatPrice(tax)}</span></div>
+                        <div className="flex justify-between text-gray-500 font-medium"><span>Subtotal ({count} items)</span><span className="font-mono">{formatPrice(subtotal)}</span></div>
                         <div className="flex justify-between text-dark-green text-base font-black pt-2 border-t border-gray-200">
                           <span>Total</span><span className="text-primary-dark font-mono">{formatPrice(total)}</span>
                         </div>

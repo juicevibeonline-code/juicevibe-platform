@@ -30,7 +30,7 @@ export const galleryService = {
   async getImages(category?: string): Promise<GalleryImage[]> {
     try {
       const { data } = await apiClient.get("/gallery", { params: { category } });
-      if (Array.isArray(data.data) && data.data.length > 0) {
+      if (Array.isArray(data.data)) {
         return data.data;
       }
       return FALLBACK_GALLERY_IMAGES;

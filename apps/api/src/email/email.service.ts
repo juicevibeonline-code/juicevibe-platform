@@ -98,7 +98,7 @@ ${html}
 
         <div style="width: 100%; text-align: right; font-size: 14px; line-height: 1.6; margin-top: 10px; border-top: 2px solid #e1e8e4; padding-top: 10px;">
           <p style="margin: 0;">Subtotal: <strong>LKR ${order.subtotal.toLocaleString()}</strong></p>
-          <p style="margin: 0;">Tax (5%): <strong>LKR ${order.tax.toLocaleString()}</strong></p>
+          ${order.tax > 0 ? `<p style="margin: 0;">Tax: <strong>LKR ${order.tax.toLocaleString()}</strong></p>` : ""}
           ${order.discount > 0 ? `<p style="margin: 0; color: #10b981;">Discount: <strong>- LKR ${order.discount.toLocaleString()}</strong></p>` : ""}
           <p style="margin: 5px 0 0 0; font-size: 16px; color: #10b981;"><strong>Grand Total: LKR ${order.total.toLocaleString()}</strong></p>
         </div>
