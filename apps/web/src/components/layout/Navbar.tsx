@@ -6,8 +6,10 @@ import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X } from "lucide-react";
 import { useScrollPosition } from "@/hooks/use-scroll-position";
+import { useStorefrontSettings } from "@/hooks/use-storefront-settings";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { Sparkles, ArrowRight } from "lucide-react";
 
 const navLinks = [
   { href: "/", label: "Home" },
@@ -19,12 +21,33 @@ const navLinks = [
 
 export function Navbar() {
   const { isScrolled } = useScrollPosition();
+  const { settings } = useStorefrontSettings();
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
 
+  const isAnnouncementActive = settings.announcement_enabled === "true" && Boolean(settings.announcement_text);
+
   return (
     <>
-      <header className="fixed inset-x-0 top-0 z-50 transition-all duration-500">
+      {isAnnouncementActive && !isScrolled && (
+        <div className="fixed inset-x-0 top-0 z-50 bg-[#0F2A1E] text-white text-xs font-semibold py-2 px-4 border-b border-primary/20 flex items-center justify-center gap-2 shadow-sm transition-all duration-300">
+          <Sparkles className="h-3.5 w-3.5 text-primary shrink-0 animate-pulse" />
+          <span>{settings.announcement_text}</span>
+          {settings.announcement_link && (
+            <Link
+              href={settings.announcement_link}
+              className="inline-flex items-center gap-0.5 text-primary hover:underline font-bold ml-1 transition-all"
+            >
+              Check it out <ArrowRight className="h-3 w-3" />
+            </Link>
+          )}
+        </div>
+      )}
+
+      <header className={cn(
+        "fixed inset-x-0 z-50 transition-all duration-500",
+        isAnnouncementActive && !isScrolled ? "top-8" : "top-0"
+      )}>
         <nav
           className={cn(
             "mx-auto flex items-center justify-between transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]",

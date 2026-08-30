@@ -4,9 +4,8 @@ import Link from "next/link";
 import Image from "next/image";
 import { Mail, Phone, MapPin, Send, CheckCircle, AlertCircle, ArrowRight } from "lucide-react";
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { subscribeToNewsletter } from "@/lib/api";
+import { useStorefrontSettings } from "@/hooks/use-storefront-settings";
 
 const FacebookIcon = ({ className }: { className?: string }) => (
   <svg viewBox="0 0 24 24" fill="currentColor" className={className}>
@@ -33,17 +32,18 @@ const quickLinks = [
   { href: "/contact", label: "Contact" },
 ];
 
-const socialLinks = [
-  { href: "https://www.facebook.com/share/1L9JR6DXL9/?mibextid=wwXIfr", icon: FacebookIcon, label: "Facebook" },
-  { href: "https://www.tiktok.com/@juice.vibe0", icon: TikTokIcon, label: "TikTok" },
-  { href: "#", icon: InstagramIcon, label: "Instagram" },
-];
-
 export function Footer() {
+  const { settings } = useStorefrontSettings();
   const [email, setEmail] = useState("");
   const [subscribed, setSubscribed] = useState(false);
   const [subscribeError, setSubscribeError] = useState<string | null>(null);
   const [isSubscribing, setIsSubscribing] = useState(false);
+
+  const socialLinks = [
+    ...(settings.social_facebook ? [{ href: settings.social_facebook, icon: FacebookIcon, label: "Facebook" }] : []),
+    ...(settings.social_tiktok ? [{ href: settings.social_tiktok, icon: TikTokIcon, label: "TikTok" }] : []),
+    ...(settings.social_instagram ? [{ href: settings.social_instagram, icon: InstagramIcon, label: "Instagram" }] : []),
+  ];
 
   const handleSubscribe = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -88,24 +88,29 @@ export function Footer() {
                 />
               </div>
               <span className="font-heading text-2xl font-extrabold tracking-tight text-white group-hover:text-primary transition-colors duration-300">
-                Juice <span className="text-primary">Vibe</span>
+                {settings.business_name?.split(" ")[0] || "Juice"}{" "}
+                <span className="text-primary">{settings.business_name?.split(" ").slice(1).join(" ") || "Vibe"}</span>
               </span>
             </Link>
             <p className="text-sm leading-relaxed text-gray-400 font-medium">
-              Premium tropical juice café offering fresh, organic, and handcrafted beverages. Experience the finest juices and healthy drinks in Waskaduwa.
+              {settings.business_description}
             </p>
-            <div className="flex gap-3 pt-2">
-              {socialLinks.map((social) => (
-                <a
-                  key={social.label}
-                  href={social.href}
-                  className="flex h-9 w-9 items-center justify-center rounded-lg bg-white/5 border border-white/10 text-gray-400 transition-all duration-300 hover:bg-primary hover:text-[#0F2A1E] hover:border-primary hover:-translate-y-0.5"
-                  aria-label={social.label}
-                >
-                  <social.icon className="h-4 w-4" />
-                </a>
-              ))}
-            </div>
+            {socialLinks.length > 0 && (
+              <div className="flex gap-3 pt-2">
+                {socialLinks.map((social) => (
+                  <a
+                    key={social.label}
+                    href={social.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex h-9 w-9 items-center justify-center rounded-lg bg-white/5 border border-white/10 text-gray-400 transition-all duration-300 hover:bg-primary hover:text-[#0F2A1E] hover:border-primary hover:-translate-y-0.5"
+                    aria-label={social.label}
+                  >
+                    <social.icon className="h-4 w-4" />
+                  </a>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Quick Links */}
@@ -132,33 +137,41 @@ export function Footer() {
             <ul className="space-y-3 text-sm text-gray-400 font-medium">
               <li className="flex justify-between border-b border-white/5 pb-2">
                 <span>Mon - Fri</span>
-                <span className="font-mono text-xs font-semibold text-white">08:00 AM - 10:00 PM</span>
+                <span className="font-mono text-xs font-semibold text-white">{settings.opening_hours_weekdays}</span>
               </li>
               <li className="flex justify-between border-b border-white/5 pb-2">
                 <span>Saturday</span>
-                <span className="font-mono text-xs font-semibold text-white">09:00 AM - 11:00 PM</span>
+                <span className="font-mono text-xs font-semibold text-white">{settings.opening_hours_saturday}</span>
               </li>
               <li className="flex justify-between border-b border-white/5 pb-2">
                 <span>Sunday</span>
-                <span className="font-mono text-xs font-semibold text-white">10:00 AM - 09:00 PM</span>
+                <span className="font-mono text-xs font-semibold text-white">{settings.opening_hours_sunday}</span>
               </li>
             </ul>
             <div className="mt-6 space-y-3 text-sm text-gray-400 font-medium">
-              <a href="tel:+94718435876" className="flex items-center gap-2.5 transition-colors duration-300 hover:text-primary">
-                <Phone className="h-4 w-4 text-primary" />
-                <span className="font-mono text-xs">+94 71 843 5876</span>
-              </a>
-              <a href="mailto:hello@juicevibe.com" className="flex items-center gap-2.5 transition-colors duration-300 hover:text-primary">
-                <Mail className="h-4 w-4 text-primary" />
-                hello@juicevibe.com
-              </a>
-              <div className="flex items-start gap-2.5">
-                <MapPin className="mt-0.5 h-4 w-4 text-primary shrink-0" />
-                <span>
-                  No. 89 Bandaragama Road,<br />
-                  Waskaduwa, Sri Lanka, <span className="font-mono text-xs">12580</span>
-                </span>
-              </div>
+              {settings.business_phone && (
+                <a href={`tel:${settings.business_phone.replace(/\s+/g, "")}`} className="flex items-center gap-2.5 transition-colors duration-300 hover:text-primary">
+                  <Phone className="h-4 w-4 text-primary" />
+                  <span className="font-mono text-xs">{settings.business_phone}</span>
+                </a>
+              )}
+              {settings.business_email && (
+                <a href={`mailto:${settings.business_email}`} className="flex items-center gap-2.5 transition-colors duration-300 hover:text-primary">
+                  <Mail className="h-4 w-4 text-primary" />
+                  {settings.business_email}
+                </a>
+              )}
+              {settings.business_address && (
+                <a
+                  href={settings.google_maps_link || `https://maps.google.com/?q=${encodeURIComponent(settings.business_address)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-start gap-2.5 transition-colors duration-300 hover:text-primary group"
+                >
+                  <MapPin className="mt-0.5 h-4 w-4 text-primary shrink-0" />
+                  <span className="text-xs leading-relaxed">{settings.business_address}</span>
+                </a>
+              )}
             </div>
           </div>
 
@@ -205,13 +218,14 @@ export function Footer() {
         {/* Footer Bottom bar */}
         <div className="mt-16 border-t border-white/5 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-gray-500 font-medium">
           <p>
-            &copy; <span className="font-mono text-xs">{new Date().getFullYear()}</span> Juice Vibe. All rights reserved.
+            &copy; <span className="font-mono text-xs">{new Date().getFullYear()}</span> {settings.footer_copyright_text || "Juice Vibe. All rights reserved."}
           </p>
           <p className="flex items-center gap-1 text-gray-400">
-            Sip the good vibes, crafted with 💚 in Sri Lanka.
+            {settings.footer_tagline || "Sip the good vibes, crafted with 💚 in Sri Lanka."}
           </p>
         </div>
       </div>
     </footer>
   );
 }
+

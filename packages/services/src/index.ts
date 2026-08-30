@@ -10,7 +10,7 @@ export { testimonialService } from "./testimonial-service";
 export { couponService } from "./coupon-service";
 export { blogService } from "./blog-service";
 export { contactService, type ContactMessage } from "./contact-service";
-export { settingsService } from "./settings-service";
+export { settingsService, type StorefrontSettings } from "./settings-service";
 export { galleryService, type GalleryImage } from "./gallery-service";
 export { analyticsService, type DashboardStats, type RevenueChartData, type TopSellingItem, type OrderStatusDistribution } from "./analytics-service";
 export { tableService } from "./table-service";

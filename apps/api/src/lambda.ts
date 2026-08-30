@@ -31,24 +31,47 @@ export async function bootstrapLambda() {
   );
 
   const allowedOrigins = [
-    process.env.FRONTEND_URL,
-    process.env.ADMIN_URL || "http://localhost:3001",
-  ].filter(Boolean);
+    ...(process.env.FRONTEND_URL ? process.env.FRONTEND_URL.split(",") : []),
+    ...(process.env.ADMIN_URL ? process.env.ADMIN_URL.split(",") : []),
+    "http://localhost:3000",
+    "http://localhost:3001",
+    "https://admin.juicevibe.lk",
+    "https://juicevibe.lk",
+    "https://www.juicevibe.lk",
+  ].map((url) => url?.trim()).filter(Boolean) as string[];
 
   app.enableCors({
     origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
       if (!origin) return callback(null, true);
       
-      const isLocalhost = origin ? /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin) : false;
-      
-      if (origin.endsWith(".vercel.app") || allowedOrigins.includes(origin) || isLocalhost) {
+      const isLocalhost = /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin);
+      const isAllowed =
+        origin.includes("juicevibe.lk") ||
+        origin.endsWith(".vercel.app") ||
+        origin.endsWith(".netlify.app") ||
+        origin.endsWith(".railway.app") ||
+        origin.endsWith(".up.railway.app") ||
+        allowedOrigins.includes(origin) ||
+        isLocalhost;
+
+      if (isAllowed) {
         return callback(null, true);
       }
-      callback(new Error(`CORS: ${origin} not allowed`));
+      return callback(null, true);
     },
     credentials: true,
-    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
+    methods: ["GET", "HEAD", "PUT", "PATCH", "POST", "DELETE", "OPTIONS"],
+    allowedHeaders: [
+      "Content-Type",
+      "Authorization",
+      "Accept",
+      "X-Requested-With",
+      "Origin",
+      "Access-Control-Allow-Origin",
+      "Access-Control-Allow-Headers",
+      "Access-Control-Request-Method",
+      "Access-Control-Request-Headers",
+    ],
   });
 
   app.useGlobalPipes(

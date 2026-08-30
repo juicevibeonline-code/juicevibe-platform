@@ -87,7 +87,7 @@ export class EmployeesService {
           },
         },
       });
-    });
+    }, { maxWait: 15000, timeout: 30000 });
   }
 
   async updateEmployee(id: string, input: UpdateEmployeeDto) {
@@ -132,7 +132,7 @@ export class EmployeesService {
           },
         },
       });
-    });
+    }, { maxWait: 15000, timeout: 30000 });
   }
 
   async deleteEmployee(id: string) {
@@ -148,6 +148,6 @@ export class EmployeesService {
         where: { id: employee.userId },
         data: { isActive: false },
       });
-    });
+    }, { maxWait: 15000, timeout: 30000 });
   }
 }

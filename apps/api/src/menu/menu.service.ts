@@ -35,31 +35,49 @@ export class MenuService {
   }
 
   async deleteCategory(id: string) {
-    return prisma.category.delete({ where: { id } });
+    try {
+      return await prisma.category.delete({ where: { id } });
+    } catch {
+      return await prisma.category.update({
+        where: { id },
+        data: { status: "archived" },
+      });
+    }
   }
 
   async getMenuItems(params: { category?: string; search?: string; popular?: boolean; featured?: boolean; page?: number; limit?: number; status?: string }) {
-    const where: any = {};
+    const andConditions: any[] = [];
 
     if (params.status === "all") {
-      where.status = { not: "archived" };
+      andConditions.push({ status: { not: "archived" } });
     } else if (params.status) {
-      where.status = params.status as any;
+      andConditions.push({ status: params.status as any });
     } else {
-      where.status = "active";
+      andConditions.push({ status: "active" });
     }
 
     if (params.category && params.category !== "all") {
-      where.category = { slug: params.category };
+      andConditions.push({
+        OR: [
+          { categoryId: params.category },
+          { category: { slug: params.category } },
+        ],
+      });
     }
+
     if (params.search) {
-      where.OR = [
-        { name: { contains: params.search, mode: "insensitive" } },
-        { description: { contains: params.search, mode: "insensitive" } },
-      ];
+      andConditions.push({
+        OR: [
+          { name: { contains: params.search, mode: "insensitive" } },
+          { description: { contains: params.search, mode: "insensitive" } },
+        ],
+      });
     }
-    if (params.popular) where.isPopular = true;
-    if (params.featured) where.isFeatured = true;
+
+    if (params.popular) andConditions.push({ isPopular: true });
+    if (params.featured) andConditions.push({ isFeatured: true });
+
+    const where: any = andConditions.length > 0 ? { AND: andConditions } : {};
 
     const page = params.page || 1;
     const limit = params.limit || 50;

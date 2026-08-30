@@ -17,7 +17,14 @@ import {
   ChevronLeft,
   ChevronRight,
   Leaf,
-  QrCode
+  QrCode,
+  Users,
+  UserCheck,
+  Ticket,
+  ImageIcon,
+  FileText,
+  MessageSquareQuote,
+  Mail
 } from "lucide-react";
 import { Button } from "@juice-vibe/ui";
 
@@ -39,6 +46,7 @@ export function Sidebar({ collapsed, setCollapsed }: SidebarProps) {
   const userRole = user?.role || "admin";
 
   const allNavItems = [
+    // Operations
     {
       label: "Mission Control",
       href: "/dashboard",
@@ -68,6 +76,52 @@ export function Sidebar({ collapsed, setCollapsed }: SidebarProps) {
       href: "/dashboard/tables",
       icon: QrCode,
       roles: ["admin", "manager", "cashier"],
+    },
+
+    // Storefront & Marketing
+    {
+      label: "Media Gallery",
+      href: "/dashboard/gallery",
+      icon: ImageIcon,
+      roles: ["admin", "manager", "editor"],
+    },
+    {
+      label: "Blog Articles",
+      href: "/dashboard/blog",
+      icon: FileText,
+      roles: ["admin", "manager", "editor"],
+    },
+    {
+      label: "Testimonials",
+      href: "/dashboard/testimonials",
+      icon: MessageSquareQuote,
+      roles: ["admin", "manager", "editor"],
+    },
+    {
+      label: "Subscribers",
+      href: "/dashboard/subscribers",
+      icon: Mail,
+      roles: ["admin", "manager"],
+    },
+    {
+      label: "Coupons & Promos",
+      href: "/dashboard/coupons",
+      icon: Ticket,
+      roles: ["admin", "manager"],
+    },
+
+    // People & System
+    {
+      label: "Customers",
+      href: "/dashboard/customers",
+      icon: Users,
+      roles: ["admin", "manager"],
+    },
+    {
+      label: "Staff & Team",
+      href: "/dashboard/employees",
+      icon: UserCheck,
+      roles: ["admin"],
     },
     {
       label: "System Settings",

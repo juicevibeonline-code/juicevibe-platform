@@ -13,33 +13,10 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
 import { submitContactForm } from "@/lib/api";
-
-const contactInfo = [
-  {
-    icon: MapPin,
-    title: "Visit Us",
-    details: ["No. 89 Bandaragama Road", "Waskaduwa, Sri Lanka 12580"],
-  },
-  {
-    icon: Phone,
-    title: "Call Us",
-    details: ["+94 71 843 5876"],
-    href: "tel:+94718435876",
-  },
-  {
-    icon: Mail,
-    title: "Email Us",
-    details: ["hello@juicevibe.com", "orders@juicevibe.com"],
-    href: "mailto:hello@juicevibe.com",
-  },
-  {
-    icon: Clock,
-    title: "Opening Hours",
-    details: ["Mon - Fri: 8 AM - 10 PM", "Sat: 9 AM - 11 PM", "Sun: 10 AM - 9 PM"],
-  },
-];
+import { useStorefrontSettings } from "@/hooks/use-storefront-settings";
 
 export default function ContactPage() {
+  const { settings } = useStorefrontSettings();
   const [formState, setFormState] = useState({
     name: "",
     email: "",
@@ -47,6 +24,36 @@ export default function ContactPage() {
     subject: "",
     message: "",
   });
+
+  const contactInfo = [
+    {
+      icon: MapPin,
+      title: "Visit Us",
+      details: [settings.business_address || "No. 89 Bandaragama Road, Waskaduwa, Sri Lanka"],
+      href: settings.google_maps_link || undefined,
+    },
+    {
+      icon: Phone,
+      title: "Call Us",
+      details: [settings.business_phone || "+94 71 843 5876"],
+      href: settings.business_phone ? `tel:${settings.business_phone.replace(/\s+/g, "")}` : undefined,
+    },
+    {
+      icon: Mail,
+      title: "Email Us",
+      details: [settings.business_email || "hello@juicevibe.com"],
+      href: settings.business_email ? `mailto:${settings.business_email}` : undefined,
+    },
+    {
+      icon: Clock,
+      title: "Opening Hours",
+      details: [
+        `Mon - Fri: ${settings.opening_hours_weekdays || "08:00 AM - 10:00 PM"}`,
+        `Sat: ${settings.opening_hours_saturday || "09:00 AM - 11:00 PM"}`,
+        `Sun: ${settings.opening_hours_sunday || "10:00 AM - 09:00 PM"}`,
+      ],
+    },
+  ];
 
   const [submitted, setSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -218,7 +225,7 @@ export default function ContactPage() {
                 })}
 
                 <a
-                  href="https://wa.me/94718435876"
+                  href={`https://wa.me/${settings.social_whatsapp?.replace(/\D/g, "") || "94718435876"}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center gap-4 rounded-2xl bg-white border border-emerald-200/90 p-5 shadow-sm transition-all duration-300 hover:border-[#25D366] hover:shadow-md group"

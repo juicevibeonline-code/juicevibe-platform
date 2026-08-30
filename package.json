@@ -12,7 +12,8 @@
     "db:generate": "pnpm --filter @juice-vibe/database db:generate",
     "db:push": "pnpm --filter @juice-vibe/database db:push",
     "db:seed": "pnpm --filter @juice-vibe/database db:seed",
-    "db:studio": "pnpm --filter @juice-vibe/database db:studio"
+    "db:studio": "pnpm --filter @juice-vibe/database db:studio",
+    "test:e2e": "tsx scripts/e2e-api-test.ts"
   },
   "devDependencies": {
     "@types/body-parser": "^1.19.6",
@@ -28,6 +29,7 @@
     "@types/serve-static": "^2.2.0",
     "@types/ws": "^8.18.1",
     "prettier": "^3.4.0",
+    "tsx": "^4.0.0",
     "turbo": "^2.4.0",
     "typescript": "^5.7.0"
   },

@@ -6,21 +6,31 @@ import { ApiResponseDto } from "../common/dto";
 
 @ApiTags("Settings")
 @Controller("settings")
-@UseGuards(JwtAuthGuard, RolesGuard)
-@Roles("admin", "manager")
-@ApiBearerAuth()
 export class SettingsController {
   constructor(private settingsService: SettingsService) {}
 
+  @Get("public")
+  @ApiOperation({ summary: "Get public business and storefront settings" })
+  async getPublicSettings() {
+    const settings = await this.settingsService.getPublicSettings();
+    return ApiResponseDto.ok(settings);
+  }
+
   @Get()
-  @ApiOperation({ summary: "Get business settings" })
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles("admin", "manager")
+  @ApiBearerAuth()
+  @ApiOperation({ summary: "Get business settings (Admin)" })
   async getSettings() {
     const settings = await this.settingsService.getSettings();
     return ApiResponseDto.ok(settings);
   }
 
   @Patch()
-  @ApiOperation({ summary: "Update business settings" })
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles("admin", "manager")
+  @ApiBearerAuth()
+  @ApiOperation({ summary: "Update business settings (Admin)" })
   async updateSettings(@Body() body: Record<string, string>) {
     const updated = await this.settingsService.updateSettings(body);
     return ApiResponseDto.ok(updated, "Settings updated successfully");

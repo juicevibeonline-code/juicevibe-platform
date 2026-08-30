@@ -27,10 +27,10 @@ export class OrdersService {
     const dbMenuItems = await prisma.menuItem.findMany({
       where: {
         OR: [
-          { id: { in: menuItemIds } },
-          { name: { in: menuItemNames, mode: "insensitive" } }
-        ]
-      }
+          ...(menuItemIds.length > 0 ? [{ id: { in: menuItemIds } }] : []),
+          ...(menuItemNames.length > 0 ? [{ name: { in: menuItemNames } }] : []),
+        ],
+      },
     });
 
     const orderItems = input.items.map((item) => {
@@ -136,7 +136,7 @@ export class OrdersService {
       }
 
       return order;
-    });
+    }, { maxWait: 15000, timeout: 30000 });
 
     // Emit live event to dashboard
     this.ordersGateway.emitNewOrder(order);

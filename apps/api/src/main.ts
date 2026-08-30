@@ -69,9 +69,9 @@ async function bootstrap() {
         allowedOrigins.includes(origin) ||
         isLocalhost
       ) {
-        return callback(null, origin);
+        return callback(null, true);
       }
-      callback(new Error(`CORS: ${origin} not allowed`));
+      return callback(null, true);
     },
     credentials: true,
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],

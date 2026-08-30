@@ -3,7 +3,7 @@ import { ApiTags, ApiBearerAuth, ApiOperation } from "@nestjs/swagger";
 import { MenuService } from "./menu.service";
 import { JwtAuthGuard, RolesGuard, Roles, OptionalAuthGuard } from "../common/guards";
 import { ApiResponseDto } from "../common/dto";
-import { CreateMenuItemDto, CreateCategoryDto, ReorderItemsDto } from "../common/dto";
+import { CreateMenuItemDto, UpdateMenuItemDto, CreateCategoryDto, UpdateCategoryDto, ReorderItemsDto } from "../common/dto";
 
 @ApiTags("Menu")
 @Controller("menu")
@@ -42,7 +42,7 @@ export class MenuController {
   @Roles("admin", "manager", "editor")
   @ApiBearerAuth()
   @ApiOperation({ summary: "Update a category" })
-  async updateCategory(@Param("id") id: string, @Body() body: CreateCategoryDto) {
+  async updateCategory(@Param("id") id: string, @Body() body: UpdateCategoryDto) {
     const category = await this.menuService.updateCategory(id, body);
     return ApiResponseDto.ok(category, "Category updated");
   }
@@ -102,7 +102,7 @@ export class MenuController {
   @Roles("admin", "manager", "editor")
   @ApiBearerAuth()
   @ApiOperation({ summary: "Update a menu item" })
-  async updateMenuItem(@Param("id") id: string, @Body() body: CreateMenuItemDto) {
+  async updateMenuItem(@Param("id") id: string, @Body() body: UpdateMenuItemDto) {
     const item = await this.menuService.updateMenuItem(id, body);
     return ApiResponseDto.ok(item, "Menu item updated");
   }

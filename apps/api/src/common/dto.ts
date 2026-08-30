@@ -245,6 +245,87 @@ export class CreateMenuItemDto {
   addOns?: { name: string; price: number; category: string; isAvailable: boolean }[];
 }
 
+export class UpdateMenuItemDto {
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  name?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  slug?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  description?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
+  price?: number;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  categoryId?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  images?: string[];
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  thumbnail?: string;
+
+  @ApiPropertyOptional({ enum: ["in_stock", "out_of_stock", "coming_soon"] })
+  @IsOptional()
+  @IsString()
+  availability?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsNumber()
+  calories?: number;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  ingredients?: string[];
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  tags?: string[];
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsBoolean()
+  isPopular?: boolean;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsBoolean()
+  isFeatured?: boolean;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsArray()
+  variants?: { name: string; priceAdjustment: number; isDefault: boolean }[];
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsArray()
+  addOns?: { name: string; price: number; category: string; isAvailable: boolean }[];
+}
+
 export class CreateCategoryDto {
   @ApiProperty()
   @IsString()
@@ -258,6 +339,33 @@ export class CreateCategoryDto {
   @ApiProperty()
   @IsString()
   icon: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  image?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsNumber()
+  order?: number;
+}
+
+export class UpdateCategoryDto {
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  name?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  description?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  icon?: string;
 
   @ApiPropertyOptional()
   @IsOptional()
@@ -361,9 +469,22 @@ export class SubscribeDto {
   email: string;
 }
 
-export class ReorderItemsDto {
+export class ReorderItemDto {
   @ApiProperty()
-  items: { id: string; order: number }[];
+  @IsString()
+  id: string;
+
+  @ApiProperty()
+  @IsNumber()
+  order: number;
+}
+
+export class ReorderItemsDto {
+  @ApiProperty({ type: [ReorderItemDto] })
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => ReorderItemDto)
+  items: ReorderItemDto[];
 }
 
 export class CreateBlogPostDto {

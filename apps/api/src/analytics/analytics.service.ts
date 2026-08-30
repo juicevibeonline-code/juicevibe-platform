@@ -25,17 +25,17 @@ export class AnalyticsService {
       prisma.customer.count({ where: { createdAt: { gte: startOfLastMonth, lte: endOfLastMonth } } }),
     ]);
 
-    const currentRevenue = currentMonthAgg._sum.total ?? 0;
-    const lastRevenue = lastMonthAgg._sum.total ?? 0;
-    const currentOrders = currentMonthAgg._count;
-    const lastOrders = lastMonthAgg._count;
+    const currentRevenue = currentMonthAgg?._sum?.total ?? 0;
+    const lastRevenue = lastMonthAgg?._sum?.total ?? 0;
+    const currentOrders = currentMonthAgg?._count ?? 0;
+    const lastOrders = lastMonthAgg?._count ?? 0;
 
-    const revenueChange = lastRevenue ? ((currentRevenue - lastRevenue) / lastRevenue) * 100 : 0;
-    const ordersChange = lastOrders ? ((currentOrders - lastOrders) / lastOrders) * 100 : 0;
-    const currentAOV = currentOrders ? currentRevenue / currentOrders : 0;
-    const lastAOV = lastOrders ? lastRevenue / lastOrders : 0;
-    const aovChange = lastAOV ? ((currentAOV - lastAOV) / lastAOV) * 100 : 0;
-    const customersChange = lastMonthCustomerCount ? ((currentMonthCustomerCount - lastMonthCustomerCount) / lastMonthCustomerCount) * 100 : 0;
+    const revenueChange = lastRevenue > 0 ? ((currentRevenue - lastRevenue) / lastRevenue) * 100 : (currentRevenue > 0 ? 100 : 0);
+    const ordersChange = lastOrders > 0 ? ((currentOrders - lastOrders) / lastOrders) * 100 : (currentOrders > 0 ? 100 : 0);
+    const currentAOV = currentOrders > 0 ? currentRevenue / currentOrders : 0;
+    const lastAOV = lastOrders > 0 ? lastRevenue / lastOrders : 0;
+    const aovChange = lastAOV > 0 ? ((currentAOV - lastAOV) / lastAOV) * 100 : (currentAOV > 0 ? 100 : 0);
+    const customersChange = lastMonthCustomerCount > 0 ? ((currentMonthCustomerCount - lastMonthCustomerCount) / lastMonthCustomerCount) * 100 : (currentMonthCustomerCount > 0 ? 100 : 0);
 
     return {
       revenue: currentRevenue,
