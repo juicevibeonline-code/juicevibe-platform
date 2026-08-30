@@ -30,9 +30,9 @@ export default function BlogManagement() {
     retry: 1,
   });
 
-  const posts = data?.posts || [];
+  const posts: any[] = Array.isArray(data) ? data : (data?.posts || []);
   const totalPages = data?.totalPages || 1;
-  const totalCount = data?.total || 0;
+  const totalCount = Array.isArray(data) ? data.length : (data?.total || posts.length);
 
   // Create Mutation
   const createMutation = useMutation({

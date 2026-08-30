@@ -4,12 +4,18 @@ import type { BlogPost, CreateBlogInput } from "@juice-vibe/types";
 export const blogService = {
   async getPublishedPosts(params?: { category?: string; page?: number; limit?: number }): Promise<{ posts: BlogPost[]; total: number; totalPages: number }> {
     const { data } = await apiClient.get("/blog", { params });
-    return data.data;
+    const posts = Array.isArray(data.data) ? data.data : (data.data?.posts || data.posts || []);
+    const total = data.meta?.total ?? data.data?.total ?? posts.length;
+    const totalPages = data.meta?.totalPages ?? data.data?.totalPages ?? 1;
+    return { posts, total, totalPages };
   },
 
   async getAllPosts(params?: { page?: number; limit?: number }): Promise<{ posts: BlogPost[]; total: number; totalPages: number }> {
     const { data } = await apiClient.get("/blog/all", { params });
-    return data.data;
+    const posts = Array.isArray(data.data) ? data.data : (data.data?.posts || data.posts || []);
+    const total = data.meta?.total ?? data.data?.total ?? posts.length;
+    const totalPages = data.meta?.totalPages ?? data.data?.totalPages ?? 1;
+    return { posts, total, totalPages };
   },
 
   async getPostBySlug(slug: string): Promise<BlogPost> {

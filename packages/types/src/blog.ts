@@ -1,3 +1,8 @@
+export interface BlogPostAuthor {
+  name: string;
+  avatar?: string;
+}
+
 export interface BlogPost {
   id: string;
   title: string;
@@ -5,7 +10,7 @@ export interface BlogPost {
   excerpt: string;
   content: string;
   coverImage?: string;
-  author: string;
+  author?: BlogPostAuthor | string;
   tags: string[];
   category: string;
   isPublished: boolean;

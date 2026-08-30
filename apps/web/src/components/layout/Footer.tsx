@@ -29,6 +29,7 @@ const quickLinks = [
   { href: "/menu", label: "Our Menu" },
   { href: "/about", label: "About Us" },
   { href: "/gallery", label: "Gallery" },
+  { href: "/blog", label: "Blog & Stories" },
   { href: "/contact", label: "Contact" },
 ];
 
