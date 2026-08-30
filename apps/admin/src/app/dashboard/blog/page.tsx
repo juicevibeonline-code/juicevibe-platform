@@ -106,16 +106,29 @@ export default function BlogManagement() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!title.trim() || !slug.trim() || !excerpt.trim() || !content.trim()) {
-      alert("Please fill in all required fields");
+    const finalSlug = (slug.trim() || title.trim())
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/(^-|-$)/g, "") || ("article-" + Date.now());
+
+    if (!title.trim()) {
+      alert("Please enter an Article Title");
+      return;
+    }
+    if (!excerpt.trim()) {
+      alert("Please enter a Short Excerpt");
+      return;
+    }
+    if (!content.trim()) {
+      alert("Please enter the Article Body Content");
       return;
     }
 
     const payload = {
-      title,
-      slug: slug.toLowerCase().replace(/[^a-z0-9-]/g, "-"),
-      excerpt,
-      content,
+      title: title.trim(),
+      slug: finalSlug,
+      excerpt: excerpt.trim(),
+      content: content.trim(),
       category,
       coverImage: coverImage.trim() || undefined,
       tags: tagsInput.split(",").map(t => t.trim()).filter(Boolean),
@@ -320,16 +333,28 @@ export default function BlogManagement() {
             </div>
 
             <form onSubmit={handleSubmit} className="p-5 space-y-4 overflow-y-auto flex-1 flex flex-col scrollbar-hide">
-              <div className="space-y-1">
-                <label className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">Article Title *</label>
-                <input
-                  type="text"
-                  placeholder="e.g. 5 Cold-Pressed Elixirs for Tropical Vitality"
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  className="w-full bg-ink-dark border border-border text-foreground font-mono text-xs px-3 py-2.5 rounded-lg focus:outline-none focus:border-primary/50"
-                  required
-                />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <label className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">Article Title *</label>
+                  <input
+                    type="text"
+                    placeholder="e.g. 5 Reasons to Start Your Day with Green Celery Juice"
+                    value={title}
+                    onChange={(e) => handleTitleChange(e.target.value)}
+                    className="w-full bg-ink-dark border border-border text-foreground font-mono text-xs px-3 py-2.5 rounded-lg focus:outline-none focus:border-primary/50"
+                    required
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">URL Slug (Auto-generated)</label>
+                  <input
+                    type="text"
+                    placeholder="5-reasons-green-celery-juice"
+                    value={slug}
+                    onChange={(e) => setSlug(e.target.value)}
+                    className="w-full bg-ink-dark border border-border text-foreground font-mono text-xs px-3 py-2.5 rounded-lg focus:outline-none focus:border-primary/50"
+                  />
+                </div>
               </div>
 
               <div className="grid grid-cols-2 gap-4">

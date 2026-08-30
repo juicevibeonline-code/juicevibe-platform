@@ -19,7 +19,7 @@ export class BlogController {
 
   @Get("all")
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles("admin", "editor")
+  @Roles("admin", "manager", "editor")
   @ApiBearerAuth()
   @ApiOperation({ summary: "Get all posts (admin)" })
   async getAllPosts(@Query("page") page?: number, @Query("limit") limit?: number) {
@@ -36,7 +36,7 @@ export class BlogController {
 
   @Post()
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles("admin", "editor")
+  @Roles("admin", "manager", "editor")
   @ApiBearerAuth()
   @ApiOperation({ summary: "Create a blog post" })
   async createPost(@Body() body: any, @CurrentUser("sub") authorId: string) {
@@ -46,7 +46,7 @@ export class BlogController {
 
   @Patch(":id/publish")
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles("admin", "editor")
+  @Roles("admin", "manager", "editor")
   @ApiBearerAuth()
   @ApiOperation({ summary: "Publish a blog post" })
   async publishPost(@Param("id") id: string) {
@@ -56,7 +56,7 @@ export class BlogController {
 
   @Patch(":id")
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles("admin", "editor")
+  @Roles("admin", "manager", "editor")
   @ApiBearerAuth()
   @ApiOperation({ summary: "Update a blog post" })
   async updatePost(@Param("id") id: string, @Body() body: UpdateBlogPostDto) {
