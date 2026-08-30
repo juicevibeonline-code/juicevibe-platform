@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
@@ -9,11 +9,9 @@ import {
   ArrowLeft,
   Calendar,
   Clock,
-  User,
   Share2,
   Check,
   BookOpen,
-  Sparkles,
   ArrowRight,
   Loader2,
 } from "lucide-react";
@@ -25,9 +23,31 @@ import { WhatsAppButton } from "@/components/shared/WhatsAppButton";
 import { blogService } from "@juice-vibe/services";
 import type { BlogPost } from "@juice-vibe/types";
 
+function SafePostCover({ src, alt }: { src?: string; alt: string }) {
+  const [hasError, setHasError] = useState(false);
+
+  if (!src || hasError) {
+    return null;
+  }
+
+  return (
+    <div className="relative w-full aspect-[16/9] rounded-3xl overflow-hidden shadow-md border border-slate-200/80 bg-slate-100">
+      <Image
+        src={src}
+        alt={alt}
+        fill
+        unoptimized
+        priority
+        sizes="(max-width: 1024px) 100vw, 900px"
+        className="object-cover"
+        onError={() => setHasError(true)}
+      />
+    </div>
+  );
+}
+
 export default function SingleBlogPostPage() {
   const params = useParams();
-  const router = useRouter();
   const slug = params?.slug as string;
 
   const [post, setPost] = useState<BlogPost | null>(null);
@@ -81,7 +101,7 @@ export default function SingleBlogPostPage() {
               <span className="text-xs font-mono tracking-widest uppercase">Opening Story...</span>
             </div>
           ) : !post ? (
-            <div className="text-center py-20 bg-white dark:bg-zinc-900 rounded-3xl border border-slate-200 p-8 shadow-sm">
+            <div className="text-center py-20 bg-white rounded-3xl border border-slate-200 p-8 shadow-sm">
               <BookOpen className="h-12 w-12 text-gray-300 mx-auto mb-3" />
               <h1 className="text-xl font-bold font-heading">Story Not Found</h1>
               <p className="text-xs text-gray-500 mt-2">
@@ -102,22 +122,22 @@ export default function SingleBlogPostPage() {
                   {post.category || "Wellness Story"}
                 </span>
 
-                <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold font-heading text-dark-green dark:text-white leading-tight">
+                <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold font-heading text-dark-green leading-tight">
                   {post.title}
                 </h1>
 
-                <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 font-medium leading-relaxed">
+                <p className="text-sm sm:text-base text-gray-600 font-medium leading-relaxed">
                   {post.excerpt}
                 </p>
 
                 {/* Author Meta Row */}
-                <div className="flex flex-wrap items-center justify-between gap-4 py-4 border-y border-slate-200/80 dark:border-zinc-800 text-xs text-gray-500 font-mono">
+                <div className="flex flex-wrap items-center justify-between gap-4 py-4 border-y border-slate-200/80 text-xs text-gray-500 font-mono">
                   <div className="flex items-center gap-3">
                     <div className="h-9 w-9 rounded-full bg-primary/15 text-primary flex items-center justify-center font-bold text-sm">
                       {(typeof post.author === "string" ? post.author : post.author?.name || "J")[0].toUpperCase()}
                     </div>
                     <div>
-                      <div className="font-bold text-dark-green dark:text-white font-sans text-xs">
+                      <div className="font-bold text-dark-green font-sans text-xs">
                         {typeof post.author === "string" ? post.author : post.author?.name || "Juice Vibe Editorial"}
                       </div>
                       <div className="text-[10px] text-gray-400">
@@ -137,7 +157,7 @@ export default function SingleBlogPostPage() {
                     </span>
                     <button
                       onClick={handleShare}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-100 dark:bg-zinc-800 hover:bg-primary hover:text-ink-dark transition-all text-xs font-bold font-sans cursor-pointer"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-100 hover:bg-primary hover:text-ink-dark transition-all text-xs font-bold font-sans cursor-pointer"
                     >
                       {copied ? (
                         <>
@@ -156,21 +176,10 @@ export default function SingleBlogPostPage() {
               </div>
 
               {/* Cover Image */}
-              {post.coverImage && (
-                <div className="relative w-full aspect-[16/9] rounded-3xl overflow-hidden shadow-md border border-slate-100 dark:border-zinc-800 bg-slate-100">
-                  <Image
-                    src={post.coverImage}
-                    alt={post.title}
-                    fill
-                    className="object-cover"
-                    priority
-                    sizes="(max-width: 1024px) 100vw, 900px"
-                  />
-                </div>
-              )}
+              {post.coverImage && <SafePostCover src={post.coverImage} alt={post.title} />}
 
               {/* Article Content Body */}
-              <div className="bg-white dark:bg-zinc-900 rounded-3xl p-6 sm:p-10 border border-slate-100 dark:border-zinc-800 shadow-sm leading-relaxed text-sm sm:text-base text-gray-700 dark:text-gray-200 font-sans space-y-4 whitespace-pre-line">
+              <div className="bg-white rounded-3xl p-6 sm:p-10 border border-slate-200/80 shadow-sm leading-relaxed text-sm sm:text-base text-gray-700 font-sans space-y-4 whitespace-pre-line">
                 {post.content}
               </div>
 
@@ -183,7 +192,7 @@ export default function SingleBlogPostPage() {
                   {post.tags.map((t) => (
                     <span
                       key={t}
-                      className="px-3 py-1 rounded-full bg-white dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-xs text-gray-600 dark:text-gray-300 font-medium"
+                      className="px-3 py-1 rounded-full bg-white border border-slate-200 text-xs text-gray-600 font-medium"
                     >
                       #{t}
                     </span>

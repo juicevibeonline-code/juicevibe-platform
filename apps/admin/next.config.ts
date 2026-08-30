@@ -6,27 +6,11 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "api.juicevibe.lk",
-      },
-      {
-        protocol: "https",
-        hostname: "res.cloudinary.com",
-      },
-      {
-        protocol: "https",
-        hostname: "juice-vibeapi.up.railway.app",
-      },
-      {
-        protocol: "https",
-        hostname: "juice-vibe-waskaduwa-api.vercel.app",
+        hostname: "**",
       },
       {
         protocol: "http",
-        hostname: "localhost",
-      },
-      {
-        protocol: "https",
-        hostname: "images.unsplash.com",
+        hostname: "**",
       },
     ],
   },

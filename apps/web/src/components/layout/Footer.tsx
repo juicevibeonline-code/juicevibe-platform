@@ -85,6 +85,7 @@ export function Footer() {
                   src="/images/Logo.jpeg"
                   alt="Juice Vibe Logo"
                   fill
+                  sizes="48px"
                   className="object-cover"
                 />
               </div>
