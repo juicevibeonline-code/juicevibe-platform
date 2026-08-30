@@ -249,7 +249,7 @@ export default function GalleryManager() {
                   sizes="(max-width: 768px) 100vw, 300px"
                 />
                 <div className="absolute top-2 left-2">
-                  <Badge variant="outline" className="bg-ink-dark/80 backdrop-blur-sm text-[9px] font-mono uppercase text-primary border-primary/30">
+                  <Badge variant="primary" className="bg-ink-dark/80 backdrop-blur-sm text-[9px] font-mono uppercase text-primary border-primary/30">
                     {img.category || "General"}
                   </Badge>
                 </div>
