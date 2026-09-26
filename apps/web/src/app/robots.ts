@@ -1,7 +1,8 @@
 import type { MetadataRoute } from "next";
+import { getSiteUrl } from "@/lib/utils";
 
 export default function robots(): MetadataRoute.Robots {
-  const baseUrl = (process.env.NEXT_PUBLIC_SITE_URL || "https://juicevibe.lk").replace(/\/+$/, "");
+  const baseUrl = getSiteUrl();
 
   return {
     rules: {

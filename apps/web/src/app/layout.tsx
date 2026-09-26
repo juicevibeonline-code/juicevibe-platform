@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { FloatingCart } from "@/components/cart/FloatingCart";
 import { CartDrawer } from "@/components/cart/CartDrawer";
+import { getSiteUrl } from "@/lib/utils";
+
+const siteUrl = getSiteUrl();
 
 // Production Build Marker: 2026-07-27-01
 export const metadata: Metadata = {
@@ -29,14 +32,14 @@ export const metadata: Metadata = {
   authors: [{ name: "Juice Vibe" }],
   creator: "Juice Vibe",
   publisher: "Juice Vibe",
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://juicevibe.lk"),
+  metadataBase: new URL(siteUrl),
   alternates: {
-    canonical: process.env.NEXT_PUBLIC_SITE_URL || "https://juicevibe.lk",
+    canonical: siteUrl,
   },
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: process.env.NEXT_PUBLIC_SITE_URL || "https://juicevibe.lk",
+    url: siteUrl,
     siteName: "Juice Vibe",
     title: "Juice Vibe - Sip the Good Vibes",
     description:

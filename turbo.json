@@ -1,6 +1,24 @@
 {
   "$schema": "https://turbo.build/schema.json",
   "globalDependencies": ["**/.env.*local"],
+  "globalEnv": [
+    "NEXT_PUBLIC_SITE_URL",
+    "SITE_URL",
+    "NEXT_PUBLIC_API_URL",
+    "DATABASE_URL",
+    "JWT_SECRET",
+    "JWT_REFRESH_SECRET",
+    "JWT_ACCESS_EXPIRATION",
+    "JWT_REFRESH_EXPIRATION",
+    "PORT",
+    "FRONTEND_URL",
+    "ADMIN_URL",
+    "CLOUDINARY_CLOUD_NAME",
+    "CLOUDINARY_API_KEY",
+    "CLOUDINARY_API_SECRET",
+    "CLOUDINARY_URL",
+    "NODE_ENV"
+  ],
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
