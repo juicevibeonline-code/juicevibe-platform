@@ -41,7 +41,7 @@ export default function ContactPage() {
     {
       icon: Mail,
       title: "Email Us",
-      details: [settings.business_email || "hello@juicevibe.com"],
+      details: [settings.business_email || "hello@juicevibe.lk"],
       href: settings.business_email ? `mailto:${settings.business_email}` : undefined,
     },
     {

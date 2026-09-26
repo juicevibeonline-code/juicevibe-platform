@@ -7,7 +7,7 @@ import bcrypt from "bcryptjs";
 
 const prisma = new PrismaClient();
 
-const EMAIL = "admin@juicevibe.com";
+const EMAIL = "admin@juicevibe.lk";
 const NEW_PASSWORD = "Admin@123";
 
 async function main() {

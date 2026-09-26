@@ -6,7 +6,7 @@ export const DEFAULT_SETTINGS: Record<string, string> = {
   business_tagline: "Sip the Good Vibes",
   business_description: "Premium tropical juice café offering fresh, organic, and handcrafted beverages. Experience the finest juices and healthy drinks in Waskaduwa.",
   business_phone: "+94 71 843 5876",
-  business_email: "hello@juicevibe.com",
+  business_email: "hello@juicevibe.lk",
   business_address: "No. 89 Bandaragama Road, Waskaduwa, Sri Lanka, 12580",
   business_city: "Waskaduwa",
   business_country: "Sri Lanka",

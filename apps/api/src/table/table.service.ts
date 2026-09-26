@@ -9,7 +9,7 @@ export class TableService {
     const baseUrl =
       process.env.FRONTEND_URL ||
       (process.env.NODE_ENV === "production"
-        ? "https://juice-vibe-waskaduwa-web.vercel.app"
+        ? "https://juicevibe.lk"
         : "http://localhost:3000");
     return baseUrl.endsWith("/") ? baseUrl.slice(0, -1) : baseUrl;
   }

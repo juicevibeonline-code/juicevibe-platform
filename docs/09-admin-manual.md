@@ -10,7 +10,7 @@
 
 - **Admin Dashboard URL**: `https://admin.juicevibe.lk` (or local `http://localhost:3001`)
 - **Initial Login Credentials**:
-  - **Email**: `admin@juicevibe.com`
+  - **Email**: `admin@juicevibe.lk`
   - **Password**: `[PROVIDED_SEPARATELY_VIA_SECURE_VAULT]` *(Default: `Admin@123` on first install)*
 
 > [!IMPORTANT]

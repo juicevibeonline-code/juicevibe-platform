@@ -3,8 +3,8 @@ export const siteConfig = {
   tagline: "Sip the Good Vibes",
   description:
     "Premium tropical juice café offering fresh, organic, and handcrafted beverages. Experience the finest juices, smoothies, and healthy drinks in Bentota, Sri Lanka.",
-  url: "https://juicevibe.com",
-  ogImage: "/og-image.jpg",
+  url: "https://juicevibe.lk",
+  ogImage: "/images/Logo.jpeg",
   links: {
     facebook: "https://facebook.com/juicevibe",
     instagram: "https://instagram.com/juicevibe",
@@ -13,7 +13,7 @@ export const siteConfig = {
   contact: {
     phone: "+94718435876",
     whatsapp: "94718435876",
-    email: "hello@juicevibe.com",
+    email: "hello@juicevibe.lk",
     address: {
       street: "Galle Road",
       city: "Bentota",

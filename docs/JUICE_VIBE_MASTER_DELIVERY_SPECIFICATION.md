@@ -178,7 +178,7 @@ ENABLE_EXPERIMENTAL_COREPACK=1
 
 ### 8.1 Access Credentials
 - **Admin Portal URL**: `https://admin.juicevibe.lk` (or local `http://localhost:3001`)
-- **Default Email**: `admin@juicevibe.com`
+- **Default Email**: `admin@juicevibe.lk`
 - **Default Password**: `Admin@123` *(Change immediately upon first login)*
 
 ### 8.2 Dispatching Orders

@@ -145,7 +145,7 @@ export default function SystemSettings() {
         footer_tagline: settingsData.footer_tagline || "Sip the good vibes, crafted with 💚 in Sri Lanka.",
 
         business_phone: settingsData.business_phone || "+94 71 843 5876",
-        business_email: settingsData.business_email || "hello@juicevibe.com",
+        business_email: settingsData.business_email || "hello@juicevibe.lk",
         business_address: settingsData.business_address || "No. 89 Bandaragama Road, Waskaduwa, Sri Lanka, 12580",
         google_maps_link: settingsData.google_maps_link || "https://maps.google.com/?q=Juice+Vibe+Waskaduwa",
         social_whatsapp: settingsData.social_whatsapp || "94718435876",

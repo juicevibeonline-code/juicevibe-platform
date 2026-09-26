@@ -11,10 +11,10 @@ async function main() {
   // ─── Admin User ───────────────────────────────────────────────
   const hashedPassword = "$2a$12$Ql6rP3QJeWvLmRX8kD2aXu5mHKjQzNsOxPYvwAZbTlFcGiE9uRsKi";
   await prisma.user.upsert({
-    where: { email: "admin@juicevibe.com" },
+    where: { email: "admin@juicevibe.lk" },
     update: {},
     create: {
-      email: "admin@juicevibe.com",
+      email: "admin@juicevibe.lk",
       name: "Admin",
       password: hashedPassword,
       role: "admin",
@@ -318,7 +318,7 @@ async function main() {
   }
 
   console.log("✅ Seed completed successfully!");
-  console.log("   Admin login: admin@juicevibe.com / Admin@123");
+  console.log("   Admin login: admin@juicevibe.lk / Admin@123");
 }
 
 main()

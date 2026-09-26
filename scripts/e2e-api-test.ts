@@ -237,7 +237,7 @@ async function main() {
 
   await runTest("Auth", "Admin Login", "POST", "/api/auth/login", async () => {
     const res = await request("POST", "/auth/login", {
-      body: { email: "admin@juicevibe.com", password: "Admin@123" },
+      body: { email: "admin@juicevibe.lk", password: "Admin@123" },
       expectedStatus: 200,
     });
     if (!res.data?.success || !res.data?.data?.tokens?.accessToken) {

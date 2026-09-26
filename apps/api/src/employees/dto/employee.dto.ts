@@ -11,7 +11,7 @@ export class CreateEmployeeDto {
   @IsString()
   name: string;
 
-  @ApiProperty({ example: "kasun@juicevibe.com" })
+  @ApiProperty({ example: "kasun@juicevibe.lk" })
   @IsEmail()
   email: string;
 
@@ -45,7 +45,7 @@ export class UpdateEmployeeDto {
   @IsOptional()
   name?: string;
 
-  @ApiPropertyOptional({ example: "kasun@juicevibe.com" })
+  @ApiPropertyOptional({ example: "kasun@juicevibe.lk" })
   @IsEmail()
   @IsOptional()
   email?: string;

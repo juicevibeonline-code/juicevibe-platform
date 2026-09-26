@@ -38,26 +38,30 @@ export async function bootstrapLambda() {
     "https://admin.juicevibe.lk",
     "https://juicevibe.lk",
     "https://www.juicevibe.lk",
-  ].map((url) => url?.trim()).filter(Boolean) as string[];
+  ].map((url) => url?.trim().replace(/\/+$/, "")).filter(Boolean) as string[];
 
   app.enableCors({
     origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
       if (!origin) return callback(null, true);
       
-      const isLocalhost = /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin);
+      const normalizedOrigin = origin.replace(/\/+$/, "");
+      const isLocalhost = /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(normalizedOrigin);
       const isAllowed =
-        origin.includes("juicevibe.lk") ||
-        origin.endsWith(".vercel.app") ||
-        origin.endsWith(".netlify.app") ||
-        origin.endsWith(".railway.app") ||
-        origin.endsWith(".up.railway.app") ||
-        allowedOrigins.includes(origin) ||
+        normalizedOrigin === "https://juicevibe.lk" ||
+        normalizedOrigin === "https://www.juicevibe.lk" ||
+        normalizedOrigin === "https://admin.juicevibe.lk" ||
+        normalizedOrigin.endsWith(".juicevibe.lk") ||
+        normalizedOrigin.endsWith(".vercel.app") ||
+        normalizedOrigin.endsWith(".netlify.app") ||
+        normalizedOrigin.endsWith(".railway.app") ||
+        normalizedOrigin.endsWith(".up.railway.app") ||
+        allowedOrigins.includes(normalizedOrigin) ||
         isLocalhost;
 
       if (isAllowed) {
         return callback(null, true);
       }
-      return callback(null, true);
+      return callback(new Error(`CORS origin not allowed: ${origin}`), false);
     },
     credentials: true,
     methods: ["GET", "HEAD", "PUT", "PATCH", "POST", "DELETE", "OPTIONS"],

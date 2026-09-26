@@ -227,9 +227,9 @@ export function Hero() {
             </motion.div>
 
             {/* Dominating Headline */}
-            <div className="mt-6 font-heading font-black text-dark-green" style={{ fontSize: "clamp(3.5rem, 8vw, 7.5rem)", lineHeight: 0.95 }}>
+            <h1 className="mt-6 font-heading font-black text-dark-green" style={{ fontSize: "clamp(3.5rem, 8vw, 7.5rem)", lineHeight: 0.95 }}>
               <div className="overflow-hidden py-1">
-                <motion.h1
+                <motion.span
                   key={`${activeThemeKey}-line1`}
                   initial={{ y: "100%" }}
                   animate={{ y: 0 }}
@@ -237,10 +237,10 @@ export function Hero() {
                   className="block"
                 >
                   {activeTheme.line1}
-                </motion.h1>
+                </motion.span>
               </div>
               <div className="overflow-hidden py-1">
-                <motion.h1
+                <motion.span
                   key={`${activeThemeKey}-line2`}
                   initial={{ y: "100%" }}
                   animate={{ y: 0 }}
@@ -248,7 +248,7 @@ export function Hero() {
                   className="block"
                 >
                   {activeTheme.line2}
-                </motion.h1>
+                </motion.span>
               </div>
               <div className="overflow-hidden py-1">
                 <motion.span
@@ -264,7 +264,7 @@ export function Hero() {
                   {activeTheme.line3}
                 </motion.span>
               </div>
-            </div>
+            </h1>
 
             {/* Supporting Paragraph */}
             <motion.p

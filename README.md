@@ -188,7 +188,7 @@ pnpm db:seed
 pnpm dev
 ```
 * **Customer Storefront:** `http://localhost:3000`
-* **Admin Dashboard:** `http://localhost:3001` (Login: `admin@juicevibe.com` / `Admin@123`)
+* **Admin Dashboard:** `http://localhost:3001` (Login: `admin@juicevibe.lk` / `Admin@123`)
 * **Backend API:** `http://localhost:4000/api`
 * **Swagger API Docs:** `http://localhost:4000/api/docs`
 

@@ -47,31 +47,39 @@ async function bootstrap() {
 
   const allowedOrigins = [
     ...(process.env.FRONTEND_URL ? process.env.FRONTEND_URL.split(",") : []),
-    ...(process.env.ADMIN_URL ? process.env.ADMIN_URL.split(",") : ["http://localhost:3001"]),
-  ].map((url) => url.trim()).filter(Boolean);
+    ...(process.env.ADMIN_URL ? process.env.ADMIN_URL.split(",") : []),
+    "https://juicevibe.lk",
+    "https://www.juicevibe.lk",
+    "https://admin.juicevibe.lk",
+    "http://localhost:3000",
+    "http://localhost:3001",
+  ].map((url) => url.trim().replace(/\/+$/, "")).filter(Boolean);
 
   app.enableCors({
     origin: (origin, callback) => {
       // Allow requests with no origin (mobile apps, Postman, server-to-server)
       if (!origin) return callback(null, true);
       
-      // Allow local development origins (localhost or 127.0.0.1 on any port) dynamically
-      const isLocalhost = /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin);
+      const normalizedOrigin = origin.replace(/\/+$/, "");
       
-      // Allow any vercel.app, netlify.app, railway.app, or juicevibe.lk domain automatically
-      if (
-        origin.includes("juicevibe.lk") ||
-        origin.endsWith(".vercel.app") ||
-        origin.endsWith(".netlify.app") ||
-        origin.endsWith(".railway.app") ||
-        origin.endsWith(".up.railway.app") ||
-        origin.endsWith(".lk") ||
-        allowedOrigins.includes(origin) ||
-        isLocalhost
-      ) {
+      // Allow local development origins (localhost or 127.0.0.1 on any port) dynamically
+      const isLocalhost = /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(normalizedOrigin);
+      
+      // Allow official juicevibe.lk domains and specific deployment preview domains
+      const isDomainAllowed =
+        normalizedOrigin === "https://juicevibe.lk" ||
+        normalizedOrigin === "https://www.juicevibe.lk" ||
+        normalizedOrigin === "https://admin.juicevibe.lk" ||
+        normalizedOrigin.endsWith(".juicevibe.lk") ||
+        normalizedOrigin.endsWith(".vercel.app") ||
+        normalizedOrigin.endsWith(".netlify.app") ||
+        normalizedOrigin.endsWith(".railway.app") ||
+        normalizedOrigin.endsWith(".up.railway.app");
+
+      if (isDomainAllowed || allowedOrigins.includes(normalizedOrigin) || isLocalhost) {
         return callback(null, true);
       }
-      return callback(null, true);
+      return callback(new Error(`CORS origin not allowed: ${origin}`), false);
     },
     credentials: true,
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],

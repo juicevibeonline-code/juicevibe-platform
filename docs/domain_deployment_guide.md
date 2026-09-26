@@ -29,7 +29,7 @@ This guide details the step-by-step process to deploy the complete **JuiceVibe M
    # Push latest schema tables to Neon Cloud DB
    pnpm db:push
 
-   # Seed default admin user (admin@juicevibe.com / Admin@123), menu items, and settings
+   # Seed default admin user (admin@juicevibe.lk / Admin@123), menu items, and settings
    pnpm db:seed
    ```
 
@@ -122,8 +122,8 @@ In your Domain Registrar / DNS Provider (Cloudflare / LK Domain Registry DNS), a
 
 ## 🔒 Step 6: Verification & Testing Checklist
 
-- [x] **Database**: Schema pushed & default seed data loaded (`admin@juicevibe.com` / `Admin@123`).
+- [x] **Database**: Schema pushed & default seed data loaded (`admin@juicevibe.lk` / `Admin@123`).
 - [ ] **Railway NestJS API**: `https://api.juicevibe.lk/api` returns active NestJS API status.
 - [ ] **Storefront Web App**: `https://juicevibe.lk` loads products, categories, and shopping cart.
-- [ ] **Admin Dashboard**: `https://admin.juicevibe.lk` logs in with `admin@juicevibe.com`.
+- [ ] **Admin Dashboard**: `https://admin.juicevibe.lk` logs in with `admin@juicevibe.lk`.
 - [ ] **Real-Time Orders**: Test order placement; verifies WebSocket communication between API, Web, and Admin.

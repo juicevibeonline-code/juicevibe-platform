@@ -311,7 +311,7 @@ export default function StaffRoster() {
                 <label className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">Corporate Email Address</label>
                 <input
                   type="email"
-                  placeholder="kasun@juicevibe.com"
+                  placeholder="kasun@juicevibe.lk"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="w-full bg-ink-dark border border-border text-foreground font-mono text-xs px-3 py-2 rounded-lg focus:outline-none focus:border-primary/50"

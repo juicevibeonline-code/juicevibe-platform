@@ -111,7 +111,7 @@ export default function LoginPage() {
               </label>
               <Input
                 type="email"
-                placeholder="name@juicevibe.com"
+                placeholder="name@juicevibe.lk"
                 leftIcon={<Mail className="h-4 w-4 text-muted-foreground" />}
                 error={errors.email?.message}
                 className="w-full bg-[#0F2A1E] border-border text-foreground focus:border-primary focus:ring-1 focus:ring-primary/20 placeholder:text-muted-foreground/40 h-10 font-mono text-xs rounded-lg"
