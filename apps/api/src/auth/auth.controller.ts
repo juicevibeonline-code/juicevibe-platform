@@ -43,16 +43,6 @@ export class AuthController {
     return ApiResponseDto.ok(user);
   }
 
-  @Get("test-prisma")
-  testPrisma() {
-    const db = require("@juice-vibe/database");
-    return {
-      dbKeys: Object.keys(db),
-      dbType: typeof db,
-      prismaType: typeof db.prisma,
-      prismaObject: db.prisma ? "defined" : "undefined",
-    };
-  }
 
   @Get("customers")
   @UseGuards(JwtAuthGuard, RolesGuard)

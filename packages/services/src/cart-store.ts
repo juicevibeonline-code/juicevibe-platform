@@ -1,92 +1,96 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import type { CartItem, MenuItem, ItemVariant, AddOn } from "@juice-vibe/types";
-import { generateId } from "@juice-vibe/utils";
+import type { MenuItem } from "@juice-vibe/types";
+
+export interface CartItem extends MenuItem {
+  cartItemId: string;
+  quantity: number;
+}
 
 export interface CartState {
   items: CartItem[];
-  couponCode: string | null;
-  couponDiscount: number;
-  isOpen: boolean;
-  addItem: (menuItem: MenuItem, quantity?: number, variant?: ItemVariant, addOns?: AddOn[], notes?: string) => void;
-  removeItem: (id: string) => void;
-  updateQuantity: (id: string, quantity: number) => void;
+  tableId: string | null;
+  setTableId: (tableId: string | null) => void;
+  addItem: (item: MenuItem, quantity?: number) => void;
+  removeItem: (cartItemId: string) => void;
+  updateQuantity: (cartItemId: string, quantity: number) => void;
   clearCart: () => void;
-  applyCoupon: (code: string, discount: number) => void;
-  removeCoupon: () => void;
-  toggleCart: () => void;
-  setOpen: (open: boolean) => void;
-  getSubtotal: () => number;
-  getTotal: () => number;
-  getItemCount: () => number;
+  isOpen: boolean;
+  setIsOpen: (isOpen: boolean) => void;
+  getTotals: () => { subtotal: number; count: number };
+  couponCode?: string | null;
+  couponDiscount?: number;
+  applyCoupon?: (code: string, discount: number) => void;
+  removeCoupon?: () => void;
 }
 
 export const useCartStore = create<CartState>()(
   persist(
     (set, get) => ({
       items: [],
+      tableId: null,
+      setTableId: (tableId) => set({ tableId }),
+      isOpen: false,
+      setIsOpen: (isOpen) => set({ isOpen }),
       couponCode: null,
       couponDiscount: 0,
-      isOpen: false,
 
-      addItem: (menuItem, quantity = 1, variant, addOns = [], notes = "") => {
-        const existing = get().items.find(
-          (i) => i.menuItem.id === menuItem.id && i.variant?.id === variant?.id
-        );
-        if (existing) {
-          get().updateQuantity(existing.id, existing.quantity + quantity);
-          return;
-        }
-        const variantPrice = variant?.priceAdjustment ?? 0;
-        const addOnsPrice = addOns.reduce((sum, a) => sum + a.price, 0);
-        const totalPrice = (menuItem.price + variantPrice + addOnsPrice) * quantity;
+      addItem: (item, quantity = 1) =>
+        set((state) => {
+          const existingItem = state.items.find((i) => i.id === item.id);
+          if (existingItem) {
+            return {
+              items: state.items.map((i) =>
+                i.id === item.id ? { ...i, quantity: i.quantity + quantity } : i
+              ),
+              isOpen: true,
+            };
+          }
 
-        const item: CartItem = {
-          id: generateId(),
-          menuItem,
-          quantity,
-          variant,
-          addOns,
-          notes,
-          totalPrice,
-        };
-        set((state) => ({ items: [...state.items, item] }));
-      },
+          return {
+            items: [
+              ...state.items,
+              {
+                ...item,
+                cartItemId: typeof crypto !== "undefined" && crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).substring(2),
+                quantity,
+              },
+            ],
+            isOpen: true,
+          };
+        }),
 
-      removeItem: (id) =>
-        set((state) => ({ items: state.items.filter((i) => i.id !== id) })),
+      removeItem: (cartItemId) =>
+        set((state) => ({
+          items: state.items.filter((i) => i.cartItemId !== cartItemId),
+        })),
 
-      updateQuantity: (id, quantity) =>
+      updateQuantity: (cartItemId, quantity) =>
         set((state) => ({
           items: state.items.map((i) =>
-            i.id === id
-              ? {
-                  ...i,
-                  quantity,
-                  totalPrice:
-                    (i.menuItem.price +
-                      (i.variant?.priceAdjustment ?? 0) +
-                      i.addOns.reduce((s, a) => s + a.price, 0)) *
-                    quantity,
-                }
-              : i
+            i.cartItemId === cartItemId ? { ...i, quantity: Math.max(1, quantity) } : i
           ),
         })),
 
-      clearCart: () => set({ items: [], couponCode: null, couponDiscount: 0 }),
+      clearCart: () => set({ items: [], tableId: null, couponCode: null, couponDiscount: 0 }),
+
+      getTotals: () => {
+        const { items } = get();
+        return items.reduce(
+          (acc, item) => ({
+            subtotal: acc.subtotal + item.price * item.quantity,
+            count: acc.count + item.quantity,
+          }),
+          { subtotal: 0, count: 0 }
+        );
+      },
+
       applyCoupon: (code, discount) => set({ couponCode: code, couponDiscount: discount }),
       removeCoupon: () => set({ couponCode: null, couponDiscount: 0 }),
-      toggleCart: () => set((state) => ({ isOpen: !state.isOpen })),
-      setOpen: (isOpen) => set({ isOpen }),
-
-      getSubtotal: () => get().items.reduce((sum, i) => sum + i.totalPrice, 0),
-      getTotal: () => {
-        const subtotal = get().items.reduce((sum, i) => sum + i.totalPrice, 0);
-        const discount = get().couponDiscount;
-        return Math.max(0, subtotal - discount);
-      },
-      getItemCount: () => get().items.reduce((sum, i) => sum + i.quantity, 0),
     }),
-    { name: "juice-vibe-cart", partialize: (state) => ({ items: state.items, couponCode: state.couponCode, couponDiscount: state.couponDiscount }) }
+    {
+      name: "juice-vibe-cart",
+      partialize: (state) => ({ items: state.items, tableId: state.tableId, couponCode: state.couponCode, couponDiscount: state.couponDiscount }),
+    }
   )
 );

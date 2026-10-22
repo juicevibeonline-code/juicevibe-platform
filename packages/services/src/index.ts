@@ -1,6 +1,6 @@
 export { apiClient, injectAuthStore } from "./api-client";
 export { useAuthStore, type AuthState } from "./auth-store";
-export { useCartStore, type CartState } from "./cart-store";
+export { useCartStore, type CartState, type CartItem } from "./cart-store";
 export { useUIStore, type UIState } from "./ui-store";
 export type { ApiClient } from "./api-client";
 export { authService } from "./auth-service";

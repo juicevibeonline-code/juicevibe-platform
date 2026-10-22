@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 import { useCartStore } from "@/store/cart";
 import { formatPrice } from "@/lib/utils";
-import { createOrder } from "@/lib/api";
+import { orderService } from "@juice-vibe/services";
 import { Button } from "@/components/ui/button";
 
 type Step = "cart" | "checkout" | "success";
@@ -69,20 +69,21 @@ export function CartDrawer() {
     setIsSubmitting(true);
 
     try {
-      const order = await createOrder({
+      const order = await orderService.createOrder({
         customerName: form.customerName,
         customerPhone: form.customerPhone,
         customerEmail: form.customerEmail || undefined,
-        type: tableId ? "dine_in" : form.type,
-        paymentMethod: form.paymentMethod,
+        type: (tableId ? "dine_in" : form.type) as any,
+        paymentMethod: form.paymentMethod as any,
         notes: form.notes || undefined,
         tableId: tableId || undefined,
         items: items.map((item) => ({
+          menuItemId: item.id,
           name: item.name,
           price: item.price,
           quantity: item.quantity,
         })),
-      });
+      } as any);
       setOrderNumber(order.orderNumber);
       clearCart();
       setStep("success");
@@ -351,7 +352,16 @@ export function CartDrawer() {
                     </div>
                   )}
                   <div className="mt-4 w-full space-y-2">
-                    <Button variant="primary" className="w-full h-12 rounded-2xl" onClick={() => setIsOpen(false)}>
+                    {orderNumber && (
+                      <a
+                        href={`/track?orderNumber=${orderNumber}`}
+                        onClick={() => setIsOpen(false)}
+                        className="w-full h-12 rounded-2xl bg-dark-green text-white flex items-center justify-center font-bold text-sm hover:bg-dark-green/90 transition-all shadow-md"
+                      >
+                        Track Live Order Status →
+                      </a>
+                    )}
+                    <Button variant="ghost" className="w-full h-12 rounded-2xl text-gray-500" onClick={() => setIsOpen(false)}>
                       Continue Shopping
                     </Button>
                   </div>

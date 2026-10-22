@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
-import { submitContactForm } from "@/lib/api";
+import { contactService } from "@juice-vibe/services";
 import { useStorefrontSettings } from "@/hooks/use-storefront-settings";
 
 export default function ContactPage() {
@@ -64,7 +64,7 @@ export default function ContactPage() {
     setIsSubmitting(true);
     setError(null);
     try {
-      await submitContactForm({
+      await contactService.submitMessage({
         name: formState.name,
         email: formState.email,
         phone: formState.phone || undefined,

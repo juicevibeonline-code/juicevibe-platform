@@ -2,7 +2,7 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowUp } from "lucide-react";
-import { useScrollPosition } from "@/hooks/use-scroll-position";
+import { useScrollPosition } from "@juice-vibe/hooks";
 
 export function BackToTop() {
   const { scrollY } = useScrollPosition();

@@ -4,12 +4,11 @@ import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X } from "lucide-react";
-import { useScrollPosition } from "@/hooks/use-scroll-position";
+import { Menu, X, Sparkles, ArrowRight } from "lucide-react";
+import { useScrollPosition } from "@juice-vibe/hooks";
 import { useStorefrontSettings } from "@/hooks/use-storefront-settings";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { Sparkles, ArrowRight } from "lucide-react";
 
 const navLinks = [
   { href: "/", label: "Home" },

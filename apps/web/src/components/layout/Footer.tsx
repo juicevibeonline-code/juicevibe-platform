@@ -4,7 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Mail, Phone, MapPin, Send, CheckCircle, AlertCircle, ArrowRight } from "lucide-react";
 import { useState } from "react";
-import { subscribeToNewsletter } from "@/lib/api";
+import { contactService } from "@juice-vibe/services";
 import { useStorefrontSettings } from "@/hooks/use-storefront-settings";
 
 const FacebookIcon = ({ className }: { className?: string }) => (
@@ -52,7 +52,7 @@ export function Footer() {
     setIsSubscribing(true);
     setSubscribeError(null);
     try {
-      await subscribeToNewsletter(email);
+      await contactService.subscribe(email);
       setSubscribed(true);
       setEmail("");
       setTimeout(() => setSubscribed(false), 5000);
